@@ -22,6 +22,7 @@
         "sstream": "cpp",
         "streambuf": "cpp",
         "system_error": "cpp",
-        "lvgl.h": "c"
+        "lvgl.h": "c",
+        "lv_conf.h": "c"
     }
 }
