@@ -986,6 +986,8 @@ void loop()
             http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20G28"); //获取home状态
           }else if(httpswitch==4){
             http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"); //获取levelling状态
+          }else if(httpswitch==5){
+            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20KNOMI_STATUS"); // independant for home and leveling
           }else{
 
           }
@@ -1099,6 +1101,29 @@ void loop()
                       levelling_status = 1;    
                       display_step = 13;  //更快进入显示  
                       timer_contne = 0;                   
+                  }else{
+                      levelling_status = 0; 
+                  }
+
+                  httpswitch = 5;
+              }else if(httpswitch == 5){   // homing and leveling
+
+                  String nameStr10 = doc["result"]["status"]["gcode_macro KNOMI_STATUS"]["probing"].as<String>();
+                  Serial.println(nameStr10);
+                  String nameStr11 = doc["result"]["status"]["gcode_macro KNOMI_STATUS"]["homing"].as<String>();
+                  Serial.println(nameStr11);
+
+                  if(nameStr10 == "true"){
+                      levelling_status = 1;    
+                      display_step = 13;  //更快进入显示  
+                      timer_contne = 0;                   
+                  }else{
+                      levelling_status = 0; 
+                  }
+                  if(nameStr11 == "true"){
+                      homing_status = 1; 
+                      display_step = 12;  //更快进入显示 
+                      timer_contne = 0;  
                   }else{
                       levelling_status = 0; 
                   }
