@@ -1080,7 +1080,7 @@ void loop()
                   httpswitch = 3;
               }else if(httpswitch == 3){   //home状态
 
-                  String nameStr8 = doc["result"]["status"]["gcode_macro G28"]["homing"].as<String>();
+                  String nameStr8 = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["homing"].as<String>();
                   Serial.println(nameStr8);
 
                   if(nameStr8 == "true"){
@@ -1094,7 +1094,7 @@ void loop()
                   httpswitch = 4;
               }else if(httpswitch == 4){   //levelling状态
 
-                  String nameStr9 = doc["result"]["status"]["gcode_macro BED_MESH_CALIBRATE"]["probing"].as<String>();
+                  String nameStr9 = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["probing"].as<String>();
                   Serial.println(nameStr9);
 
                   if(nameStr9 == "true"){
@@ -1103,29 +1103,6 @@ void loop()
                       timer_contne = 0;                   
                   }else{
                       levelling_status = 0; 
-                  }
-
-                  httpswitch = 5;
-              }else if(httpswitch == 5){   // homing and leveling
-
-                  String nameStr10 = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["probing"].as<String>();
-                  Serial.println(nameStr10);
-                  String nameStr11 = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["homing"].as<String>();
-                  Serial.println(nameStr11);
-
-                  if(nameStr10 == "true"){
-                      levelling_status = 1;    
-                      display_step = 13;  //更快进入显示  
-                      timer_contne = 0;                   
-                  }else{
-                      levelling_status = 0; 
-                  }
-                  if(nameStr11 == "true"){
-                      homing_status = 1; 
-                      display_step = 12;  //更快进入显示 
-                      timer_contne = 0;  
-                  }else{
-                      homing_status = 0;  
                   }
 
                   httpswitch = 1;
