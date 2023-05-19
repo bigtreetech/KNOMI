@@ -1125,7 +1125,7 @@ void loop()
                       display_step = 12;  //更快进入显示 
                       timer_contne = 0;  
                   }else{
-                      levelling_status = 0; 
+                      homing_status = 0;  
                   }
 
                   httpswitch = 1;
