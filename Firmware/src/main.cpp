@@ -983,11 +983,9 @@ void loop()
           }else if(httpswitch==2){
             http.begin("http://"+klipper_ip+"/printer/objects/query?display_status"); //获取打印
           }else if(httpswitch==3){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20G28"); //获取home状态
+            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20_KNOMI_STATUS"); //获取home状态
           }else if(httpswitch==4){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"); //获取levelling状态
-          }else if(httpswitch==5){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20_KNOMI_STATUS"); // independant for home and leveling
+            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20_KNOMI_STATUS"); //获取levelling状态
           }else{
 
           }
