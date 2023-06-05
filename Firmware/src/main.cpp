@@ -983,9 +983,9 @@ void loop()
           }else if(httpswitch==2){
             http.begin("http://"+klipper_ip+"/printer/objects/query?display_status"); //获取打印
           }else if(httpswitch==3){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20G28"); //获取home状态
+            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20_KNOMI_STATUS"); //获取home状态
           }else if(httpswitch==4){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"); //获取levelling状态
+            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20_KNOMI_STATUS"); //获取levelling状态
           }else{
 
           }
@@ -1078,7 +1078,7 @@ void loop()
                   httpswitch = 3;
               }else if(httpswitch == 3){   //home状态
 
-                  String nameStr8 = doc["result"]["status"]["gcode_macro G28"]["homing"].as<String>();
+                  String nameStr8 = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["homing"].as<String>();
                   Serial.println(nameStr8);
 
                   if(nameStr8 == "true"){
@@ -1092,7 +1092,7 @@ void loop()
                   httpswitch = 4;
               }else if(httpswitch == 4){   //levelling状态
 
-                  String nameStr9 = doc["result"]["status"]["gcode_macro BED_MESH_CALIBRATE"]["probing"].as<String>();
+                  String nameStr9 = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["probing"].as<String>();
                   Serial.println(nameStr9);
 
                   if(nameStr9 == "true"){
