@@ -11,7 +11,8 @@
 extern const int LED;                         //设置LED引脚
 extern const char* HOST_NAME;                 //设置设备名
 extern int connectTimeOut_s;                 //WiFi连接超时时间，单位秒
-extern String klipper_ip;                     //暂时存储KlipperIP
+extern String klipper_api;                    //暂时存储KlipperAPI
+extern String tool_id;                        //暂时存储ToolID
 extern String wifi_ssid;                     //暂时存储wifi账号密码
 extern int connectTimeOut_s;                 //WiFi连接超时时间，单位秒
 
@@ -25,6 +26,8 @@ struct config_type
   char stassid[32];//定义配网得到的WIFI名长度(最大32字节)
   char stapsw[64];//定义配网得到的WIFI密码长度(最大64字节)
   char klipperip[32];//定义配网得到的klipperip长度(最大32字节)  
+  char klipperport[32];//定义配网得到的klipperip长度(最大32字节)  
+  char toolid[32];//定义配网得到的toolid长度(最大32字节)  
   char apmodeflag[32];//开机进入ap模式标志位(最大32字节) 
 };
 
@@ -49,7 +52,7 @@ void wifiConfig();                    //配置配网功能
 void wifiConfig_test();               //测试时使用
 void blinkLED(int led, int n, int t); //LED闪烁函数        //用不上LED可删除
 
-//===========需要保存的数据wifi账号、wifi密码、klipperIp===========
+//===========需要保存的数据wifi账号、wifi密码、klipperIp、klipperPort、toolId===========
 void savewificonfig();
 void readwificonfig();
 void deletewificonfig(); 

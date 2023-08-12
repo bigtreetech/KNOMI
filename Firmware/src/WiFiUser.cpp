@@ -19,7 +19,8 @@ IPAddress apIP(192, 168, 20, 1);            //设置AP的IP地址
  
 String wifi_ssid = "";                     //暂时存储wifi账号密码
 String wifi_pass = "";                     //暂时存储wifi账号密码
-String klipper_ip = "";                     //暂时存储KlipperIP
+String klipper_api = "";                   //暂时存储KlipperAPI
+String tool_id = "tool0";                   //暂时存储ToolID
 
 int connectTimeOut_s = 15;   //WiFi连接超时时间，单位秒
 const int LED = 2;                         //设置LED引脚
@@ -33,13 +34,13 @@ int wifi_addr = 1; //被写入数据的EEPROM地址编号  wifi-ssid-psw klipper
 
 
 
-//如开启WEB配网则可不用设置这里的参数，1为wifi ssid，2为密码，3为klipper ip ，4为 ap模式标志位
-config_type wificonf ={{""},{""},{""},{""}};
+//如开启WEB配网则可不用设置这里的参数，1为wifi ssid，2为密码，3为klipper ip, 4为klipper port, 5为tool id，6>为 ap模式标志位
+config_type wificonf ={{""},{""},{""},{""},{""},{""}};
 
 
-// #define ROOT_HTML  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.input{display: block; margin-top: 10px;}.input span{width: 100px; float: left; float: left; height: 36px; line-height: 36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: 50px; background-color: #438EF0; border-radius:8px; font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; margin-left:104px;}</style><body><form method=\"POST\" action=\"configwifi\"><p><span> BIQU TFT</P><label class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input type=\"text\"  name=\"pass\"><label class=\"input\"><span>Klipper IP</span> <input type=\"text\"  name=\"klipper\"></label><input class=\"btn\" type=\"submit\" name=\"submit\" value=\"Submie\"> </form>"
+// #define ROOT_HTML  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.input{display: block; margin-top: 10px;}.input span{width: 100px; float: left; float: left; height: 36px; line-height: 36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: 50px; background-color: #438EF0; border-radius:8px; font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; margin-left:104px;}</style><body><form method=\"POST\" action=\"configwifi\"><p><span> BIQU TFT</P><label class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input type=\"password\"  name=\"pass\"></label><label class=\"input\"><span>Klipper IP</span> <input type=\"text\"  name=\"klipper\" placeholder=\"1.2.3.4 or printer.local\"></label><label class=\"input\"><span>Klipper Port</span> <input type=\"number\"  name=\"port\" value=\"7125\" placeholder=\"7125\"></label><label class=\"input\"><span>Tool ID</span> <input type=\"number\"  name=\"tool\" value=\"0\"></label><input class=\"btn\" type=\"submit\" name=\"submit\" value=\"Submie\"> </form>"
 // #define ROOT_HTML_OK  "<!DOCTYPE html><html><head><title>WIFI SET</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.c,body {text-align: center}</style><body><form method=\"POST\" action=\"configwifi\"></label><p><span> submit successfully!</P><p><span> please manually close this page.</P> </form>"
-#define ROOT_HTML  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.input{display: block; margin-top: 10px;}.input span{width: 100px; float: left; float: left; height: 36px; line-height: 36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: 50px; background-color: #438EF0; border-radius:8px; font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; margin-left:104px;}</style><body><form method=\"POST\" action=\"configwifi\"><p><span> KNOMI :-)</P><label class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input type=\"text\"  name=\"pass\"><label class=\"input\"><span>Klipper IP</span> <input type=\"text\"  name=\"klipper\"></label><input class=\"btn\" type=\"submit\" name=\"submit\" value=\"SUBMIT\"> </form>"
+#define ROOT_HTML  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.input{display: block; margin-top: 10px;}.input span{width: 100px; float: left; float: left; height: 36px; line-height: 36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: 50px; background-color: #438EF0; border-radius:8px; font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; margin-left:104px;}</style><body><form method=\"POST\" action=\"configwifi\"><p><span> KNOMI :-)</P><label class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input type=\"password\"  name=\"pass\"></label><label class=\"input\"><span>Klipper IP</span> <input type=\"text\"  name=\"klipper\" placeholder=\"1.2.3.4 or printer.local\"></label><label class=\"input\"><span>Klipper Port</span> <input type=\"number\"  name=\"port\" value=\"7125\" placeholder=\"7125\"></label><label class=\"input\"><span>Tool ID</span> <input type=\"numeric\"  name=\"tool\" value=\"0\"></label><input class=\"btn\" type=\"submit\" name=\"submit\" value=\"SUBMIT\"> </form>"
 #define ROOT_HTML_OK  "<!DOCTYPE html><html><head><title>WIFI SET</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.c,body {text-align: center}</style><body><form method=\"POST\" action=\"configwifi\"></label><p><span> Submission successful!</P><p><span> You may now close this page.</P> </form>"
 /*
  * 处理网站根目录的访问请求
@@ -93,12 +94,16 @@ void handleConfigWifi()               //返回http状态
     return;
   }
   //klipper ip
-  if (server.hasArg("klipper")) 
+  if (server.hasArg("klipper") && server.hasArg("port")) 
   {
     Serial.print("got KlipperIP:");
-    klipper_ip = server.arg("klipper");  //获取html表单输入框name名为"KlipperIP"的内容
+    String klipper_ip = server.arg("klipper");  //获取html表单输入框name名为"KlipperIP"的内容
+    String klipper_port = server.arg("port");  //获取html表单输入框name名为"KlipperPort"的内容
 
     strcpy(wificonf.klipperip,klipper_ip.c_str());//名称复制  
+    strcpy(wificonf.klipperport,klipper_port.c_str());//名称复制  
+
+    klipper_api = klipper_ip + ":" + klipper_port;
 
     wificonf.apmodeflag[0] = '8';//8 STA模式
 
@@ -110,6 +115,26 @@ void handleConfigWifi()               //返回http状态
     server.send(200, "text/html", "<meta charset='UTF-8'>error, not found klipper ip");
     return;
   }
+  //tool id
+  if (server.hasArg("tool")) 
+  {
+    Serial.print("got ToolID:");
+    tool_id = "tool"+server.arg("tool");  //获取html表单输入框name名为"ToolID"的内容
+
+    strcpy(wificonf.toolid,tool_id.c_str());//名称复制  
+
+    Serial.println(tool_id);
+  } 
+  else 
+  {
+    Serial.println("not found tool id, using default of 0");
+
+    strcpy(wificonf.toolid,"tool0");//名称复制  
+
+    return;
+  }
+  delay(200);
+
   delay(200);
 
   // server.send(200, "text/html", "<meta charset='UTF-8'>SSID：" + wifi_ssid + "<br />password:" + wifi_pass + "<br />Trying to connect Trying to connect, please manually close this page."); //返回保存成功页面
@@ -293,10 +318,11 @@ void connectToWiFi(int timeOut_s) {
     Serial.print(" ,GateIP:");
     Serial.println(WiFi.gatewayIP());
 
-    Serial.print("KlipperIP:");
-    String str(wificonf.klipperip);
-    klipper_ip = wificonf.klipperip;
-    Serial.println(klipper_ip);
+    Serial.print("Klipper API:");
+    String str_ip(wificonf.klipperip);
+    String str_port(wificonf.klipperport);
+    klipper_api = str_ip + ":" + str_port;
+    Serial.println(klipper_api);
 
     Serial.print("WIFI status is:");
     Serial.print(WiFi.status());
@@ -359,7 +385,7 @@ void savewificonfig()
 //删除原有eeprom中的信息
 void deletewificonfig()
 {
-  config_type deletewifi ={{""},{""},{""},{"5"}};//5 AP模式标志位 ， 8 STA模式
+  config_type deletewifi ={{""},{""},{""},{""},{""},{"5"}};//5 AP模式标志位 ， 8 STA模式
   uint8_t *p = (uint8_t*)(&deletewifi);
   for (int i = 0; i < sizeof(deletewifi); i++)
   {

@@ -979,13 +979,13 @@ void loop()
           }
 
           if(httpswitch==1){
-            http.begin("http://"+klipper_ip+"/api/printer"); //获取温度
+            http.begin("http://"+klipper_api+"/api/printer"); //获取温度
           }else if(httpswitch==2){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?display_status"); //获取打印
+            http.begin("http://"+klipper_api+"/printer/objects/query?display_status"); //获取打印
           }else if(httpswitch==3){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20G28"); //获取home状态
+            http.begin("http://"+klipper_api+"/printer/objects/query?gcode_macro%20G28"); //获取home状态
           }else if(httpswitch==4){
-            http.begin("http://"+klipper_ip+"/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"); //获取levelling状态
+            http.begin("http://"+klipper_api+"/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"); //获取levelling状态
           }else{
 
           }
@@ -1004,15 +1004,15 @@ void loop()
 
                   String nameStr1 = doc["temperature"]["bed"]["actual"].as<String>();
                   String nameStr2 = doc["temperature"]["bed"]["target"].as<String>();
-                  String nameStr3 = doc["temperature"]["tool0"]["actual"].as<String>();
-                  String nameStr4 = doc["temperature"]["tool0"]["target"].as<String>();
+                  String nameStr3 = doc["temperature"][tool_id]["actual"].as<String>();
+                  String nameStr4 = doc["temperature"][tool_id]["target"].as<String>();
                   String nameStr5 = doc["state"]["flags"]["printing"].as<String>();
                   String nameStr6 = doc["state"]["flags"]["paused"].as<String>();
 
                   bedtemp_actual = (uint16_t)((doc["temperature"]["bed"]["actual"].as<double>())*100);
                   bedtemp_target = (uint16_t)((doc["temperature"]["bed"]["target"].as<double>())*100);
-                  tooltemp_actual = (uint16_t)((doc["temperature"]["tool0"]["actual"].as<double>())*100);
-                  tooltemp_target = (uint16_t)((doc["temperature"]["tool0"]["target"].as<double>())*100);
+                  tooltemp_actual = (uint16_t)((doc["temperature"][tool_id]["actual"].as<double>())*100);
+                  tooltemp_target = (uint16_t)((doc["temperature"][tool_id]["target"].as<double>())*100);
 
 
                   Serial.println(nameStr1);
