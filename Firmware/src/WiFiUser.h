@@ -7,6 +7,7 @@
 #include <ESPmDNS.h>      //用于设备域名 MDNS.begin("esp32")
 #include <esp_wifi.h>     //用于esp_wifi_restore() 删除保存的wifi信息
 #include <EEPROM.h>
+#include <ElegantOTA.h>
 
 extern const int LED;                         //设置LED引脚
 extern const char* HOST_NAME;                 //设置设备名
@@ -44,6 +45,7 @@ void handleNotFound();                //处理404情况的函数'handleNotFound'
 void initSoftAP();                    //进入AP模式
 void initDNS();                       //开启DNS服务器
 void initWebServer();                 //初始化WebServer
+void initOtaServer();
 bool scanWiFi();                      //扫描附近的WiFi，为了显示在配网界面
 void wifiConfig();                    //配置配网功能
 void wifiConfig_test();               //测试时使用

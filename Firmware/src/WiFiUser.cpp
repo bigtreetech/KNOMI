@@ -190,9 +190,18 @@ void initWebServer()
                                                             
   server.onNotFound(handleNotFound);                         //当浏览器请求的网络资源无法在服务器找到时调用自定义函数handleNotFound处理
  
+  ElegantOTA.begin(&server);
   server.begin();                                           //启动TCP SERVER
  
   Serial.println("WebServer started!");
+}
+
+void initOtaServer()
+{
+  server.on("/", HTTP_GET, handleRoot); 
+  server.onNotFound(handleNotFound);                         //当浏览器请求的网络资源无法在服务器找到时调用自定义函数handleNotFound处理
+  ElegantOTA.begin(&server);
+  server.begin();                                           //启动TCP SERVER
 }
  
 /*

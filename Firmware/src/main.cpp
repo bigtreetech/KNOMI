@@ -923,9 +923,10 @@ void setup()
 
     if(wifi_ap_config_flg == 1){
       wifiConfig();                           //开始配网功能
-    }
-
+    } 
 }     
+
+bool otaWasInit = false;
 
 void loop() 
 {
@@ -967,6 +968,10 @@ void loop()
     if (httprequest_nowtime > httprequest_nexttime) {
 
       if ((WiFi.status() == WL_CONNECTED) && (KeyDownFlag != KEY_DWON) && (start_http_request_flg == 1)) {    //wifi已经连接成功，发送http请求获取数据
+          if (!otaWasInit) {
+            otaWasInit = true;
+            initOtaServer();
+          }
 
           HTTPClient http; 
           
@@ -1331,9 +1336,9 @@ void loop()
   if (netcheck_nowtime > netcheck_nexttime) {
 
       checkConnect(true);               //检测网络连接状态，参数true表示如果断开重新连接
-
+      checkDNS_HTTP();                  //检测客户端DNS&HTTP请求，也就是检查配网页面那部分
+      
       if (WiFi.status() != WL_CONNECTED) {    //wifi没有连接成功
-          checkDNS_HTTP();                  //检测客户端DNS&HTTP请求，也就是检查配网页面那部分
           First_connection_flg = 0;
         } 
       netcheck_nexttime = netcheck_nowtime + 100UL;     
