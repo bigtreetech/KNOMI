@@ -19,8 +19,8 @@ try:
     from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
     from tqdm import tqdm
 except ImportError:
-    env.Execute("\"$PYTHONEXE\" -m pip install requests_toolbelt")
-    env.Execute("\"$PYTHONEXE\" -m pip install tqdm")
+    env.Execute("\"$PYTHONEXE\" -m pip install requests_toolbelt~=1.0.0")
+    env.Execute("\"$PYTHONEXE\" -m pip install tqdm~=4.66.1")
     from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
     from tqdm import tqdm
 
