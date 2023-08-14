@@ -175,6 +175,11 @@ void initDNS()
     Serial.println("start dnsserver failed.");
   }
 }
+
+void setId() {
+  std::string str = Version::getGitCommitSha1().substr(0,8).append(" - ").append(Version::getBuildTimestamp());
+  ElegantOTA.setID(str.c_str());
+}
  
 /*
  * 初始化WebServer
@@ -190,8 +195,6 @@ void initWebServer()
   server.on("/configwifi", HTTP_POST, handleConfigWifi);     //  当浏览器请求服务器/configwifi(表单字段)目录时调用自定义函数handleConfigWifi处理
                                                             
   server.onNotFound(handleNotFound);                         //当浏览器请求的网络资源无法在服务器找到时调用自定义函数handleNotFound处理
-  
-  ElegantOTA.setID(Version::getGitCommitSha1().substr(0,6).c_str());
   ElegantOTA.begin(&server);
   server.begin();                                           //启动TCP SERVER
  
@@ -202,7 +205,6 @@ void initOtaServer()
 {
   server.on("/", HTTP_GET, handleRoot); 
   server.onNotFound(handleNotFound);                         //当浏览器请求的网络资源无法在服务器找到时调用自定义函数handleNotFound处理
-  ElegantOTA.setID(Version::getGitCommitSha1().substr(0,6).c_str());
   ElegantOTA.begin(&server);
   server.begin();                                           //启动TCP SERVER
 }
