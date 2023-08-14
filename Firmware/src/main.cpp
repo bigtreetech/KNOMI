@@ -639,14 +639,6 @@ void update_screen19(lv_timer_t * timer)
   exist_object_screen_flg = 19;
 }
 
-void update_screen20(lv_timer_t * timer)
-{
-  update_gif_AP_Config_back_display();
-  update_gif_AP_Config_display();
-
-  exist_object_screen_flg = 20;
-}
-
 void update_screen21(lv_timer_t * timer)
 {
   update_gif_black_back_display();
@@ -668,29 +660,6 @@ void update_screen23(lv_timer_t * timer)
   update_gif_wait_back_display();
 
   exist_object_screen_flg = 23;
-}
-
-//-----------------------------------------------------------//
-void update_screen16(lv_timer_t * timer)
-{
-  if(exist_object_screen_flg==11)
-  {
-    lv_obj_del(label_bed_actual_temp); 
-    lv_obj_del(label_bed_target_temp); 
-    update_label_heaterbed_actual_temp();
-    update_label_heaterbed_target_temp();
-  }
-}
-
-void update_screen17(lv_timer_t * timer)
-{
-  if(exist_object_screen_flg==12)
-  {
-    lv_obj_del(label_ext_actual_temp);
-    lv_obj_del(label_ext_target_temp);
-    update_label_extruder_actual_temp();
-    update_label_extruder_target_temp();
-  }
 }
 
 //------------------------------------------------------------------------------------------------------------//
