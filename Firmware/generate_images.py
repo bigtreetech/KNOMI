@@ -9,7 +9,7 @@ try:
     from lv_img_converter import Converter
 
 except ImportError:
-    env.Execute("$PYTHONEXE -m pip install Pillow~=9.3.0")
+    env.Execute("\"$PYTHONEXE\" -m pip install Pillow~=9.3.0")
     from lv_img_converter import Converter
 
 gifs = [f for f in listdir('GIFS') if isfile(join('GIFS', f))]
