@@ -21,9 +21,14 @@ for gif in gifs:
     filepath = "GIFS/%s%s" % (parts[0],parts[1])
     filename = parts[0]
     out_path = "src/generated/%s.c" % parts[0]
-    conv = Converter(filepath, filename, False, Converter.FLAG.CF_RAW_CHROMA)
 
-    conv.convert(Converter.FLAG.CF_RAW_CHROMA, 0)
+    if (parts[1] == ".gif"): 
+        conv = Converter(filepath, filename, False, Converter.FLAG.CF_RAW_CHROMA)
+        conv.convert(Converter.FLAG.CF_RAW_CHROMA, 0)
+    else:
+        conv = Converter(filepath, filename, False, Converter.FLAG.CF_TRUE_COLOR_565)
+        conv.convert(Converter.FLAG.CF_TRUE_COLOR_565, 0)
+    
     c_arr = conv.format_to_c_array()
 
     with open(out_path, "w") as fi:

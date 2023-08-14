@@ -363,6 +363,8 @@ const lv_img_dsc_t {self.out_name} = {{
   .header.h = {self.h},
   .data_size = """
         c_footer += {
+            self.FLAG.CF_TRUE_COLOR_565: f"{self.w * self.h} * LV_COLOR_SIZE / 8,\n  "
+            f".header.cf = LV_IMG_CF_TRUE_COLOR,",
             self.FLAG.CF_TRUE_COLOR: f"{self.w * self.h} * LV_COLOR_SIZE / 8,\n  "
             f".header.cf = LV_IMG_CF_TRUE_COLOR,",
             self.FLAG.CF_TRUE_COLOR_ALPHA: f"{self.w * self.h} * LV_IMG_PX_SIZE_ALPHA_BYTE,\n  .header.cf = "
