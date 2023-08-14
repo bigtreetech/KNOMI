@@ -1,5 +1,6 @@
 from os import listdir, makedirs
 from os.path import isfile, join, splitext
+from os import listdir, remove
 from pathlib import Path
 
 Import("env")
@@ -14,6 +15,11 @@ except ImportError:
 gifs = [f for f in listdir('GIFS') if isfile(join('GIFS', f))]
 
 makedirs(join("src", "generated"), exist_ok=True)
+files = listdir(join("src", "generated"))
+for file in files:
+    file_path = join("src", "generated", file)
+    if isfile(file_path):
+        remove(file_path)
 
 for gif in gifs:
     parts = splitext(gif)
