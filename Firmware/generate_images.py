@@ -23,7 +23,7 @@ for file in files:
 
 for gif in gifs:
     parts = splitext(gif)
-    print("Converting: %s" % parts[0])
+    print("Converting GIFS/%s.gif to src/generated/%s.c" % (parts[0], parts[0]))
     filepath = "GIFS/%s%s" % (parts[0],parts[1])
     filename = parts[0]
     out_path = "src/generated/%s.c" % parts[0]
