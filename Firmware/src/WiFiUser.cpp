@@ -1,6 +1,7 @@
 #include "WiFiUser.h"
 #include <lvgl_gui.h>
 #include <test.h>
+#include "version.h"
 
 const byte DNS_PORT = 53;                  //设置DNS端口号
 const int webPort = 80;                    //设置Web端口号
@@ -189,7 +190,8 @@ void initWebServer()
   server.on("/configwifi", HTTP_POST, handleConfigWifi);     //  当浏览器请求服务器/configwifi(表单字段)目录时调用自定义函数handleConfigWifi处理
                                                             
   server.onNotFound(handleNotFound);                         //当浏览器请求的网络资源无法在服务器找到时调用自定义函数handleNotFound处理
- 
+  
+  ElegantOTA.setID(Version::getGitCommitSha1().substr(0,6).c_str());
   ElegantOTA.begin(&server);
   server.begin();                                           //启动TCP SERVER
  
@@ -200,6 +202,7 @@ void initOtaServer()
 {
   server.on("/", HTTP_GET, handleRoot); 
   server.onNotFound(handleNotFound);                         //当浏览器请求的网络资源无法在服务器找到时调用自定义函数handleNotFound处理
+  ElegantOTA.setID(Version::getGitCommitSha1().substr(0,6).c_str());
   ElegantOTA.begin(&server);
   server.begin();                                           //启动TCP SERVER
 }
@@ -282,12 +285,6 @@ void connectToWiFi(int timeOut_s) {
       wifi_connect_fail = 1;
       return;                                 //跳出 防止无限初始化
     }
-
-    if(test_mode_flag==1){            //测试模式直接退出
-
-      return;
-    }
-
   }
   
   if (WiFi.status() == WL_CONNECTED)          //如果连接成功

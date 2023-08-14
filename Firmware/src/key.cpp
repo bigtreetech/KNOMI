@@ -113,15 +113,6 @@ int KeyMessageProc(uint8_t KeyMessage)
 
 		case KEY_1_UP:
 				KeyDownFlag = 0;  //按键已松开
-
-				test_key_timer_cnt = 0;
-				test_key_cnt++;  //1秒内短按3次，定时器自动清零
-
-				if(test_key_cnt>=3){   //短按3下，进入测试模式
-				    test_key_cnt = 0;
-					test_mode_flag = 1;
-					Serial.println("\n进入测试模式");
-				}				
 			break;
 		
 		default: 

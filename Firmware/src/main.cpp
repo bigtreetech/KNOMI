@@ -17,7 +17,6 @@
 #include <iostream>
 #include <lvgl_gui.h>
 #include <lvgl_gif.h>
-#include <test.h>
 
 
 //全局变量
@@ -742,15 +741,6 @@ void timer1_cb()
     KeyScan();
 }
 
-void timer2_cb() //短按清零计时
-{
-    test_key_timer_cnt++;
-    if(test_key_timer_cnt>10){
-      test_key_timer_cnt = 0;
-      test_key_cnt = 0;
-    }
-}
-
 void delete_exist_object()
 {
     if(exist_object_screen_flg==1){    //del screen1
@@ -919,7 +909,6 @@ void setup()
     lv_display_led_Init();         //晚一点开背光
 
     timer1.attach(0.001, timer1_cb);  //定时0.001s，即1ms，回调函数为timer1_cb，并启动定时器 
-    timer2.attach(0.1, timer2_cb); 
 
     if(wifi_ap_config_flg == 1){
       wifiConfig();                           //开始配网功能
@@ -933,35 +922,7 @@ void loop()
   // lv_tick_inc(1);/* le the GUI do its work */ 
   lv_task_handler();  
   
-  //----------------测试模式，搜索在线网络------------------//
-  if(test_mode_flag==1){
-
-    screen_begin_dis_flg = 0;
-
-    delay(100);
-    update_blue_back_display();
-    lv_task_handler(); 
-    delay(4000);
-    lv_obj_del(img_blue_test);
-
-    delay(100);
-    init_gif_White_back_display();
-    update_label_scan_networks_test();
-    lv_task_handler(); 
-    delay(100);
-
-    wifiConfig_test();
-    delay(100);
-
-    update_label_networksID_test();
-
-    while(1){
-      lv_task_handler();  
-      delay(10);
-    }
-  }
-
-  if((screen_begin_dis_flg==1)&&(test_mode_flag==0))
+  if(screen_begin_dis_flg==1)
   {
     //-------------HTTP请求-----------------------//
     httprequest_nowtime = millis();
@@ -1136,7 +1097,7 @@ void loop()
 
         if(timer_contne > 0)timer_contne--;  //显示计时
         
-        if((wifi_ap_config_flg == 0)&&(test_mode_flag == 0))
+        if(wifi_ap_config_flg == 0)
         {
 
           if((display_step == 2)&&(timer_contne==0)){  //Standby
