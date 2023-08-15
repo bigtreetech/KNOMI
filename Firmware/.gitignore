@@ -3,5 +3,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+.idea
 src/generated
 lv_img_converter/__pycache__

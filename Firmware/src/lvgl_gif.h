@@ -10,7 +10,6 @@ extern "C" {  //extern "C"表示编译生成的内部符号名使用C约定。�
 extern lv_obj_t * gif_White_back; 
 extern lv_obj_t * img_black_back;
 
-extern lv_obj_t * gif_AP_Config_back; 
 extern lv_obj_t * gif_wait_back;
 
 extern lv_obj_t * gif_Standby; 
@@ -37,7 +36,6 @@ void init_gif_levelling_display();
 void init_gif_wait_display();
 
 void init_gif_White_back_display();
-void init_gif_black_back_display();
 void init_gif_Standby_display();
 void init_gif_BeforePrinting_display();
 void init_gif_AfterPrinting_display();
@@ -57,16 +55,12 @@ void update_gif_levelling_display();
 void update_gif_wait_display();
 
 void update_gif_White_back_display();
-void update_gif_black_back_display();
 void update_gif_Standby_display();
 void update_gif_BeforePrinting_display();
 void update_gif_AfterPrinting_display();
 void update_gif_StartPrinting_display();
 void update_gif_Printing_display();
 void update_gif_PrintComplete_display();
-
-void update_gif_AP_Config_back_display();
-void update_gif_wait_back_display();
 
 void update_gif_bed_temp_display();
 void update_gif_ext_temp_display();

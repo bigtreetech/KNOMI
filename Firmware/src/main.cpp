@@ -17,6 +17,7 @@
 #include <iostream>
 #include <lvgl_gui.h>
 #include <lvgl_gif.h>
+#include "generated/images.h"
 
 
 //全局变量
@@ -509,7 +510,7 @@ void update_bar_fan_speed()
 //-----------------------------------------------------------------------------------------------------//
 void update_screen1(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_label_print_progress();
   update_arc_print_progress();
 
@@ -552,7 +553,7 @@ void update_screen6(lv_timer_t * timer)
 
 void update_screen7(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_Standby_display();
 
   exist_object_screen_flg = 7;
@@ -560,7 +561,7 @@ void update_screen7(lv_timer_t * timer)
 
 void update_screen8(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_StartPrinting_display();
 
   exist_object_screen_flg = 8;
@@ -568,7 +569,7 @@ void update_screen8(lv_timer_t * timer)
 
 void update_screen9(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_Printing_display();
 
   exist_object_screen_flg = 9;
@@ -576,7 +577,7 @@ void update_screen9(lv_timer_t * timer)
 
 void update_screen10(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_AfterPrinting_display();
 
   exist_object_screen_flg = 10;
@@ -584,7 +585,7 @@ void update_screen10(lv_timer_t * timer)
 
 void update_screen11(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_bed_temp_display();
   update_label_heaterbed_actual_temp();
   update_label_heaterbed_target_temp();
@@ -594,7 +595,7 @@ void update_screen11(lv_timer_t * timer)
 
 void update_screen12(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_ext_temp_display();
   update_label_extruder_actual_temp();
   update_label_extruder_target_temp();
@@ -609,7 +610,7 @@ void update_screen13(lv_timer_t * timer)
 
 void update_screen14(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_OK_display();
 
   exist_object_screen_flg = 14;
@@ -617,7 +618,7 @@ void update_screen14(lv_timer_t * timer)
 
 void update_screen15(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_voron_display();
 
   exist_object_screen_flg = 15;
@@ -625,7 +626,7 @@ void update_screen15(lv_timer_t * timer)
 
 void update_screen18(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_BeforePrinting_display();
 
   exist_object_screen_flg = 18;
@@ -633,7 +634,7 @@ void update_screen18(lv_timer_t * timer)
 
 void update_screen19(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_AfterPrinting_display();
 
   exist_object_screen_flg = 19;
@@ -641,7 +642,7 @@ void update_screen19(lv_timer_t * timer)
 
 void update_screen21(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_Home_display();
 
   exist_object_screen_flg = 21;
@@ -649,7 +650,7 @@ void update_screen21(lv_timer_t * timer)
 
 void update_screen22(lv_timer_t * timer)
 {
-  update_gif_black_back_display();
+  init_img_bc_black();
   update_gif_levelling_display();
 
   exist_object_screen_flg = 22;
@@ -657,7 +658,7 @@ void update_screen22(lv_timer_t * timer)
 
 void update_screen23(lv_timer_t * timer)
 {
-  update_gif_wait_back_display();
+  init_img_Disconnect_Back();
 
   exist_object_screen_flg = 23;
 }
@@ -786,7 +787,7 @@ void delete_exist_object()
       lv_obj_del(gif_AfterPrinting);
     }else if(exist_object_screen_flg==20){
 
-      lv_obj_del(gif_AP_Config_back);
+      lv_obj_del(img_AP_Config_Back);
       lv_obj_del(gif_AP_Config);
     }else if(exist_object_screen_flg==21){
 
@@ -826,7 +827,7 @@ void Display_Object_Init()
     init_label_fan_speed();
     init_bar_fan_speed();
 
-    init_gif_black_back_display();
+    init_img_bc_black();
     init_gif_Standby_display();
 
     lv_obj_del(label_print_status);

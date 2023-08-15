@@ -22,15 +22,15 @@ for file in files:
         remove(file_path)
 
 cWrapper = rf"""
-#include "images.h"
+#include "generated/images.h"
 #include <Arduino.h>
 #include <lvgl.h>
 #include <WiFi.h>
 #include <TFT_eSPI.h> // Hardware-specific library
 """
 hWrapper = rf"""
-#ifndef LVGL_LOGO_BTT_H
-#define LVGL_LOGO_BTT_H
+#ifndef LVGL_IMAGES_H
+#define LVGL_IMAGES_H
 
 #ifdef __cplusplus
 extern "C" {{
@@ -55,12 +55,12 @@ for gif in gifs:
         conv.convert(Converter.FLAG.CF_TRUE_COLOR_565, 0)
 
         cWrapper += rf"""
-LV_IMG_DECLARE({parts[0].upper()});
+LV_IMG_DECLARE({parts[0]});
 lv_obj_t * img_{parts[0]};
 void init_img_{parts[0]}()
 {{
     img_{parts[0]} = lv_img_create(lv_scr_act());
-    lv_img_set_src(img_{parts[0]}, &{parts[0].upper()});
+    lv_img_set_src(img_{parts[0]}, &{parts[0]});
     lv_obj_align(img_{parts[0]},LV_ALIGN_CENTER,0,0);
 }}
 
