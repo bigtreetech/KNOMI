@@ -682,15 +682,19 @@ void Display_Object_Init() {
   screen_begin_dis_flg = 0;
 }
 
-void my_log_cb(const char* logLine)
+#if LV_USE_LOG
+void logToSerial(const char* logLine)
 {
     Serial.print(logLine);
 }
+#endif
 
 __attribute__((unused)) void setup() {
   Serial.begin(115200); // 波特率
   EEPROM.begin(1024);   // 分配flash空间存储配网信息
-  lv_log_register_print_cb(&my_log_cb);
+#if LV_USE_LOG
+  lv_log_register_print_cb(&logToSerial);
+#endif
   delay(100);
   readwificonfig(); // 将wifi账号读出，判断是否进入配网界面
 
