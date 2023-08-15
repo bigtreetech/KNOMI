@@ -577,7 +577,7 @@ void update_screen9(lv_timer_t * timer)
 void update_screen10(lv_timer_t * timer)
 {
   update_gif_black_back_display();
-  update_gif_PrintComplete_display();
+  update_gif_AfterPrinting_display();
 
   exist_object_screen_flg = 10;
 }
@@ -752,7 +752,7 @@ void delete_exist_object()
     }else if(exist_object_screen_flg==10){
 
       lv_obj_del(img_black_back);
-      lv_obj_del(gif_PrintComplete);
+      lv_obj_del(gif_AfterPrinting);
     }else if(exist_object_screen_flg==11){
 
       lv_obj_del(img_black_back);
