@@ -18,7 +18,7 @@ std::string Version::getBuildTimestamp() {
 }
 """.replace("$1", result).replace("$2", datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
 
-VERSION_FILE = "src/generated/version.cpp"
+VERSION_FILE = "src/generated/Version.cpp"
 
 print("Updating {} with version/timestamp...".format(VERSION_FILE))
 with open(VERSION_FILE, 'w+') as FILE:
