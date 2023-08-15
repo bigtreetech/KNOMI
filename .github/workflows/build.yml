@@ -21,4 +21,7 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: cd Firmware && pio run 
+        run: cd Firmware && pio run
+
+      - name: Build LightFS
+        run: cd Firmware && pio run buildfs
