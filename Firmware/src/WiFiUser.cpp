@@ -64,34 +64,34 @@ void handleConfigWifi() // 返回http状态
 {
   if (server.hasArg("ssid")) // 判断是否有账号参数
   {
-    Serial.print("got ssid:");
+    LV_LOG_INFO("got ssid:");
     wifi_ssid = server.arg("ssid"); // 获取html表单输入框name名为"ssid"的内容
 
     strcpy(wificonf.stassid, wifi_ssid.c_str()); // 名称复制
-    Serial.println(wifi_ssid);
+    LV_LOG_INFO(wifi_ssid);
   } else // 没有参数
   {
-    Serial.println("error, not found ssid");
+    LV_LOG_INFO("error, not found ssid");
     server.send(200, "text/html",
                 "<meta charset='UTF-8'>error, not found ssid"); // 返回错误页面
     return;
   }
   // 密码与账号同理
   if (server.hasArg("pass")) {
-    Serial.print("got password:");
+    LV_LOG_INFO("got password:");
     wifi_pass = server.arg("pass"); // 获取html表单输入框name名为"pwd"的内容
 
     strcpy(wificonf.stapsw, wifi_pass.c_str()); // 名称复制
-    Serial.println(wifi_pass);
+    LV_LOG_INFO(wifi_pass);
   } else {
-    Serial.println("error, not found password");
+    LV_LOG_INFO("error, not found password");
     server.send(200, "text/html",
                 "<meta charset='UTF-8'>error, not found password");
     return;
   }
   // klipper ip
   if (server.hasArg("klipper")) {
-    Serial.print("got KlipperIP:");
+    LV_LOG_INFO("got KlipperIP:");
     klipper_ip =
         server.arg("klipper"); // 获取html表单输入框name名为"KlipperIP"的内容
 
@@ -99,9 +99,9 @@ void handleConfigWifi() // 返回http状态
 
     wificonf.apmodeflag[0] = '8'; // 8 STA模式
 
-    Serial.println(klipper_ip);
+    LV_LOG_INFO(klipper_ip);
   } else {
-    Serial.println("error, not found klipper ip");
+    LV_LOG_INFO("error, not found klipper ip");
     server.send(200, "text/html",
                 "<meta charset='UTF-8'>error, not found klipper ip");
     return;
@@ -117,14 +117,14 @@ void handleConfigWifi() // 返回http状态
       true); // 参数设置为true，设备将直接关闭接入点模式，即关闭设备所建立的WiFi网络。
   server.close();          // 关闭web服务
   WiFi.softAPdisconnect(); // 在不输入参数的情况下调用该函数,将关闭接入点模式,并将当前配置的AP热点网络名和密码设置为空值.
-  Serial.println("WiFi Connect SSID:" + wifi_ssid + "  PASS:" + wifi_pass);
+  LV_LOG_INFO("WiFi Connect SSID:" + wifi_ssid + "  PASS:" + wifi_pass);
 
   if (WiFi.status() != WL_CONNECTED) // wifi没有连接成功
   {
-    Serial.println("开始调用连接函数connectToWiFi()..");
+    LV_LOG_INFO("开始调用连接函数connectToWiFi()..");
     connectToWiFi(connectTimeOut_s);
   } else {
-    Serial.println("提交的配置信息自动连接成功..");
+    LV_LOG_INFO("提交的配置信息自动连接成功..");
   }
 }
 
@@ -146,16 +146,16 @@ void initSoftAP() {
   if (WiFi.softAP(AP_SSID)) // 开启AP热点,如需要密码则添加第二个参数
   {
     // 打印相关信息
-    Serial.println("ESP-32S SoftAP is right.");
-    Serial.print("Soft-AP IP address = ");
-    Serial.println(WiFi.softAPIP()); // 接入点ip
-    Serial.println(String("MAC address = ") +
+    LV_LOG_INFO("ESP-32S SoftAP is right.");
+    LV_LOG_INFO("Soft-AP IP address = ");
+    LV_LOG_INFO(WiFi.softAPIP()); // 接入点ip
+    LV_LOG_INFO(String("MAC address = ") +
                    WiFi.softAPmacAddress().c_str()); // 接入点mac
   } else                                             // 开启AP热点失败
   {
-    Serial.println("WiFiAP Failed");
+    LV_LOG_INFO("WiFiAP Failed");
     delay(1000);
-    Serial.println("restart now...");
+    LV_LOG_INFO("restart now...");
     ESP.restart(); // 重启复位esp32
   }
 }
@@ -168,9 +168,9 @@ void initDNS() {
   if (dnsServer.start(DNS_PORT, "*",
                       apIP)) // 判断将所有地址映射到esp32的ip上是否成功
   {
-    Serial.println("start dnsserver success.");
+    LV_LOG_INFO("start dnsserver success.");
   } else {
-    Serial.println("start dnsserver failed.");
+    LV_LOG_INFO("start dnsserver failed.");
   }
 }
 
@@ -187,7 +187,7 @@ void setId() {
 void initWebServer() {
   if (MDNS.begin("esp32")) // 给设备设定域名esp32,完整的域名是esp32.local
   {
-    Serial.println("MDNS responder started");
+    LV_LOG_INFO("MDNS responder started");
   }
   // 必须添加第二个参数HTTP_GET，以下面这种格式去写，否则无法强制门户
   server.on(
@@ -203,7 +203,7 @@ void initWebServer() {
   ElegantOTA.begin(&server);
   server.begin(); // 启动TCP SERVER
 
-  Serial.println("WebServer started!");
+  LV_LOG_INFO("WebServer started!");
 }
 
 void initOtaServer() {
@@ -220,13 +220,13 @@ void initOtaServer() {
  */
 void connectToWiFi(int timeOut_s) {
   WiFi.hostname(HOST_NAME); // 设置设备名
-  Serial.println("进入connectToWiFi()函数");
+  LV_LOG_INFO("进入connectToWiFi()函数");
   WiFi.mode(WIFI_STA);       // 设置为STA模式并连接WIFI
   WiFi.setAutoConnect(true); // 设置自动连接
 
   if (wifi_ssid != "") // wifi_ssid不为空，意味着从网页读取到wifi
   {
-    Serial.println("用web配置信息连接.");
+    LV_LOG_INFO("用web配置信息连接.");
     WiFi.begin(wifi_ssid.c_str(),
                wifi_pass.c_str()); // c_str(),获取该字符串的指针
     wifi_ssid = "";
@@ -234,7 +234,7 @@ void connectToWiFi(int timeOut_s) {
   } else // 未从网页读取到wifi
   {
     readwificonfig();
-    Serial.println("用EEROM保存的信息连接.");
+    LV_LOG_INFO("用EEROM保存的信息连接.");
     WiFi.begin(
         wificonf.stassid,
         wificonf.stapsw); // begin()不传入参数，默认连接上一次连接成功的wifi
@@ -243,7 +243,7 @@ void connectToWiFi(int timeOut_s) {
   int Connect_time = 0; // 用于连接计时，如果长时间连接不成功，复位设备
   while (WiFi.status() != WL_CONNECTED) // 等待WIFI连接成功
   {
-    Serial.print("."); // 一共打印30个点点
+    LV_LOG_INFO("."); // 一共打印30个点点
     // digitalWrite(LED, !digitalRead(LED));
     delay(500);
     Connect_time++;
@@ -251,8 +251,8 @@ void connectToWiFi(int timeOut_s) {
     if (Connect_time > 2 * timeOut_s) // 长时间连接不上，重新进入配网页面
     {
       // digitalWrite(LED, LOW);
-      Serial.println(""); // 主要目的是为了换行符
-      Serial.println("WIFI autoconnect fail, start AP for webconfig now...");
+      LV_LOG_INFO(""); // 主要目的是为了换行符
+      LV_LOG_INFO("WIFI autoconnect fail, start AP for webconfig now...");
       wifiConfig(); // 开始配网功能
 
       wifi_connect_fail = 1;
@@ -264,21 +264,21 @@ void connectToWiFi(int timeOut_s) {
   {
     savewificonfig();
 
-    Serial.println("WIFI connect Success");
-    Serial.printf("SSID:%s", WiFi.SSID().c_str());
-    Serial.printf(", PSW:%s\r\n", WiFi.psk().c_str());
-    Serial.print("LocalIP:");
-    Serial.print(WiFi.localIP());
-    Serial.print(" ,GateIP:");
-    Serial.println(WiFi.gatewayIP());
+    LV_LOG_INFO("WIFI connect Success");
+    LV_LOG_INFO("SSID:%s", WiFi.SSID().c_str());
+    LV_LOG_INFO(", PSW:%s\r\n", WiFi.psk().c_str());
+    LV_LOG_INFO("LocalIP:");
+    LV_LOG_INFO(WiFi.localIP());
+    LV_LOG_INFO(" ,GateIP:");
+    LV_LOG_INFO(WiFi.gatewayIP());
 
-    Serial.print("KlipperIP:");
+    LV_LOG_INFO("KlipperIP:");
     String str(wificonf.klipperip);
     klipper_ip = wificonf.klipperip;
-    Serial.println(klipper_ip);
+    LV_LOG_INFO(klipper_ip);
 
-    Serial.print("WIFI status is:");
-    Serial.print(WiFi.status());
+    LV_LOG_INFO("WIFI status is:");
+    LV_LOG_INFO(WiFi.status());
 
     // digitalWrite(LED, HIGH);
     server.stop(); // 停止开发板所建立的网络服务器。
@@ -302,7 +302,7 @@ void wifiConfig() {
 void restoreWiFi() {
   delay(500);
   esp_wifi_restore(); // 删除保存的wifi信息
-  Serial.println("连接信息已清空,准备重启设备..");
+  LV_LOG_INFO("连接信息已清空,准备重启设备..");
   delay(10);
 }
 
@@ -347,10 +347,10 @@ void checkConnect(bool reConnect) {
   {
     if (reConnect == true && WiFi.getMode() != WIFI_AP &&
         WiFi.getMode() != WIFI_AP_STA) {
-      Serial.println("WIFI未连接.");
-      Serial.println("WiFi Mode:");
-      Serial.println(WiFi.getMode());
-      Serial.println("正在连接WiFi...");
+      LV_LOG_INFO("WIFI未连接.");
+      LV_LOG_INFO("WiFi Mode:");
+      LV_LOG_INFO(WiFi.getMode());
+      LV_LOG_INFO("正在连接WiFi...");
       connectToWiFi(connectTimeOut_s); // 连接wifi函数
     }
   }

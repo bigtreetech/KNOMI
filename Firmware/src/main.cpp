@@ -698,7 +698,7 @@ __attribute__((unused)) void setup() {
     wifi_ap_config_flg = 1;
   }
 
-  Serial.printf("SSID:%s\r\n", wificonf.stassid);
+  LV_LOG_INFO("SSID:%s\r\n", wificonf.stassid);
 
   InitKeyInterface(); // 按键接口初始化
   lv_display_Init();  // 显示初始化
@@ -797,10 +797,10 @@ __attribute__((unused)) void loop() {
                                               .as<double>()) *
                                          100);
 
-            Serial.println(nameStr1);
-            Serial.println(nameStr2);
-            Serial.println(nameStr3);
-            Serial.println(nameStr4);
+            LV_LOG_INFO(nameStr1);
+            LV_LOG_INFO(nameStr2);
+            LV_LOG_INFO(nameStr3);
+            LV_LOG_INFO(nameStr4);
 
             text_ext_actual_temp = nameStr3 + "°C";
             text_ext_target_temp = nameStr4 + "°C";
@@ -862,7 +862,7 @@ __attribute__((unused)) void loop() {
               result = String(datas);
               nameStrpriting = result;
             }
-            Serial.println(nameStrpriting);
+            LV_LOG_INFO(nameStrpriting);
 
             httpswitch = 3;
           } else if (httpswitch == 3) { // home状态
@@ -870,7 +870,7 @@ __attribute__((unused)) void loop() {
             String nameStr8 =
                 doc["result"]["status"]["gcode_macro G28"]["homing"]
                     .as<String>();
-            Serial.println(nameStr8);
+            LV_LOG_INFO(nameStr8);
 
             if (nameStr8 == "true") {
               homing_status = 1;
@@ -886,7 +886,7 @@ __attribute__((unused)) void loop() {
             String nameStr9 = doc["result"]["status"]
                                  ["gcode_macro BED_MESH_CALIBRATE"]["probing"]
                                      .as<String>();
-            Serial.println(nameStr9);
+            LV_LOG_INFO(nameStr9);
 
             if (nameStr9 == "true") {
               levelling_status = 1;
@@ -905,7 +905,7 @@ __attribute__((unused)) void loop() {
           if (screen_no_klipper_dis_flg < 10)
             screen_no_klipper_dis_flg++;
 
-          Serial.println("Error on HTTP request");
+          LV_LOG_INFO("Error on HTTP request");
 
           if (screen_no_klipper_dis_flg > 3) {
             display_step = 8; // no klipper connect
