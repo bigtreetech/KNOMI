@@ -1,16 +1,15 @@
 #include <lvgl_gui.h>
 #include <Arduino.h>
 #include <lvgl.h>
-#include <WiFi.h>
-#include <TFT_eSPI.h> // Hardware-specific library
 #include <WiFiUser.h>
 #include "generated/images.h"
 #include <lvgl_gif.h>
 #include <test.h>
 
+ResourceImage* logo;
+
 //显示刷新定时器
 lv_timer_t * update_timer=NULL;
-uint8_t contne = 0;
 uint8_t print_status = 0;  //0 待机  1 打印  2暂停
 uint8_t homing_status = 0;  
 uint8_t levelling_status = 0;  
@@ -120,7 +119,9 @@ void Open_up_animation()
 void project_task_init(lv_timer_t * timer){
 
     lv_obj_del(open_anim_arc);
-    lv_obj_del(img_BTT_LOGO);
+    if (logo) {
+      delete logo;
+    }
 
     display_step = 2; //待机
     timer_contne = 1;
@@ -167,7 +168,7 @@ void open_task_conv(lv_timer_t * timer){
     //连接wifi
     connectToWiFi(connectTimeOut_s);     //连接wifi，传入的是wifi连接等待时间15s    
 
-    init_img_BTT_LOGO();
+    logo = get_BTT_LOGO();
 
     Open_up_animation();
 
@@ -178,13 +179,13 @@ void open_task_conv(lv_timer_t * timer){
 void Open_display_init(){
 
    if(wifi_ap_config_flg == 1){
-        init_img_AP_Config_Back();
+        logo = get_AP_Config_Back();
         update_gif_AP_Config_display();
         exist_object_screen_flg = 20;
         screen_begin_dis_flg = 1;
     }else{
 
-        init_img_BTT_LOGO();
+        logo = get_BTT_LOGO();
 
         timer_open_init=lv_timer_create(open_task_conv, 100, NULL);
         lv_timer_set_repeat_count(timer_open_init,1);

@@ -72,6 +72,8 @@ int16_t bed_per_data=0;
 //风扇转速百分比变量定义
 int16_t fanspeed_data=0;
 
+ResourceImage *ri_ap_config_back, *ri_bc_black, *ri_disconnect;
+
 //----------------------------------------//
 using namespace std;
 #define max 100
@@ -510,7 +512,7 @@ void update_bar_fan_speed()
 //-----------------------------------------------------------------------------------------------------//
 void update_screen1(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_label_print_progress();
   update_arc_print_progress();
 
@@ -553,7 +555,7 @@ void update_screen6(lv_timer_t * timer)
 
 void update_screen7(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_Standby_display();
 
   exist_object_screen_flg = 7;
@@ -561,7 +563,7 @@ void update_screen7(lv_timer_t * timer)
 
 void update_screen8(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_StartPrinting_display();
 
   exist_object_screen_flg = 8;
@@ -569,7 +571,7 @@ void update_screen8(lv_timer_t * timer)
 
 void update_screen9(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_Printing_display();
 
   exist_object_screen_flg = 9;
@@ -577,7 +579,7 @@ void update_screen9(lv_timer_t * timer)
 
 void update_screen10(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_AfterPrinting_display();
 
   exist_object_screen_flg = 10;
@@ -585,7 +587,7 @@ void update_screen10(lv_timer_t * timer)
 
 void update_screen11(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_bed_temp_display();
   update_label_heaterbed_actual_temp();
   update_label_heaterbed_target_temp();
@@ -595,7 +597,7 @@ void update_screen11(lv_timer_t * timer)
 
 void update_screen12(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_ext_temp_display();
   update_label_extruder_actual_temp();
   update_label_extruder_target_temp();
@@ -610,7 +612,7 @@ void update_screen13(lv_timer_t * timer)
 
 void update_screen14(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_OK_display();
 
   exist_object_screen_flg = 14;
@@ -618,7 +620,7 @@ void update_screen14(lv_timer_t * timer)
 
 void update_screen15(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_voron_display();
 
   exist_object_screen_flg = 15;
@@ -626,7 +628,7 @@ void update_screen15(lv_timer_t * timer)
 
 void update_screen18(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_BeforePrinting_display();
 
   exist_object_screen_flg = 18;
@@ -634,7 +636,7 @@ void update_screen18(lv_timer_t * timer)
 
 void update_screen19(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_AfterPrinting_display();
 
   exist_object_screen_flg = 19;
@@ -642,7 +644,7 @@ void update_screen19(lv_timer_t * timer)
 
 void update_screen21(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_Home_display();
 
   exist_object_screen_flg = 21;
@@ -650,7 +652,7 @@ void update_screen21(lv_timer_t * timer)
 
 void update_screen22(lv_timer_t * timer)
 {
-  init_img_bc_black();
+  ri_bc_black = get_bc_black();
   update_gif_levelling_display();
 
   exist_object_screen_flg = 22;
@@ -658,7 +660,7 @@ void update_screen22(lv_timer_t * timer)
 
 void update_screen23(lv_timer_t * timer)
 {
-  init_img_Disconnect_Back();
+  ri_disconnect = get_Disconnect_Back();
 
   exist_object_screen_flg = 23;
 }
@@ -715,7 +717,10 @@ void delete_exist_object()
 {
     if(exist_object_screen_flg==1){    //del screen1
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
       lv_obj_del(label_print_progress);
       lv_obj_del(arc_print_progress); 
 
@@ -740,29 +745,53 @@ void delete_exist_object()
 
     }else if(exist_object_screen_flg==7){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_Standby);
     }else if(exist_object_screen_flg==8){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_StartPrinting);
     }else if(exist_object_screen_flg==9){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_Printing);
     }else if(exist_object_screen_flg==10){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_AfterPrinting);
     }else if(exist_object_screen_flg==11){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_bed_temp);
       lv_obj_del(label_bed_actual_temp); 
       lv_obj_del(label_bed_target_temp); 
     }else if(exist_object_screen_flg==12){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_ext_temp);
       lv_obj_del(label_ext_actual_temp);
       lv_obj_del(label_ext_target_temp);
@@ -771,35 +800,62 @@ void delete_exist_object()
 
     }else if(exist_object_screen_flg==14){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_OK);
     }else if(exist_object_screen_flg==15){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_voron);
     }else if(exist_object_screen_flg==18){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_BeforePrinting);
     }else if(exist_object_screen_flg==19){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_AfterPrinting);
     }else if(exist_object_screen_flg==20){
 
-      lv_obj_del(img_AP_Config_Back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
       lv_obj_del(gif_AP_Config);
     }else if(exist_object_screen_flg==21){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_Home);
     }else if(exist_object_screen_flg==22){
 
-      lv_obj_del(img_black_back);
+      if (ri_bc_black) {
+        delete ri_bc_black;
+        ri_bc_black = nullptr;
+      }
+
       lv_obj_del(gif_levelling);
     }else if(exist_object_screen_flg==23){
-
-      lv_obj_del(gif_wait_back);
+      if (ri_disconnect)
+        delete ri_disconnect;
     }else{
 
     }
@@ -827,7 +883,7 @@ void Display_Object_Init()
     init_label_fan_speed();
     init_bar_fan_speed();
 
-    init_img_bc_black();
+    delete get_bc_black();
     init_gif_Standby_display();
 
     lv_obj_del(label_print_status);
@@ -848,7 +904,6 @@ void Display_Object_Init()
     lv_obj_del(label_fan_speed);
     lv_obj_del(bar_fan_speed);
 
-    lv_obj_del(img_black_back);
     lv_obj_del(gif_Standby);
 
     exist_object_screen_flg = 0;

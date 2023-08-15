@@ -8,11 +8,8 @@ extern "C" {  //extern "C"表示编译生成的内部符号名使用C约定。�
 #include <lvgl.h>
 
 extern lv_obj_t * gif_White_back; 
-extern lv_obj_t * img_black_back;
 
-extern lv_obj_t * gif_wait_back;
-
-extern lv_obj_t * gif_Standby; 
+extern lv_obj_t * gif_Standby;
 extern lv_obj_t * gif_BeforePrinting; 
 extern lv_obj_t * gif_AfterPrinting; 
 extern lv_obj_t * gif_StartPrinting; 
