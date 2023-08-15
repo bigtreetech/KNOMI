@@ -3,13 +3,12 @@
 #include <lvgl.h>
 #include <WiFiUser.h>
 #include "generated/images.h"
-#include <lvgl_gif.h>
 #include <test.h>
 
-ResourceImage* logo;
+ResourceImage *logo, *apc;
 
 //显示刷新定时器
-lv_timer_t * update_timer=NULL;
+lv_timer_t * update_timer= nullptr;
 uint8_t print_status = 0;  //0 待机  1 打印  2暂停
 uint8_t homing_status = 0;  
 uint8_t levelling_status = 0;  
@@ -74,14 +73,8 @@ lv_obj_t * label_fan_speed;
 lv_obj_t * bar_fan_speed;
 //打印界面对象样式定义
 lv_style_t style_label_fan_speed;
-lv_style_t style_bar_fan_speed;
 
-lv_obj_t * label_open_anim;
 lv_obj_t * open_anim_arc;
-lv_obj_t * open_back;//开机背景创建
-lv_obj_t * label_open;//开机wifi连接提示标签
-lv_style_t style_label_open;
-lv_style_t style_label_load;
 lv_style_t style_spinner_open;
 lv_style_t style_bc_spinner_open;
 
@@ -93,11 +86,6 @@ lv_timer_t * timer_project_init=NULL;
 
 int wifi_connect_ok = 0; //wifi 连接成功标志
 int wifi_connect_fail = 0; //wifi 连接失败标志
-
-static void set_angle(void * var, int32_t v)
-{
-    lv_arc_set_value((lv_obj_t *)var, v);
-}
 
 void Open_up_animation()
 {
@@ -168,7 +156,7 @@ void open_task_conv(lv_timer_t * timer){
     //连接wifi
     connectToWiFi(connectTimeOut_s);     //连接wifi，传入的是wifi连接等待时间15s    
 
-    logo = get_BTT_LOGO();
+    logo = KnownResourceImages::get_BTT_LOGO();
 
     Open_up_animation();
 
@@ -179,13 +167,13 @@ void open_task_conv(lv_timer_t * timer){
 void Open_display_init(){
 
    if(wifi_ap_config_flg == 1){
-        logo = get_AP_Config_Back();
-        update_gif_AP_Config_display();
+        logo = KnownResourceImages::get_AP_Config_Back();
+        apc = KnownResourceImages::get_AP_Config(0, -36);
         exist_object_screen_flg = 20;
         screen_begin_dis_flg = 1;
     }else{
 
-        logo = get_BTT_LOGO();
+        logo = KnownResourceImages::get_BTT_LOGO();
 
         timer_open_init=lv_timer_create(open_task_conv, 100, NULL);
         lv_timer_set_repeat_count(timer_open_init,1);

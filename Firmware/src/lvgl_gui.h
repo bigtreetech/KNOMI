@@ -16,8 +16,7 @@ void Open_display_init();
 
 //显示刷新定时器
 extern lv_timer_t * update_timer;
-extern uint8_t contne;
-extern uint8_t print_status; 
+extern uint8_t print_status;
 extern uint8_t homing_status;  
 extern uint8_t levelling_status; 
 extern uint8_t timer_contne;
@@ -89,8 +88,6 @@ void init_label_extruder_actual_temp();
 void init_label_heaterbed_actual_temp();
 void init_label_extruder_target_temp();
 void init_label_heaterbed_target_temp();
-void init_arc_extruder_temp();
-void init_arc_heaterbed_temp();
 //---------screen3---------------//
 void init_label_print_file();
 //---------screen4---------------//
@@ -110,8 +107,6 @@ void update_label_extruder_actual_temp();
 void update_label_heaterbed_actual_temp();
 void update_label_extruder_target_temp();
 void update_label_heaterbed_target_temp();
-void update_arc_extruder_temp();
-void update_arc_heaterbed_temp();
 //---------screen3---------------//
 void update_label_print_file();
 //---------screen4---------------//
@@ -123,18 +118,10 @@ void update_label_fan_speed();
 
 //界面对象刷新处理函数定义
 void update_screen1(lv_timer_t * timer);
-void update_screen2(lv_timer_t * timer);
-void update_screen3(lv_timer_t * timer);
-void update_screen4(lv_timer_t * timer);
-void update_screen5(lv_timer_t * timer);
-void update_screen6(lv_timer_t * timer);
 void update_screen7(lv_timer_t * timer);
-void update_screen8(lv_timer_t * timer);
 void update_screen9(lv_timer_t * timer);
-void update_screen10(lv_timer_t * timer);
 void update_screen11(lv_timer_t * timer);
 void update_screen12(lv_timer_t * timer);
-void update_screen13(lv_timer_t * timer);
 
 //删除界面对象
 void delete_exist_object();

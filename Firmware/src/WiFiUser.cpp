@@ -1,20 +1,14 @@
 #include "WiFiUser.h"
 #include <lvgl_gui.h>
-#include <test.h>
 #include "version.h"
 
 const byte DNS_PORT = 53;                  //设置DNS端口号
 const int webPort = 80;                    //设置Web端口号
  
 const char* AP_SSID  = "BTT-KNOMI";        //设置AP热点名称
-//const char* AP_PASS  = "";               //这里不设置设置AP热点密码
- 
+
 const char* HOST_NAME = "KNOMI";        //设置设备名
 String scanNetworksID = "";                //用于储存扫描到的WiFi ID
-
-String scanNetworksID1 = "no networks found";                
-String scanNetworksID2 = "";
-String scanNetworksID3 = "";                 
 
 IPAddress apIP(192, 168, 20, 1);            //设置AP的IP地址
  
@@ -23,8 +17,7 @@ String wifi_pass = "";                     //暂时存储wifi账号密码
 String klipper_ip = "";                     //暂时存储KlipperIP
 
 int connectTimeOut_s = 15;   //WiFi连接超时时间，单位秒
-const int LED = 2;                         //设置LED引脚
- 
+
 DNSServer dnsServer;                       //创建dnsServer实例
 WebServer server(webPort);                 //开启web服务, 创建TCP SERVER,参数: 端口号,最大连接数
 
@@ -32,14 +25,10 @@ WebServer server(webPort);                 //开启web服务, 创建TCP SERVER,�
 //EEPROM参数存储地址位
 int wifi_addr = 1; //被写入数据的EEPROM地址编号  wifi-ssid-psw klipper
 
-
-
 //如开启WEB配网则可不用设置这里的参数，1为wifi ssid，2为密码，3为klipper ip ，4为 ap模式标志位
 config_type wificonf ={{""},{""},{""},{""}};
 
 
-// #define ROOT_HTML  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.input{display: block; margin-top: 10px;}.input span{width: 100px; float: left; float: left; height: 36px; line-height: 36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: 50px; background-color: #438EF0; border-radius:8px; font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; margin-left:104px;}</style><body><form method=\"POST\" action=\"configwifi\"><p><span> BIQU TFT</P><label class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input type=\"text\"  name=\"pass\"><label class=\"input\"><span>Klipper IP</span> <input type=\"text\"  name=\"klipper\"></label><input class=\"btn\" type=\"submit\" name=\"submit\" value=\"Submie\"> </form>"
-// #define ROOT_HTML_OK  "<!DOCTYPE html><html><head><title>WIFI SET</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.c,body {text-align: center}</style><body><form method=\"POST\" action=\"configwifi\"></label><p><span> submit successfully!</P><p><span> please manually close this page.</P> </form>"
 #define ROOT_HTML  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.input{display: block; margin-top: 10px;}.input span{width: 100px; float: left; float: left; height: 36px; line-height: 36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: 50px; background-color: #438EF0; border-radius:8px; font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; margin-left:104px;}</style><body><form method=\"POST\" action=\"configwifi\"><p><span> KNOMI :-)</P><label class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input type=\"text\"  name=\"pass\"><label class=\"input\"><span>Klipper IP</span> <input type=\"text\"  name=\"klipper\"></label><input class=\"btn\" type=\"submit\" name=\"submit\" value=\"SUBMIT\"> </form>"
 #define ROOT_HTML_OK  "<!DOCTYPE html><html><head><title>WIFI SET</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><style type=\"text/css\">.c,body {text-align: center}</style><body><form method=\"POST\" action=\"configwifi\"></label><p><span> Submission successful!</P><p><span> You may now close this page.</P> </form>"
 /*
@@ -47,16 +36,7 @@ config_type wificonf ={{""},{""},{""},{""}};
  */
 void handleRoot() 
 {
-  // if (server.hasArg("selectSSID")) {
-  //   server.send(200, "text/html", ROOT_HTML + scanNetworksID + "</body></html>");   //scanNetWprksID是扫描到的wifi
-  // } else {
-  //   server.send(200, "text/html", ROOT_HTML + scanNetworksID + "</body></html>");   
-  // }
-  if (server.hasArg("selectSSID")) {
-    server.send(200, "text/html", ROOT_HTML);   
-  } else {
-    server.send(200, "text/html", ROOT_HTML);   
-  }
+  server.send(200, "text/html", ROOT_HTML);
 }
  
 /*
@@ -214,43 +194,6 @@ void initOtaServer()
 }
  
 /*
- * 扫描附近的WiFi，为了显示在配网界面
- */
-bool scanWiFi() {
-  Serial.println("scan start");
-  Serial.println("--------->");
-  // 扫描附近WiFi
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0) {
-    Serial.println("no networks found");
-    scanNetworksID = "no networks found";
-    return false;
-  } else {
-    Serial.print(n);
-    Serial.println(" networks found");
-    for (int i = 0; i < n; ++i) {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*");
-      scanNetworksID += "<P>" + WiFi.SSID(i) + "</P>";
-      
-      if(i==0)scanNetworksID1 =WiFi.SSID(i);
-      if(i==1)scanNetworksID2 =WiFi.SSID(i);
-      if(i==2)scanNetworksID3 =WiFi.SSID(i);
-
-      delay(10);
-    }
-    return true;
-  }
-}
- 
-/*
  * 连接WiFi
  */
 void connectToWiFi(int timeOut_s) {
@@ -331,17 +274,7 @@ void wifiConfig()
   // scanWiFi();       
 }
 
-/*
- * 测试时使用
- */
-void wifiConfig_test() 
-{
-  initSoftAP();   
-  initDNS();        
-  initWebServer();  
-  scanWiFi();       
-}
- 
+
 /*
  * 删除保存的wifi信息，这里的删除是删除存储在flash的信息。删除后wifi读不到上次连接的记录，需重新配网
  */
@@ -390,13 +323,6 @@ void readwificonfig()
   {
     *(p + i) = EEPROM.read(i + wifi_addr);
   }
-  // EEPROM.commit();
-  // Serial.printf("Read WiFi Config.....\r\n");
-  // Serial.printf("SSID:%s\r\n",wificonf.stassid);
-  // Serial.printf("PSW:%s\r\n",wificonf.stapsw);
-  // Serial.printf("KlipperIP:%s\r\n",wificonf.klipperip);
-  // Serial.printf("Connecting.....\r\n");
-
 }
 
 /*
@@ -406,9 +332,7 @@ void checkConnect(bool reConnect)
 {
   if (WiFi.status() != WL_CONNECTED)           //wifi连接失败
   {
-    // if (digitalRead(LED) != LOW) 
-    //   digitalWrite(LED, LOW);
-    if (reConnect == true && WiFi.getMode() != WIFI_AP && WiFi.getMode() != WIFI_AP_STA ) 
+    if (reConnect == true && WiFi.getMode() != WIFI_AP && WiFi.getMode() != WIFI_AP_STA )
     {
       Serial.println("WIFI未连接.");
       Serial.println("WiFi Mode:");
@@ -417,32 +341,9 @@ void checkConnect(bool reConnect)
       connectToWiFi(connectTimeOut_s);          //连接wifi函数 
     }
   } 
-  // else if (digitalRead(LED) != HIGH)  
-  //   digitalWrite(LED, HIGH);                    //wifi连接成功
 }
  
-/*
- * LED闪烁函数        //用不上LED可删除
- */
-// void blinkLED(int led, int n, int t) 
-// {
-//   for (int i = 0; i < 2 * n; i++) 
-//   {
-//     digitalWrite(led, !digitalRead(led));
-//     delay(t);
-//   }
-// }
- 
- 
-/*
- * LED初始化
- */
-// void LEDinit()
-// {
-//   pinMode(LED, OUTPUT);                 //配置LED口为输出口
-//   digitalWrite(LED, LOW);               //初始灯灭
-// }
- 
+
 /*
  * 检测客户端DNS&HTTP请求
  */

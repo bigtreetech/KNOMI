@@ -1,27 +1,17 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WiFiClient.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include <WiFiUdp.h>
 #include <WiFiUser.h>
 #include <EEPROM.h>
 #include <key.h>
 #include <Ticker.h>
 #include <lvgl.h>
 #include <TFT_eSPI.h> 
-#include <SPI.h>
-#include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <lvgl_gui.h>
-#include <lvgl_gif.h>
 #include "generated/images.h"
-
-
-//全局变量
-const char * statedata;
 
 uint16_t bedtemp_actual = 0;
 uint16_t bedtemp_target = 0;
@@ -38,11 +28,9 @@ String text_ext_target_temp = " °C";
 String text_bed_actual_temp = " °C";
 String text_bed_target_temp = " °C";
 
-
 int httpswitch = 1;
 
 String nameStrpriting="0";
-String fanspeed="0";
 
 uint32_t keyscan_nowtime=0;
 uint32_t keyscan_nexttime=0;
@@ -55,24 +43,16 @@ uint32_t httprequest_nexttime=0;
 
 String to_String(int n);
 Ticker timer1; 
-Ticker timer2; 
 
 static lv_disp_draw_buf_t draw_buf;    //定义显示器变量
 static lv_color_t buf[TFT_WIDTH*10]; //定义刷新缓存
  
 TFT_eSPI tft = TFT_eSPI(240,240);
 
-
-//打印进度百分比变量定义
 int16_t progress_data=0;
-//喷头温度百分比变量定义
-int16_t ext_per_data=0;
-//热床温度百分比变量定义
-int16_t bed_per_data=0;
-//风扇转速百分比变量定义
 int16_t fanspeed_data=0;
 
-ResourceImage *ri_ap_config_back, *ri_bc_black, *ri_disconnect;
+ResourceImage *ri_bc_black, *ri_disconnect, *ri_standby, *ri_voron, *ri_print, *ri_bedTemp, *ri_extTemp, *ri_before, *ri_after, *ri_ok, *ri_home, *ri_level;
 
 //----------------------------------------//
 using namespace std;
@@ -198,42 +178,6 @@ void init_label_heaterbed_target_temp()
     lv_obj_align(label_bed_target_temp, LV_ALIGN_CENTER, 0, -75); //居中显示
 }
 
-void init_arc_extruder_temp()
-{
-    arc_extruder_temp = lv_arc_create(lv_scr_act()); //创建圆弧对象
-
-    lv_style_set_arc_width(&style_arc_extruder_temp, 8);  // 设置样式的圆弧粗细
-    lv_obj_add_style(arc_extruder_temp, &style_arc_extruder_temp, LV_PART_MAIN);  // 将样式应用到圆弧背景
-    lv_obj_add_style(arc_extruder_temp, &style_arc_extruder_temp, LV_PART_INDICATOR);  // 将样式应用到圆弧前景
-
-    lv_obj_remove_style(arc_extruder_temp,NULL,LV_PART_KNOB);  //移除样式
-    lv_obj_clear_flag(arc_extruder_temp, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_set_style_arc_color(arc_extruder_temp, lv_palette_main(LV_PALETTE_ORANGE), LV_PART_INDICATOR);//进度条颜色
-    lv_obj_set_size(arc_extruder_temp,240,240);                   //设置尺寸
-    lv_arc_set_rotation(arc_extruder_temp,270);                   //设置零度位置
-    lv_arc_set_bg_angles(arc_extruder_temp,0,360);                //设置角度
-    lv_arc_set_value(arc_extruder_temp,100);                       //设置初始值
-    lv_obj_center(arc_extruder_temp);                             //居中显示
-}
-
-void init_arc_heaterbed_temp()
-{
-    arc_heaterbed_temp = lv_arc_create(lv_scr_act()); //创建圆弧对象
-
-    lv_style_set_arc_width(&style_arc_heaterbed_temp, 8);  // 设置样式的圆弧粗细
-    lv_obj_add_style(arc_heaterbed_temp, &style_arc_heaterbed_temp, LV_PART_MAIN);  // 将样式应用到圆弧背景
-    lv_obj_add_style(arc_heaterbed_temp, &style_arc_heaterbed_temp, LV_PART_INDICATOR);  // 将样式应用到圆弧前景
-
-    lv_obj_remove_style(arc_heaterbed_temp,NULL,LV_PART_KNOB);  //移除样式
-    lv_obj_clear_flag(arc_heaterbed_temp, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_set_style_arc_color(arc_heaterbed_temp, lv_palette_main(LV_PALETTE_TEAL), LV_PART_INDICATOR);//进度条颜色
-    lv_obj_set_size(arc_heaterbed_temp,224,224);                   //设置尺寸
-    lv_arc_set_rotation(arc_heaterbed_temp,270);                   //设置零度位置
-    lv_arc_set_bg_angles(arc_heaterbed_temp,0,360);                //设置角度
-    lv_arc_set_value(arc_heaterbed_temp,100);                       //设置初始值
-    lv_obj_center(arc_heaterbed_temp);                             //居中显示
-}
-
 //----------------------------------------screen3----初始化------------------------------------------------------//
 void init_label_print_file()
 {
@@ -322,15 +266,6 @@ void init_bar_fan_speed()
 }
 
 //----------------------------------------screen1---刷新-------------------------------------------------------//
-void update_label_print_status(){
-
-	label_print_status = lv_label_create(lv_scr_act()); //创建文字对象
-
-	lv_obj_add_style(label_print_status,&style_label_print_status,LV_PART_MAIN);           //将样式添加到文字对象中
-  lv_label_set_text(label_print_status, text_print_status.c_str());
-  lv_obj_align(label_print_status, LV_ALIGN_CENTER, 0, 50); //居中显示
-}
-
 void update_label_print_progress(){
 
   String TEXT = to_String(progress_data);
@@ -405,43 +340,6 @@ void update_label_heaterbed_target_temp()
   lv_obj_align(label_bed_target_temp, LV_ALIGN_CENTER, 0, -75); //居中显示
 }
 
-void update_arc_extruder_temp()
-{
-
-  arc_extruder_temp = lv_arc_create(lv_scr_act()); //创建圆弧对象
-
-  lv_style_set_arc_width(&style_arc_extruder_temp, 8);  // 设置样式的圆弧粗细
-  lv_obj_add_style(arc_extruder_temp, &style_arc_extruder_temp, LV_PART_MAIN);  // 将样式应用到圆弧背景
-  lv_obj_add_style(arc_extruder_temp, &style_arc_extruder_temp, LV_PART_INDICATOR);  // 将样式应用到圆弧前景
-
-  lv_obj_remove_style(arc_extruder_temp,NULL,LV_PART_KNOB);  //移除样式
-  lv_obj_clear_flag(arc_extruder_temp, LV_OBJ_FLAG_CLICKABLE);
-  lv_obj_set_style_arc_color(arc_extruder_temp, lv_palette_main(LV_PALETTE_ORANGE), LV_PART_INDICATOR);//进度条颜色
-  lv_obj_set_size(arc_extruder_temp,240,240);                   //设置尺寸
-  lv_arc_set_rotation(arc_extruder_temp,270);                   //设置零度位置
-  lv_arc_set_bg_angles(arc_extruder_temp,0,360);                //设置角度
-  lv_arc_set_value(arc_extruder_temp,100);            //设置值
-  lv_obj_center(arc_extruder_temp);                             //居中显示
-}
-
-void update_arc_heaterbed_temp()
-{
-  arc_heaterbed_temp = lv_arc_create(lv_scr_act()); //创建圆弧对象
-
-  lv_style_set_arc_width(&style_arc_heaterbed_temp, 8);  // 设置样式的圆弧粗细
-  lv_obj_add_style(arc_heaterbed_temp, &style_arc_heaterbed_temp, LV_PART_MAIN);  // 将样式应用到圆弧背景
-  lv_obj_add_style(arc_heaterbed_temp, &style_arc_heaterbed_temp, LV_PART_INDICATOR);  // 将样式应用到圆弧前景
-
-  lv_obj_remove_style(arc_heaterbed_temp,NULL,LV_PART_KNOB);  //移除样式
-  lv_obj_clear_flag(arc_heaterbed_temp, LV_OBJ_FLAG_CLICKABLE);
-  lv_obj_set_style_arc_color(arc_heaterbed_temp, lv_palette_main(LV_PALETTE_TEAL), LV_PART_INDICATOR);//进度条颜色
-  lv_obj_set_size(arc_heaterbed_temp,224,224);                   //设置尺寸
-  lv_arc_set_rotation(arc_heaterbed_temp,270);                   //设置零度位置
-  lv_arc_set_bg_angles(arc_heaterbed_temp,0,360);                //设置角度
-  lv_arc_set_value(arc_heaterbed_temp,100);            //设置值
-  lv_obj_center(arc_heaterbed_temp);                             //居中显示
-}
-
 //----------------------------------------screen3---刷新-------------------------------------------------------//
 void update_label_print_file()
 {
@@ -512,83 +410,33 @@ void update_bar_fan_speed()
 //-----------------------------------------------------------------------------------------------------//
 void update_screen1(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
+  ri_bc_black = KnownResourceImages::get_bc_black();
   update_label_print_progress();
   update_arc_print_progress();
 
   exist_object_screen_flg = 1;
 }
 
-void update_screen2(lv_timer_t * timer)
-{
-
-}
-
-void update_screen3(lv_timer_t * timer)
-{
-  update_label_print_file();
-
-  exist_object_screen_flg = 3;
-}
-
-void update_screen4(lv_timer_t * timer)
-{
-  update_label_ap_config();
-
-  exist_object_screen_flg = 4;
-}
-
-void update_screen5(lv_timer_t * timer)
-{
-  update_label_no_klipper();
-
-  exist_object_screen_flg = 5;
-}
-
-void update_screen6(lv_timer_t * timer)
-{
-  update_label_fan_speed();
-  update_bar_fan_speed();
-
-  exist_object_screen_flg = 6;
-}
-
 void update_screen7(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_Standby_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_standby = KnownResourceImages::get_Standby();
 
   exist_object_screen_flg = 7;
 }
 
-void update_screen8(lv_timer_t * timer)
-{
-  ri_bc_black = get_bc_black();
-  update_gif_StartPrinting_display();
-
-  exist_object_screen_flg = 8;
-}
-
 void update_screen9(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_Printing_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_print = KnownResourceImages::get_Printing();
 
   exist_object_screen_flg = 9;
 }
 
-void update_screen10(lv_timer_t * timer)
-{
-  ri_bc_black = get_bc_black();
-  update_gif_AfterPrinting_display();
-
-  exist_object_screen_flg = 10;
-}
-
 void update_screen11(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_bed_temp_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_bedTemp = KnownResourceImages::get_bed_temp();
   update_label_heaterbed_actual_temp();
   update_label_heaterbed_target_temp();
 
@@ -597,70 +445,66 @@ void update_screen11(lv_timer_t * timer)
 
 void update_screen12(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_ext_temp_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_extTemp = KnownResourceImages::get_ext_temp();
   update_label_extruder_actual_temp();
   update_label_extruder_target_temp();
 
   exist_object_screen_flg = 12;
 }
 
-void update_screen13(lv_timer_t * timer)
-{
-
-}
 
 void update_screen14(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_OK_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_ok = KnownResourceImages::get_Print_ok();
 
   exist_object_screen_flg = 14;
 }
 
 void update_screen15(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_voron_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_voron = KnownResourceImages::get_Voron();
 
   exist_object_screen_flg = 15;
 }
 
 void update_screen18(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_BeforePrinting_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_before = KnownResourceImages::get_BeforePrinting();
 
   exist_object_screen_flg = 18;
 }
 
 void update_screen19(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_AfterPrinting_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_after = KnownResourceImages::get_AfterPrinting();
 
   exist_object_screen_flg = 19;
 }
 
 void update_screen21(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_Home_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_home = KnownResourceImages::get_Home();
 
   exist_object_screen_flg = 21;
 }
 
 void update_screen22(lv_timer_t * timer)
 {
-  ri_bc_black = get_bc_black();
-  update_gif_levelling_display();
+  ri_bc_black = KnownResourceImages::get_bc_black();
+  ri_level = KnownResourceImages::get_levelling();
 
   exist_object_screen_flg = 22;
 }
 
 void update_screen23(lv_timer_t * timer)
 {
-  ri_disconnect = get_Disconnect_Back();
+  ri_disconnect = KnownResourceImages::get_Disconnect_Back();
 
   exist_object_screen_flg = 23;
 }
@@ -750,15 +594,10 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_Standby);
-    }else if(exist_object_screen_flg==8){
-
-      if (ri_bc_black) {
-        delete ri_bc_black;
-        ri_bc_black = nullptr;
+      if (ri_standby) {
+        delete ri_standby;
+        ri_standby = nullptr;
       }
-
-      lv_obj_del(gif_StartPrinting);
     }else if(exist_object_screen_flg==9){
 
       if (ri_bc_black) {
@@ -766,7 +605,10 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_Printing);
+      if (ri_print) {
+        delete ri_print;
+        ri_print = nullptr;
+      }
     }else if(exist_object_screen_flg==10){
 
       if (ri_bc_black) {
@@ -774,7 +616,7 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_AfterPrinting);
+      if (ri_after) { delete ri_after; ri_after = nullptr; }
     }else if(exist_object_screen_flg==11){
 
       if (ri_bc_black) {
@@ -782,8 +624,8 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_bed_temp);
-      lv_obj_del(label_bed_actual_temp); 
+      if (ri_bedTemp) { delete ri_bedTemp; ri_bedTemp = nullptr; }
+      lv_obj_del(label_bed_actual_temp);
       lv_obj_del(label_bed_target_temp); 
     }else if(exist_object_screen_flg==12){
 
@@ -792,7 +634,7 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_ext_temp);
+      if (ri_extTemp) { delete ri_extTemp; ri_extTemp = nullptr; }
       lv_obj_del(label_ext_actual_temp);
       lv_obj_del(label_ext_target_temp);
     }else if(exist_object_screen_flg==13){
@@ -805,7 +647,7 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_OK);
+      if (ri_ok) { delete ri_ok; ri_ok = nullptr; }
     }else if(exist_object_screen_flg==15){
 
       if (ri_bc_black) {
@@ -813,7 +655,7 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_voron);
+      if (ri_voron) { delete ri_voron; ri_voron = nullptr; }
     }else if(exist_object_screen_flg==18){
 
       if (ri_bc_black) {
@@ -821,7 +663,8 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_BeforePrinting);
+      if (ri_before) { delete ri_before; ri_before = nullptr; }
+
     }else if(exist_object_screen_flg==19){
 
       if (ri_bc_black) {
@@ -829,14 +672,7 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_AfterPrinting);
-    }else if(exist_object_screen_flg==20){
-
-      if (ri_bc_black) {
-        delete ri_bc_black;
-        ri_bc_black = nullptr;
-      }
-      lv_obj_del(gif_AP_Config);
+      if (ri_after) { delete ri_after; ri_after = nullptr; }
     }else if(exist_object_screen_flg==21){
 
       if (ri_bc_black) {
@@ -844,7 +680,7 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_Home);
+      if (ri_home) { delete ri_home; ri_home = nullptr; }
     }else if(exist_object_screen_flg==22){
 
       if (ri_bc_black) {
@@ -852,7 +688,7 @@ void delete_exist_object()
         ri_bc_black = nullptr;
       }
 
-      lv_obj_del(gif_levelling);
+      if (ri_level) { delete ri_level; ri_level = nullptr; }
     }else if(exist_object_screen_flg==23){
       if (ri_disconnect)
         delete ri_disconnect;
@@ -883,8 +719,8 @@ void Display_Object_Init()
     init_label_fan_speed();
     init_bar_fan_speed();
 
-    delete get_bc_black();
-    init_gif_Standby_display();
+    delete KnownResourceImages::get_bc_black();
+    delete KnownResourceImages::get_Standby();
 
     lv_obj_del(label_print_status);
     lv_obj_del(label_print_progress);
@@ -904,13 +740,11 @@ void Display_Object_Init()
     lv_obj_del(label_fan_speed);
     lv_obj_del(bar_fan_speed);
 
-    lv_obj_del(gif_Standby);
-
     exist_object_screen_flg = 0;
     screen_begin_dis_flg = 0;
 }
 
-void setup()
+__attribute__((unused)) void setup()
 {
     Serial.begin(115200);           //波特率
     EEPROM.begin(1024);             //分配flash空间存储配网信息
@@ -942,7 +776,7 @@ void setup()
 
 bool otaWasInit = false;
 
-void loop() 
+__attribute__((unused)) void loop()
 {
   // lv_tick_inc(1);/* le the GUI do its work */ 
   lv_task_handler();  

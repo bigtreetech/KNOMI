@@ -13,6 +13,7 @@ except ImportError:
     from lv_img_converter import Converter
 
 gifs = [f for f in listdir('data') if isfile(join('data', f))]
+gifs.sort()
 
 makedirs(join("src", "generated"), exist_ok=True)
 files = listdir(join("src", "generated"))
@@ -32,31 +33,39 @@ hWrapper = rf"""
 
 #include <lvgl.h>
 #include "ResourceImage.h"
+
+class KnownResourceImages {{
+public:
 """
 
 for gif in gifs:
     parts = splitext(gif)
-    print("Converting data/%s.gif to src/generated/%s.c" % (parts[0], parts[0]))
-    filepath = "data/%s%s" % (parts[0],parts[1])
-    filename = parts[0]
-    out_path = "src/generated/%s.c" % parts[0]
+    cWrapper += rf"""
+LV_IMG_DECLARE({parts[0]})
+"""
 
-    if (parts[1] == ".gif"): 
+for gif in gifs:
+    parts = splitext(gif)
+    filename = parts[0]
+    extension = parts[1]
+    print("Converting data/%s.gif to src/generated/%s.c" % (filename, filename))
+    filepath = "data/%s%s" % (filename,extension)
+    out_path = "src/generated/%s.c" % filename
+    isGif = (extension == ".gif")
+    if isGif:
         conv = Converter(filepath, filename, False, Converter.FLAG.CF_RAW_CHROMA)
         conv.convert(Converter.FLAG.CF_RAW_CHROMA, 0)
     else:
         conv = Converter(filepath, filename, False, Converter.FLAG.CF_TRUE_COLOR_565)
         conv.convert(Converter.FLAG.CF_TRUE_COLOR_565, 0)
 
-        cWrapper += rf"""
-LV_IMG_DECLARE({parts[0]});
-
-ResourceImage* get_{parts[0]}() {{
-    return new ResourceImage(&{parts[0]});
+    cWrapper += rf"""
+ResourceImage* KnownResourceImages::get_{filename}(int x, int y) {{
+    return new ResourceImage(&{filename}, {str(isGif).lower()}, x, y);
 }}
 """
-        hWrapper += rf"""
-ResourceImage* get_{parts[0]}();
+    hWrapper += rf"""
+    static ResourceImage* get_{filename}(int x = 0, int y = 0);
 """
     
     c_arr = conv.format_to_c_array()
@@ -64,6 +73,8 @@ ResourceImage* get_{parts[0]}();
     with open(out_path, "w") as fi:
         res = conv.get_c_code_file(-1, c_arr)
         fi.write(res)
+
+hWrapper += """};"""
 
 print("Generating images wrapper src/generated/images.h")
 with open("src/generated/images.h", "w") as fi:

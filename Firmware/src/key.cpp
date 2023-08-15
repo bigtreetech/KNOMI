@@ -1,8 +1,5 @@
 #include <key.h>
 #include <WiFiUser.h>
-#include <EEPROM.h>
-#include <test.h>
-
 
 uint8_t	KeyDownFlag=0;
 

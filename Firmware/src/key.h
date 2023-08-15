@@ -1,6 +1,4 @@
-#ifndef __KEY_H__
-#define __KEY_H__
-
+#pragma once
 #include <Arduino.h>
 
 #define RESET_PIN           0    //设置重置按键引脚,用于删除WiFi信息
@@ -21,6 +19,3 @@ void InitKeyInterface();
 int KeyMessageProc(uint8_t KeyMessage);
 int KeyMessageLongProc(uint8_t KeyMessage);
 void KeyRepeatStrikeScan();
-
-void cls();
-#endif
