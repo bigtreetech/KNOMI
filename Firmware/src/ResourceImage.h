@@ -8,16 +8,16 @@ private:
   lv_obj_t *img;
 
 public:
-  ResourceImage(const lv_img_dsc_t *image, String filename, lv_coord_t x, lv_coord_t y) {
+  ResourceImage(String filename, lv_coord_t x, lv_coord_t y) {
     lv_obj_t *screen = lv_scr_act();
+    filename = "A:/" + filename;
+    LV_LOG_INFO(("Creating resource image " + filename + " as gif").c_str());
     if (filename.endsWith(".gif")) {
-      Serial.println("Creating resource image " + filename + "as gif");
       img = lv_gif_create(screen);
-      lv_gif_set_src(img, image);
+      lv_gif_set_src(img, filename.begin());
     } else {
-      Serial.println("Creating resource image " + filename + "as img");
       img = lv_img_create(screen);
-      lv_img_set_src(img, image);
+      lv_img_set_src(img, filename.begin());
     }
     lv_obj_align(img, LV_ALIGN_CENTER, x, y);
   }
