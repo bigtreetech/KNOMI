@@ -59,13 +59,14 @@ for gif in gifs:
         conv = Converter(filepath, filename, False, Converter.FLAG.CF_TRUE_COLOR_565)
         conv.convert(Converter.FLAG.CF_TRUE_COLOR_565, 0)
 
+
     cWrapper += rf"""
-ResourceImage* KnownResourceImages::get_{filename}(int x, int y) {{
-    return new ResourceImage(&{filename}, {str(isGif).lower()}, x, y);
+ResourceImage* KnownResourceImages::get_{filename}(lv_coord_t x, lv_coord_t y) {{
+    return new ResourceImage(&{filename}, "{filename}{extension}", x, y);
 }}
 """
     hWrapper += rf"""
-    static ResourceImage* get_{filename}(int x = 0, int y = 0);
+    static ResourceImage* get_{filename}(lv_coord_t x = 0, lv_coord_t y = 0);
 """
     
     c_arr = conv.format_to_c_array()

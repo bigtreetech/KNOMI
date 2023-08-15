@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 #include <lvgl.h>
 #include <string>
 
@@ -7,12 +8,14 @@ private:
   lv_obj_t *img;
 
 public:
-  ResourceImage(const lv_img_dsc_t *image, bool isGif, int x, int y) {
+  ResourceImage(const lv_img_dsc_t *image, String filename, lv_coord_t x, lv_coord_t y) {
     lv_obj_t *screen = lv_scr_act();
-    if (isGif) {
+    if (filename.endsWith(".gif")) {
+      Serial.println("Creating resource image " + filename + "as gif");
       img = lv_gif_create(screen);
-      lv_gif_set_src(img, &img);
+      lv_gif_set_src(img, image);
     } else {
+      Serial.println("Creating resource image " + filename + "as img");
       img = lv_img_create(screen);
       lv_img_set_src(img, image);
     }
@@ -21,14 +24,3 @@ public:
 
   ~ResourceImage() { lv_obj_del(img); }
 };
-
-/*
- * white rectacngle example:
- *
- *  gif_White_back=lv_obj_create(lv_scr_act());//背景
-    lv_obj_center(gif_White_back);
-    lv_obj_set_size(gif_White_back,240,240);
-    lv_obj_set_style_bg_color(gif_White_back,lv_color_hex(0xFFFFFF),NULL);
-    lv_obj_align(gif_White_back,LV_ALIGN_CENTER,0,0);
- *
- * */

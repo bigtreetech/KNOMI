@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
+#include <Arduino.h>
 class Version {
 public:
-  static std::string getGitCommitSha1();
-  static std::string getBuildTimestamp();
+  static String getGitCommitSha1();
+  static String getBuildTimestamp();
 };

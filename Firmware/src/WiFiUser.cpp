@@ -2,6 +2,8 @@
 #include "version.h"
 #include <lvgl_gui.h>
 
+bool dnsInit = false;
+
 const byte DNS_PORT = 53; // 设置DNS端口号
 const int webPort = 80;   // 设置Web端口号
 
@@ -162,6 +164,7 @@ void initSoftAP() {
  * 开启DNS服务器
  */
 void initDNS() {
+  dnsInit = true;
   if (dnsServer.start(DNS_PORT, "*",
                       apIP)) // 判断将所有地址映射到esp32的ip上是否成功
   {
@@ -172,9 +175,9 @@ void initDNS() {
 }
 
 void setId() {
-  std::string short_sha = Version::getGitCommitSha1().substr(0, 8);
-  std::string timestamp = Version::getBuildTimestamp();
-  std::string id = short_sha + " - " + timestamp;
+  String short_sha = Version::getGitCommitSha1().substring(0, 8);
+  String timestamp = Version::getBuildTimestamp();
+  String id = short_sha + " - " + timestamp;
   ElegantOTA.setID(id.c_str());
 }
 
@@ -357,6 +360,8 @@ void checkConnect(bool reConnect) {
  * 检测客户端DNS&HTTP请求
  */
 void checkDNS_HTTP() {
-  dnsServer.processNextRequest(); // 检查客户端DNS请求
+  if (dnsInit) {
+    dnsServer.processNextRequest(); // 检查客户端DNS请求
+  }
   server.handleClient();          // 检查客户端(浏览器)http请求
 }
