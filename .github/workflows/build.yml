@@ -24,4 +24,4 @@ jobs:
         run: cd Firmware && pio run -e esp32dev
 
       - name: Build LightFS
-        run: cd Firmware && pio run buildfs -e esp32dev
+        run: cd Firmware && pio run -e fsbuild
