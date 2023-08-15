@@ -21,6 +21,25 @@ for file in files:
     if isfile(file_path):
         remove(file_path)
 
+cWrapper = rf"""
+#include "images.h"
+#include <Arduino.h>
+#include <lvgl.h>
+#include <WiFi.h>
+#include <TFT_eSPI.h> // Hardware-specific library
+"""
+hWrapper = rf"""
+#ifndef LVGL_LOGO_BTT_H
+#define LVGL_LOGO_BTT_H
+
+#ifdef __cplusplus
+extern "C" {{
+#endif
+
+#include <lvgl.h>
+
+"""
+
 for gif in gifs:
     parts = splitext(gif)
     print("Converting GIFS/%s.gif to src/generated/%s.c" % (parts[0], parts[0]))
@@ -34,9 +53,41 @@ for gif in gifs:
     else:
         conv = Converter(filepath, filename, False, Converter.FLAG.CF_TRUE_COLOR_565)
         conv.convert(Converter.FLAG.CF_TRUE_COLOR_565, 0)
+
+        cWrapper += rf"""
+LV_IMG_DECLARE({parts[0].upper()});
+lv_obj_t * img_{parts[0]};
+void init_img_{parts[0]}()
+{{
+    img_{parts[0]} = lv_img_create(lv_scr_act());
+    lv_img_set_src(img_{parts[0]}, &{parts[0].upper()});
+    lv_obj_align(img_{parts[0]},LV_ALIGN_CENTER,0,0);
+}}
+
+"""
+        hWrapper += rf"""
+extern lv_obj_t * img_{parts[0]};
+void init_img_{parts[0]}();
+"""
     
     c_arr = conv.format_to_c_array()
 
     with open(out_path, "w") as fi:
         res = conv.get_c_code_file(-1, c_arr)
         fi.write(res)
+
+hWrapper += rf"""
+#ifdef __cplusplus
+}} /* extern "C" */
+#endif
+
+#endif  
+"""
+
+print("Generating images wrapper src/generated/images.h")
+with open("src/generated/images.h", "w") as fi:
+    fi.write(hWrapper)
+
+print("Generating images wrapper src/generated/images.cpp")
+with open("src/generated/images.cpp", "w") as fi:
+    fi.write(cWrapper)

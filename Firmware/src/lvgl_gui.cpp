@@ -4,7 +4,7 @@
 #include <WiFi.h>
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <WiFiUser.h>
-#include <lvgl_logo_btt.h>
+#include "generated/images.h"
 #include <lvgl_gif.h>
 #include <test.h>
 
@@ -120,7 +120,7 @@ void Open_up_animation()
 void project_task_init(lv_timer_t * timer){
 
     lv_obj_del(open_anim_arc);
-    lv_obj_del(img_open_logo);
+    lv_obj_del(img_BTT_LOGO);
 
     display_step = 2; //待机
     timer_contne = 1;
@@ -167,7 +167,7 @@ void open_task_conv(lv_timer_t * timer){
     //连接wifi
     connectToWiFi(connectTimeOut_s);     //连接wifi，传入的是wifi连接等待时间15s    
 
-    init_img_open_logo_display();
+    init_img_BTT_LOGO();
 
     Open_up_animation();
 
@@ -184,7 +184,7 @@ void Open_display_init(){
         screen_begin_dis_flg = 1;
     }else{
 
-        init_img_open_logo_display();
+        init_img_BTT_LOGO();
 
         timer_open_init=lv_timer_create(open_task_conv, 100, NULL);
         lv_timer_set_repeat_count(timer_open_init,1);
