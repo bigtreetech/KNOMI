@@ -1,4 +1,5 @@
 #include "generated/images.h"
+#include "lv_port_fs_littlefs.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
@@ -41,7 +42,6 @@ uint32_t netcheck_nexttime = 0;
 uint32_t httprequest_nowtime = 0;
 uint32_t httprequest_nexttime = 0;
 
-String to_String(int n);
 Ticker timer1;
 
 static lv_disp_draw_buf_t draw_buf;    // 定义显示器变量
@@ -52,37 +52,12 @@ TFT_eSPI tft = TFT_eSPI(240, 240);
 int16_t progress_data = 0;
 int16_t fanspeed_data = 0;
 
-ResourceImage *ri_bc_black, *ri_disconnect, *ri_standby, *ri_voron, *ri_print,
+ResourceImage *ri_disconnect, *ri_standby, *ri_voron, *ri_print,
     *ri_bedTemp, *ri_extTemp, *ri_before, *ri_after, *ri_ok, *ri_home,
     *ri_level;
 
 //----------------------------------------//
 using namespace std;
-#define max 100
-String to_String(int n) {
-  int m = n;
-  char s[max];
-  char ss[max];
-  int i = 0, j = 0;
-  if (n < 0) {
-    m = 0 - m;
-    j = 1;
-    ss[0] = '-';
-  }
-
-  while (m > 0) {
-    s[i++] = m % 10 + '0';
-    m /= 10;
-  }
-
-  s[i] = '\0';
-  i = i - 1;
-  while (i >= 0) {
-    ss[j++] = s[i--];
-  }
-  ss[j] = '\0';
-  return ss;
-}
 
 //--------------------------------------screen1---初始化----------------------------------------------//
 void init_label_print_status() {
@@ -93,7 +68,9 @@ void init_label_print_status() {
 }
 
 void init_label_print_progress() {
-  String TEXT = to_String(progress_data);
+  String result;
+  result = String(progress_data);
+  String TEXT = result;
 
   label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
 
@@ -258,7 +235,9 @@ void init_label_no_klipper() {
 
 //----------------------------------------screen6----初始化------------------------------------------------------//
 void init_label_fan_speed() {
-  String TEXT = to_String(fanspeed_data);
+  String result;
+  result = String(fanspeed_data);
+  String TEXT = result;
 
   label_fan_speed = lv_label_create(lv_scr_act()); // 创建文字对象
 
@@ -289,7 +268,9 @@ void init_bar_fan_speed() {
 //----------------------------------------screen1---刷新-------------------------------------------------------//
 void update_label_print_progress() {
 
-  String TEXT = to_String(progress_data);
+  String result;
+  result = String(progress_data);
+  String TEXT = result;
 
   if (progress_data == 0) {
     TEXT = "0%";
@@ -402,7 +383,9 @@ void update_label_no_klipper() {
 
 //----------------------------------------screen6---刷新-------------------------------------------------------//
 void update_label_fan_speed() {
-  String TEXT = to_String(fanspeed_data);
+  String result;
+  result = String(fanspeed_data);
+  String TEXT = result;
 
   if (fanspeed_data == 0) {
     TEXT = "fan speed: 0%";
@@ -432,7 +415,6 @@ void update_bar_fan_speed() {
 
 //-----------------------------------------------------------------------------------------------------//
 void update_screen1(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   update_label_print_progress();
   update_arc_print_progress();
 
@@ -440,21 +422,18 @@ void update_screen1(lv_timer_t *timer) {
 }
 
 void update_screen7(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_standby = KnownResourceImages::get_Standby();
 
   exist_object_screen_flg = 7;
 }
 
 void update_screen9(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_print = KnownResourceImages::get_Printing();
 
   exist_object_screen_flg = 9;
 }
 
 void update_screen11(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_bedTemp = KnownResourceImages::get_bed_temp();
   update_label_heaterbed_actual_temp();
   update_label_heaterbed_target_temp();
@@ -463,7 +442,6 @@ void update_screen11(lv_timer_t *timer) {
 }
 
 void update_screen12(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_extTemp = KnownResourceImages::get_ext_temp();
   update_label_extruder_actual_temp();
   update_label_extruder_target_temp();
@@ -472,42 +450,36 @@ void update_screen12(lv_timer_t *timer) {
 }
 
 void update_screen14(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_ok = KnownResourceImages::get_Print_ok();
 
   exist_object_screen_flg = 14;
 }
 
 void update_screen15(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_voron = KnownResourceImages::get_Voron();
 
   exist_object_screen_flg = 15;
 }
 
 void update_screen18(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_before = KnownResourceImages::get_BeforePrinting();
 
   exist_object_screen_flg = 18;
 }
 
 void update_screen19(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_after = KnownResourceImages::get_AfterPrinting();
 
   exist_object_screen_flg = 19;
 }
 
 void update_screen21(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_home = KnownResourceImages::get_Home();
 
   exist_object_screen_flg = 21;
 }
 
 void update_screen22(lv_timer_t *timer) {
-  ri_bc_black = KnownResourceImages::get_bc_black();
   ri_level = KnownResourceImages::get_levelling();
 
   exist_object_screen_flg = 22;
@@ -568,10 +540,6 @@ void timer1_cb() {
 void delete_exist_object() {
   if (exist_object_screen_flg == 1) { // del screen1
 
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
     lv_obj_del(label_print_progress);
     lv_obj_del(arc_print_progress);
 
@@ -596,44 +564,22 @@ void delete_exist_object() {
 
   } else if (exist_object_screen_flg == 7) {
 
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_standby) {
       delete ri_standby;
       ri_standby = nullptr;
     }
   } else if (exist_object_screen_flg == 9) {
 
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_print) {
       delete ri_print;
       ri_print = nullptr;
     }
   } else if (exist_object_screen_flg == 10) {
-
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_after) {
       delete ri_after;
       ri_after = nullptr;
     }
   } else if (exist_object_screen_flg == 11) {
-
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_bedTemp) {
       delete ri_bedTemp;
       ri_bedTemp = nullptr;
@@ -641,11 +587,6 @@ void delete_exist_object() {
     lv_obj_del(label_bed_actual_temp);
     lv_obj_del(label_bed_target_temp);
   } else if (exist_object_screen_flg == 12) {
-
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
 
     if (ri_extTemp) {
       delete ri_extTemp;
@@ -657,32 +598,17 @@ void delete_exist_object() {
 
   } else if (exist_object_screen_flg == 14) {
 
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_ok) {
       delete ri_ok;
       ri_ok = nullptr;
     }
   } else if (exist_object_screen_flg == 15) {
 
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_voron) {
       delete ri_voron;
       ri_voron = nullptr;
     }
   } else if (exist_object_screen_flg == 18) {
-
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
 
     if (ri_before) {
       delete ri_before;
@@ -691,32 +617,17 @@ void delete_exist_object() {
 
   } else if (exist_object_screen_flg == 19) {
 
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_after) {
       delete ri_after;
       ri_after = nullptr;
     }
   } else if (exist_object_screen_flg == 21) {
 
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
-
     if (ri_home) {
       delete ri_home;
       ri_home = nullptr;
     }
   } else if (exist_object_screen_flg == 22) {
-
-    if (ri_bc_black) {
-      delete ri_bc_black;
-      ri_bc_black = nullptr;
-    }
 
     if (ri_level) {
       delete ri_level;
@@ -731,53 +642,55 @@ void delete_exist_object() {
 
 void Display_Object_Init() {
   init_label_print_status();
-  init_label_print_progress();
-  init_arc_print_progress();
-
-  init_label_extruder_actual_temp();
-  init_label_extruder_target_temp();
-
-  init_label_heaterbed_actual_temp();
-  init_label_heaterbed_target_temp();
-
-  init_label_print_file();
-
-  init_label_ap_config();
-
-  init_label_no_klipper();
-
-  init_label_fan_speed();
-  init_bar_fan_speed();
-
-  delete KnownResourceImages::get_bc_black();
-  delete KnownResourceImages::get_Standby();
-
   lv_obj_del(label_print_status);
+
+  init_label_print_progress();
   lv_obj_del(label_print_progress);
+
+  init_arc_print_progress();
   lv_obj_del(arc_print_progress);
 
+  init_label_extruder_actual_temp();
   lv_obj_del(label_ext_actual_temp);
+
+  init_label_extruder_target_temp();
   lv_obj_del(label_ext_target_temp);
+
+  init_label_heaterbed_actual_temp();
   lv_obj_del(label_bed_actual_temp);
+
+  init_label_heaterbed_target_temp();
   lv_obj_del(label_bed_target_temp);
 
+  init_label_print_file();
   lv_obj_del(label_print_file);
 
+  init_label_ap_config();
   lv_obj_del(label_ap_config);
 
+  init_label_no_klipper();
   lv_obj_del(label_no_klipper);
 
+  init_label_fan_speed();
   lv_obj_del(label_fan_speed);
+  init_bar_fan_speed();
   lv_obj_del(bar_fan_speed);
+
+  delete KnownResourceImages::get_Standby();
 
   exist_object_screen_flg = 0;
   screen_begin_dis_flg = 0;
 }
 
+void my_log_cb(const char* logLine)
+{
+    Serial.print(logLine);
+}
+
 __attribute__((unused)) void setup() {
   Serial.begin(115200); // 波特率
   EEPROM.begin(1024);   // 分配flash空间存储配网信息
-
+  lv_log_register_print_cb(&my_log_cb);
   delay(100);
   readwificonfig(); // 将wifi账号读出，判断是否进入配网界面
 
@@ -785,10 +698,11 @@ __attribute__((unused)) void setup() {
     wifi_ap_config_flg = 1;
   }
 
-  Serial.printf("SSID:%s\r\n", wificonf.stassid);
+  LV_LOG_INFO("SSID:%s\r\n", wificonf.stassid);
 
   InitKeyInterface(); // 按键接口初始化
   lv_display_Init();  // 显示初始化
+  lv_port_littlefs_init();
 
   Display_Object_Init(); // 所有显示对象初始化一遍
 
@@ -883,10 +797,10 @@ __attribute__((unused)) void loop() {
                                               .as<double>()) *
                                          100);
 
-            Serial.println(nameStr1);
-            Serial.println(nameStr2);
-            Serial.println(nameStr3);
-            Serial.println(nameStr4);
+            LV_LOG_INFO(nameStr1);
+            LV_LOG_INFO(nameStr2);
+            LV_LOG_INFO(nameStr3);
+            LV_LOG_INFO(nameStr4);
 
             text_ext_actual_temp = nameStr3 + "°C";
             text_ext_target_temp = nameStr4 + "°C";
@@ -944,9 +858,11 @@ __attribute__((unused)) void loop() {
             if (datas == 0) {
               nameStrpriting = "0";
             } else {
-              nameStrpriting = to_String(datas);
+              String result;
+              result = String(datas);
+              nameStrpriting = result;
             }
-            Serial.println(nameStrpriting);
+            LV_LOG_INFO(nameStrpriting);
 
             httpswitch = 3;
           } else if (httpswitch == 3) { // home状态
@@ -954,7 +870,7 @@ __attribute__((unused)) void loop() {
             String nameStr8 =
                 doc["result"]["status"]["gcode_macro G28"]["homing"]
                     .as<String>();
-            Serial.println(nameStr8);
+            LV_LOG_INFO(nameStr8);
 
             if (nameStr8 == "true") {
               homing_status = 1;
@@ -970,7 +886,7 @@ __attribute__((unused)) void loop() {
             String nameStr9 = doc["result"]["status"]
                                  ["gcode_macro BED_MESH_CALIBRATE"]["probing"]
                                      .as<String>();
-            Serial.println(nameStr9);
+            LV_LOG_INFO(nameStr9);
 
             if (nameStr9 == "true") {
               levelling_status = 1;
@@ -989,7 +905,7 @@ __attribute__((unused)) void loop() {
           if (screen_no_klipper_dis_flg < 10)
             screen_no_klipper_dis_flg++;
 
-          Serial.println("Error on HTTP request");
+          LV_LOG_INFO("Error on HTTP request");
 
           if (screen_no_klipper_dis_flg > 3) {
             display_step = 8; // no klipper connect

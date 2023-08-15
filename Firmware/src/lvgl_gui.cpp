@@ -171,12 +171,13 @@ void open_task_conv(lv_timer_t *timer) {
 void Open_display_init() {
 
   if (wifi_ap_config_flg == 1) {
+    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0xFFFFFF));
     logo = KnownResourceImages::get_AP_Config_Back();
     apc = KnownResourceImages::get_AP_Config(0, -36);
     exist_object_screen_flg = 20;
     screen_begin_dis_flg = 1;
   } else {
-
+    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
     logo = KnownResourceImages::get_BTT_LOGO();
 
     timer_open_init = lv_timer_create(open_task_conv, 100, NULL);

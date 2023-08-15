@@ -1,3 +1,4 @@
+#include "lvgl.h"
 #include <WiFiUser.h>
 #include <key.h>
 
@@ -117,7 +118,7 @@ int KeyMessageLongProc(uint8_t KeyMessage) {
 
   switch (KeyMessage) {
   case KEY_1_DW:
-    Serial.println("\n按键已长按4秒,正在清空网络连保存接信息.");
+    LV_LOG_INFO("Clearing wifi setup");
     deletewificonfig(); // 删除EEROM保存的wifi信息
     restoreWiFi();      // 删除保存的wifi信息
     ESP.restart();      // 重启复位esp32
