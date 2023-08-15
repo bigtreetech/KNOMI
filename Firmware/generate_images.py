@@ -12,7 +12,7 @@ except ImportError:
     env.Execute("\"$PYTHONEXE\" -m pip install Pillow~=9.3.0")
     from lv_img_converter import Converter
 
-gifs = [f for f in listdir('GIFS') if isfile(join('GIFS', f))]
+gifs = [f for f in listdir('data') if isfile(join('data', f))]
 
 makedirs(join("src", "generated"), exist_ok=True)
 files = listdir(join("src", "generated"))
@@ -42,8 +42,8 @@ extern "C" {{
 
 for gif in gifs:
     parts = splitext(gif)
-    print("Converting GIFS/%s.gif to src/generated/%s.c" % (parts[0], parts[0]))
-    filepath = "GIFS/%s%s" % (parts[0],parts[1])
+    print("Converting data/%s.gif to src/generated/%s.c" % (parts[0], parts[0]))
+    filepath = "data/%s%s" % (parts[0],parts[1])
     filename = parts[0]
     out_path = "src/generated/%s.c" % parts[0]
 
