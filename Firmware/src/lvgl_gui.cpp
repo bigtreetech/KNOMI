@@ -113,6 +113,7 @@ void project_task_init(lv_timer_t *timer) {
   lv_obj_del(open_anim_arc);
   if (logo) {
     delete logo;
+    logo = nullptr;
   }
 
   display_step = 2; // 待机
@@ -159,8 +160,6 @@ void open_task_conv(lv_timer_t *timer) {
 
   // 连接wifi
   connectToWiFi(connectTimeOut_s); // 连接wifi，传入的是wifi连接等待时间15s
-
-  logo = KnownResourceImages::get_BTT_LOGO();
 
   Open_up_animation();
 
