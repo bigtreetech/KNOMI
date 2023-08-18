@@ -14,6 +14,11 @@
 #include <lvgl_gui.h>
 #include <stdlib.h>
 
+LV_FONT_DECLARE(font_20)
+LV_FONT_DECLARE(font_28)
+LV_FONT_DECLARE(font_32)
+LV_FONT_DECLARE(font_48)
+
 uint16_t bedtemp_actual = 0;
 uint16_t bedtemp_target = 0;
 uint16_t last_bedtemp_target = 0;
@@ -75,7 +80,7 @@ void init_label_print_progress() {
   label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_print_progress,
-                         &lv_font_montserrat_48); // 设置字体样机及大小
+                         &font_48); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_print_progress,
                           lv_color_hex(0xFF0000)); // 设置样式文本字颜色
 
@@ -113,7 +118,7 @@ void init_label_extruder_actual_temp() {
   label_ext_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_ext_actual_temp,
-                         &lv_font_montserrat_32); // 设置字体样机及大小
+                         &font_32); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_ext_actual_temp,
                           lv_color_hex(0xFF0000)); // 设置样式文本字颜色
 
@@ -127,7 +132,7 @@ void init_label_extruder_target_temp() {
   label_ext_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_ext_target_temp,
-                         &lv_font_montserrat_32); // 设置字体样机及大小
+                         &font_32); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_ext_target_temp,
                           lv_color_hex(0xFF0000)); // 设置样式文本字颜色
 
@@ -141,7 +146,7 @@ void init_label_heaterbed_actual_temp() {
   label_bed_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_bed_actual_temp,
-                         &lv_font_montserrat_32); // 设置字体样机及大小
+                         &font_32); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_bed_actual_temp,
                           lv_color_hex(0xFF0000)); // 设置样式文本字颜色
 
@@ -155,7 +160,7 @@ void init_label_heaterbed_target_temp() {
   label_bed_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_bed_target_temp,
-                         &lv_font_montserrat_32); // 设置字体样机及大小
+                         &font_32); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_bed_target_temp,
                           lv_color_hex(0xFF0000)); // 设置样式文本字颜色
 
@@ -184,7 +189,7 @@ void init_label_print_file() {
   lv_style_set_pad_all(&style_label_print_file, 2);
 
   lv_style_set_text_font(&style_label_print_file,
-                         &lv_font_montserrat_28); // 设置字体样机及大小
+                         &font_28); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_print_file,
                           lv_color_hex(0xffffff)); // 设置样式文本字颜色
 
@@ -206,7 +211,7 @@ void init_label_ap_config() {
   label_ap_config = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_ap_config,
-                         &lv_font_montserrat_20); // 设置字体样机及大小
+                         &font_20); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_ap_config,
                           lv_color_hex(0x2400FF)); // 设置样式文本字颜色
 
@@ -223,7 +228,7 @@ void init_label_no_klipper() {
   label_no_klipper = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_no_klipper,
-                         &lv_font_montserrat_20); // 设置字体样机及大小
+                         &font_20); // 设置字体样机及大小
   lv_style_set_text_color(&style_label_no_klipper,
                           lv_color_hex(0x2400FF)); // 设置样式文本字颜色
 
@@ -242,7 +247,7 @@ void init_label_fan_speed() {
   label_fan_speed = lv_label_create(lv_scr_act()); // 创建文字对象
 
   lv_style_set_text_font(&style_label_fan_speed,
-                         &lv_font_montserrat_24); // 设置字体样机及大小
+                         &font_24); // 设置字体样机及大小
   lv_style_set_text_color(
       &style_label_fan_speed,
       lv_palette_main(LV_PALETTE_RED)); // 设置样式文本字颜色
@@ -639,6 +644,8 @@ void delete_exist_object() {
   } else {
   }
 }
+
+const lv_font_t font_default = lv_font_t();
 
 void Display_Object_Init() {
   init_label_print_status();

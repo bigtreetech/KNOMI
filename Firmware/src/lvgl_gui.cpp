@@ -3,7 +3,6 @@
 #include <WiFiUser.h>
 #include <lvgl.h>
 #include <lvgl_gui.h>
-#include <test.h>
 
 ResourceImage *logo, *apc;
 
