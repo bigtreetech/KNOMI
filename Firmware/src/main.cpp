@@ -808,15 +808,15 @@ __attribute__((unused)) void loop() {
                                               .as<double>()) *
                                          100);
 
-            LV_LOG_INFO(nameStr1);
-            LV_LOG_INFO(nameStr2);
-            LV_LOG_INFO(nameStr3);
-            LV_LOG_INFO(nameStr4);
-
             text_ext_actual_temp = nameStr3 + "°C";
             text_ext_target_temp = nameStr4 + "°C";
             text_bed_actual_temp = nameStr1 + "°C";
             text_bed_target_temp = nameStr2 + "°C";
+
+            LV_LOG_INFO(text_ext_actual_temp.c_str());
+            LV_LOG_INFO(text_ext_target_temp.c_str());
+            LV_LOG_INFO(text_bed_actual_temp.c_str());
+            LV_LOG_INFO(text_bed_target_temp.c_str());
 
             if (nameStr5 == "true") {
               text_print_status = "Printing";
@@ -873,7 +873,7 @@ __attribute__((unused)) void loop() {
               result = String(datas);
               nameStrpriting = result;
             }
-            LV_LOG_INFO(nameStrpriting);
+            LV_LOG_INFO(nameStrpriting.c_str());
 
             httpswitch = 3;
           } else if (httpswitch == 3) { // home状态
@@ -881,7 +881,7 @@ __attribute__((unused)) void loop() {
             String nameStr8 =
                 doc["result"]["status"]["gcode_macro G28"]["homing"]
                     .as<String>();
-            LV_LOG_INFO(nameStr8);
+            LV_LOG_INFO(nameStr8.c_str());
 
             if (nameStr8 == "true") {
               homing_status = 1;
@@ -897,7 +897,7 @@ __attribute__((unused)) void loop() {
             String nameStr9 = doc["result"]["status"]
                                  ["gcode_macro BED_MESH_CALIBRATE"]["probing"]
                                      .as<String>();
-            LV_LOG_INFO(nameStr9);
+            LV_LOG_INFO(nameStr9.c_str());
 
             if (nameStr9 == "true") {
               levelling_status = 1;

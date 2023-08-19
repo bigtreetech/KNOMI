@@ -103,7 +103,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t* drv, void* file_p) {
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t* drv, void* file_p, void* buf, uint32_t btr, uint32_t* br) {
   LV_UNUSED(drv);
-  LV_LOG_INFO(String(btr).c_str());
+  LV_LOG_TRACE(String(btr).c_str());
   LittleFile* lf = (LittleFile*)file_p;
 
   *br = lf->file.read((uint8_t*)buf, btr);
@@ -122,7 +122,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t* drv, void* file_p, void* buf, uint32_t b
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t* drv, void* file_p, const void* buf, uint32_t btw, uint32_t* bw) {
   LV_UNUSED(drv);
-  LV_LOG_INFO(String(btw).c_str());
+  LV_LOG_TRACE(String(btw).c_str());
   LittleFile* lf = (LittleFile*)file_p;
   *bw = lf->file.write((uint8_t*)buf, btw);
   return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -139,7 +139,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t* drv, void* file_p, const void* buf, uin
 static lv_fs_res_t fs_seek(lv_fs_drv_t* drv, void* file_p, uint32_t pos, lv_fs_whence_t whence) {
   LV_UNUSED(drv);
 
-  LV_LOG_INFO(String(pos).c_str());
+  LV_LOG_TRACE(String(pos).c_str());
   SeekMode mode;
   if (whence == LV_FS_SEEK_SET)
     mode = SeekSet;
@@ -155,7 +155,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t* drv, void* file_p, uint32_t pos, lv_fs_w
 
 static lv_fs_res_t fs_tell(lv_fs_drv_t* drv, void* file_p, uint32_t* pos_p) {
   LV_UNUSED(drv);
-  LV_LOG_INFO("fs_tell");
+  LV_LOG_TRACE("fs_tell");
   LittleFile* lf = (LittleFile*)file_p;
   *pos_p = lf->file.position();
   return LV_FS_RES_OK;

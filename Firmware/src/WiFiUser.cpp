@@ -68,7 +68,7 @@ void handleConfigWifi() // 返回http状态
     wifi_ssid = server.arg("ssid"); // 获取html表单输入框name名为"ssid"的内容
 
     strcpy(wificonf.stassid, wifi_ssid.c_str()); // 名称复制
-    LV_LOG_INFO(wifi_ssid);
+    LV_LOG_INFO(wifi_ssid.c_str());
   } else // 没有参数
   {
     LV_LOG_INFO("error, not found ssid");
@@ -82,7 +82,7 @@ void handleConfigWifi() // 返回http状态
     wifi_pass = server.arg("pass"); // 获取html表单输入框name名为"pwd"的内容
 
     strcpy(wificonf.stapsw, wifi_pass.c_str()); // 名称复制
-    LV_LOG_INFO(wifi_pass);
+    LV_LOG_INFO(wifi_pass.c_str());
   } else {
     LV_LOG_INFO("error, not found password");
     server.send(200, "text/html",
@@ -99,7 +99,7 @@ void handleConfigWifi() // 返回http状态
 
     wificonf.apmodeflag[0] = '8'; // 8 STA模式
 
-    LV_LOG_INFO(klipper_ip);
+    LV_LOG_INFO(klipper_ip.c_str());
   } else {
     LV_LOG_INFO("error, not found klipper ip");
     server.send(200, "text/html",
@@ -117,7 +117,7 @@ void handleConfigWifi() // 返回http状态
       true); // 参数设置为true，设备将直接关闭接入点模式，即关闭设备所建立的WiFi网络。
   server.close();          // 关闭web服务
   WiFi.softAPdisconnect(); // 在不输入参数的情况下调用该函数,将关闭接入点模式,并将当前配置的AP热点网络名和密码设置为空值.
-  LV_LOG_INFO("WiFi Connect SSID:" + wifi_ssid + "  PASS:" + wifi_pass);
+  LV_LOG_INFO(("WiFi Connect SSID:" + wifi_ssid + "  PASS:" + wifi_pass).c_str());
 
   if (WiFi.status() != WL_CONNECTED) // wifi没有连接成功
   {
@@ -148,9 +148,9 @@ void initSoftAP() {
     // 打印相关信息
     LV_LOG_INFO("ESP-32S SoftAP is right.");
     LV_LOG_INFO("Soft-AP IP address = ");
-    LV_LOG_INFO(WiFi.softAPIP()); // 接入点ip
-    LV_LOG_INFO(String("MAC address = ") +
-                   WiFi.softAPmacAddress().c_str()); // 接入点mac
+    LV_LOG_INFO(WiFi.softAPIP().toString().c_str()); // 接入点ip
+    LV_LOG_INFO((String("MAC address = ") +
+                   WiFi.softAPmacAddress().c_str()).c_str()); // 接入点mac
   } else                                             // 开启AP热点失败
   {
     LV_LOG_INFO("WiFiAP Failed");
@@ -268,17 +268,17 @@ void connectToWiFi(int timeOut_s) {
     LV_LOG_INFO("SSID:%s", WiFi.SSID().c_str());
     LV_LOG_INFO(", PSW:%s\r\n", WiFi.psk().c_str());
     LV_LOG_INFO("LocalIP:");
-    LV_LOG_INFO(WiFi.localIP());
+    LV_LOG_INFO(WiFi.localIP().toString().c_str());
     LV_LOG_INFO(" ,GateIP:");
-    LV_LOG_INFO(WiFi.gatewayIP());
+    LV_LOG_INFO(WiFi.gatewayIP().toString().c_str());
 
     LV_LOG_INFO("KlipperIP:");
     String str(wificonf.klipperip);
     klipper_ip = wificonf.klipperip;
-    LV_LOG_INFO(klipper_ip);
+    LV_LOG_INFO(klipper_ip.c_str());
 
     LV_LOG_INFO("WIFI status is:");
-    LV_LOG_INFO(WiFi.status());
+    LV_LOG_INFO(String(WiFi.status()).c_str());
 
     // digitalWrite(LED, HIGH);
     server.stop(); // 停止开发板所建立的网络服务器。
@@ -349,7 +349,7 @@ void checkConnect(bool reConnect) {
         WiFi.getMode() != WIFI_AP_STA) {
       LV_LOG_INFO("WIFI未连接.");
       LV_LOG_INFO("WiFi Mode:");
-      LV_LOG_INFO(WiFi.getMode());
+      LV_LOG_INFO(String(WiFi.getMode()).c_str());
       LV_LOG_INFO("正在连接WiFi...");
       connectToWiFi(connectTimeOut_s); // 连接wifi函数
     }
