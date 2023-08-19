@@ -1,5 +1,5 @@
+#include "fs/lv_port_fs_littlefs.h"
 #include "generated/images.h"
-#include "lv_port_fs_littlefs.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
