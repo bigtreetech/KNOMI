@@ -158,7 +158,7 @@ void open_task_1(lv_timer_t *timer) {
 void open_task_conv(lv_timer_t *timer) {
 
   // 连接wifi
-  connectToWiFi(connectTimeOut_s); // 连接wifi，传入的是wifi连接等待时间15s
+  connectToWiFi(); // 连接wifi，传入的是wifi连接等待时间15s
 
   Open_up_animation();
 

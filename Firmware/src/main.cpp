@@ -1,6 +1,8 @@
+#include "button/Button.h"
 #include "fs/lv_port_fs_littlefs.h"
 #include "generated/images.h"
-#include "key/Button.h"
+#include "network/KnomiWebServer.h"
+#include "network/WifiConfig.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
@@ -9,17 +11,19 @@
 #include <Ticker.h>
 #include <WiFi.h>
 #include <WiFiUser.h>
+#include <cstdlib>
 #include <iostream>
 #include <lvgl.h>
 #include <lvgl_gui.h>
-#include <stdlib.h>
 
 LV_FONT_DECLARE(font_20)
 LV_FONT_DECLARE(font_28)
 LV_FONT_DECLARE(font_32)
 LV_FONT_DECLARE(font_48)
 
-Button* btn;
+WifiConfig *wifiEepromConfig;
+Button *btn;
+KnomiWebServer *webServer;
 
 uint16_t bedtemp_actual = 0;
 uint16_t bedtemp_target = 0;
@@ -59,9 +63,8 @@ TFT_eSPI tft = TFT_eSPI(240, 240);
 int16_t progress_data = 0;
 int16_t fanspeed_data = 0;
 
-ResourceImage *ri_disconnect, *ri_standby, *ri_voron, *ri_print,
-    *ri_bedTemp, *ri_extTemp, *ri_before, *ri_after, *ri_ok, *ri_home,
-    *ri_level;
+ResourceImage *ri_disconnect, *ri_standby, *ri_voron, *ri_print, *ri_bedTemp,
+    *ri_extTemp, *ri_before, *ri_after, *ri_ok, *ri_home, *ri_level;
 
 //----------------------------------------//
 using namespace std;
@@ -692,10 +695,7 @@ void Display_Object_Init() {
 }
 
 #if LV_USE_LOG
-void logToSerial(const char* logLine)
-{
-    Serial.print(logLine);
-}
+void logToSerial(const char *logLine) { Serial.print(logLine); }
 #endif
 
 __attribute__((unused)) void setup() {
@@ -705,16 +705,18 @@ __attribute__((unused)) void setup() {
   lv_log_register_print_cb(&logToSerial);
 #endif
   delay(100);
-  readwificonfig(); // 将wifi账号读出，判断是否进入配网界面
 
-  if (wificonf.apmodeflag[0] != '8') { // 直接进入配网
+  wifiEepromConfig = new WifiConfig();
+  wifiEepromConfig->ReadConfig();
+
+  if (wifiEepromConfig->GetApModeFlag() != '8') { // 直接进入配网
     wifi_ap_config_flg = 1;
   }
 
-  LV_LOG_INFO("SSID:%s\r\n", wificonf.stassid);
+  LV_LOG_INFO("SSID:%s\r\n", wifiEepromConfig->getSSID().c_str());
 
-  btn = new Button();
-  lv_display_Init();  // 显示初始化
+  btn = new Button(wifiEepromConfig);
+  lv_display_Init(); // 显示初始化
   lv_port_littlefs_init();
 
   Display_Object_Init(); // 所有显示对象初始化一遍
@@ -723,6 +725,8 @@ __attribute__((unused)) void setup() {
 
   lv_display_led_Init(); // 晚一点开背光
 
+  webServer = new KnomiWebServer(wifiEepromConfig);
+
   timer1.attach(
       0.001, timer1_cb); // 定时0.001s，即1ms，回调函数为timer1_cb，并启动定时器
 
@@ -730,8 +734,6 @@ __attribute__((unused)) void setup() {
     wifiConfig(); // 开始配网功能
   }
 }
-
-bool otaWasInit = false;
 
 __attribute__((unused)) void loop() {
   // lv_tick_inc(1);/* le the GUI do its work */
@@ -745,10 +747,6 @@ __attribute__((unused)) void loop() {
       if ((WiFi.status() == WL_CONNECTED) && (!btn->isPressed()) &&
           (start_http_request_flg ==
            1)) { // wifi已经连接成功，发送http请求获取数据
-        if (!otaWasInit) {
-          otaWasInit = true;
-          initOtaServer();
-        }
 
         HTTPClient http;
 
@@ -759,7 +757,7 @@ __attribute__((unused)) void loop() {
           display_step = 2;
           First_connection_flg = 1;
         }
-
+        String klipper_ip = wifiEepromConfig->getKlipperIp();
         if (httpswitch == 1) {
           http.begin("http://" + klipper_ip + "/api/printer"); // 获取温度
         } else if (httpswitch == 2) {
@@ -1136,8 +1134,9 @@ __attribute__((unused)) void loop() {
 
     checkConnect(true); // 检测网络连接状态，参数true表示如果断开重新连接
     checkDNS_HTTP(); // 检测客户端DNS&HTTP请求，也就是检查配网页面那部分
+    webServer->tick();
 
-    if (WiFi.status() != WL_CONNECTED) { // wifi没有连接成功
+    if (WiFiClass::status() != WL_CONNECTED) { // wifi没有连接成功
       First_connection_flg = 0;
     }
     netcheck_nexttime = netcheck_nowtime + 100UL;

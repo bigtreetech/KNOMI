@@ -2,7 +2,8 @@
 #include "WiFiUser.h"
 #include "lvgl.h"
 
-Button::Button() {
+Button::Button(WifiConfig* config) {
+  wificonfig = config;
   pinMode(0, INPUT); // input mode; default -> high, pressed -> low.
   delay(200);
   currentState = HIGH;
@@ -21,7 +22,7 @@ void Button::KeyScan() {
 
     if (pressDuration > WIFI_RESET_LONG_PRESS_MS) {
       LV_LOG_INFO("Clearing wifi setup");
-      deletewificonfig(); // 删除EEROM保存的wifi信息
+      wificonfig->DeleteConfig();
       restoreWiFi();      // 删除保存的wifi信息
       ESP.restart();      // 重启复位esp32
     }
