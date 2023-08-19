@@ -1,5 +1,6 @@
 #include "fs/lv_port_fs_littlefs.h"
 #include "generated/images.h"
+#include "key/Button.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
@@ -9,7 +10,6 @@
 #include <WiFi.h>
 #include <WiFiUser.h>
 #include <iostream>
-#include <key.h>
 #include <lvgl.h>
 #include <lvgl_gui.h>
 #include <stdlib.h>
@@ -18,6 +18,8 @@ LV_FONT_DECLARE(font_20)
 LV_FONT_DECLARE(font_28)
 LV_FONT_DECLARE(font_32)
 LV_FONT_DECLARE(font_48)
+
+Button* btn;
 
 uint16_t bedtemp_actual = 0;
 uint16_t bedtemp_target = 0;
@@ -539,7 +541,7 @@ void lv_display_Init() {
 
 void timer1_cb() {
   lv_tick_inc(1); /* le the GUI do its work */
-  KeyScan();
+  btn->KeyScan();
 }
 
 void delete_exist_object() {
@@ -711,7 +713,7 @@ __attribute__((unused)) void setup() {
 
   LV_LOG_INFO("SSID:%s\r\n", wificonf.stassid);
 
-  InitKeyInterface(); // 按键接口初始化
+  btn = new Button();
   lv_display_Init();  // 显示初始化
   lv_port_littlefs_init();
 
@@ -740,7 +742,7 @@ __attribute__((unused)) void loop() {
     httprequest_nowtime = millis();
     if (httprequest_nowtime > httprequest_nexttime) {
 
-      if ((WiFi.status() == WL_CONNECTED) && (KeyDownFlag != KEY_DWON) &&
+      if ((WiFi.status() == WL_CONNECTED) && (!btn->isPressed()) &&
           (start_http_request_flg ==
            1)) { // wifi已经连接成功，发送http请求获取数据
         if (!otaWasInit) {
