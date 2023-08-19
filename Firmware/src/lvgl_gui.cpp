@@ -4,13 +4,10 @@
 #include <lvgl.h>
 #include <lvgl_gui.h>
 
-ResourceImage *logo, *apc;
+ResourceImage *logo;
 
 // 显示刷新定时器
 lv_timer_t *update_timer = nullptr;
-uint8_t print_status = 0; // 0 待机  1 打印  2暂停
-uint8_t homing_status = 0;
-uint8_t levelling_status = 0;
 uint8_t timer_contne = 0;          // 显示时间
 uint8_t standby_voron_dis_flg = 0; // 0 standby 1voron 循环显示
 uint8_t display_step =
@@ -21,7 +18,7 @@ uint8_t display_step =
 uint8_t exist_object_screen_flg = 0;   // 0 没有存在的屏幕对象
 uint8_t screen_begin_dis_flg = 0;      // 0 启动while循环
 uint8_t screen_no_klipper_dis_flg = 0; // 0 连接klipper失败
-uint8_t start_http_request_flg = 0;    // 0 开始启动http请求
+// 0 开始启动http请求
 uint8_t wifi_ap_config_flg = 0;        // 0 wifi配网中
 uint8_t First_connection_flg = 0;      // 第一次连接上
 
@@ -41,17 +38,11 @@ lv_obj_t *label_ext_target_temp;
 lv_obj_t *label_bed_actual_temp;
 lv_obj_t *label_bed_target_temp;
 
-lv_obj_t *arc_extruder_temp;
-lv_obj_t *arc_heaterbed_temp;
-
 // 温度界面对象样式定义
 lv_style_t style_label_ext_actual_temp;
 lv_style_t style_label_ext_target_temp;
 lv_style_t style_label_bed_actual_temp;
 lv_style_t style_label_bed_target_temp;
-
-lv_style_t style_arc_extruder_temp;
-lv_style_t style_arc_heaterbed_temp;
 
 // 打印文件界面对象定义
 lv_obj_t *label_print_file;
@@ -171,7 +162,7 @@ void Open_display_init() {
   if (wifi_ap_config_flg == 1) {
     lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0xFFFFFF));
     logo = KnownResourceImages::get_AP_Config_Back();
-    apc = KnownResourceImages::get_AP_Config(0, -36);
+    KnownResourceImages::get_AP_Config(0, -36);
     exist_object_screen_flg = 20;
     screen_begin_dis_flg = 1;
   } else {

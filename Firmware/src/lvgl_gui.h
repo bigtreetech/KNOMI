@@ -16,9 +16,6 @@ void Open_display_init();
 
 // 显示刷新定时器
 extern lv_timer_t *update_timer;
-extern uint8_t print_status;
-extern uint8_t homing_status;
-extern uint8_t levelling_status;
 extern uint8_t timer_contne;
 extern uint8_t display_step;
 extern uint8_t standby_voron_dis_flg;
@@ -26,7 +23,6 @@ extern uint8_t standby_voron_dis_flg;
 extern uint8_t exist_object_screen_flg; // 0 没有存在的屏幕对象
 extern uint8_t screen_begin_dis_flg;
 extern uint8_t screen_no_klipper_dis_flg; // 0 连接klipper失败
-extern uint8_t start_http_request_flg;    // 0 开始启动http请求
 extern uint8_t wifi_ap_config_flg;        // 0 wifi配网中
 extern uint8_t First_connection_flg;
 
