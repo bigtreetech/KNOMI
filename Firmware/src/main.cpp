@@ -1,6 +1,5 @@
 #include "button/Button.h"
 #include "fs/lv_port_fs_littlefs.h"
-#include "generated/images.h"
 #include "network/KnomiWebServer.h"
 #include "network/WifiConfig.h"
 #include "network/KlipperApi.h"
@@ -13,24 +12,24 @@
 #include <cstdlib>
 #include <iostream>
 #include <lvgl.h>
-#include <lvgl_gui.h>
+#include "SceneManager.h"
 
 LV_FONT_DECLARE(font_20)
 LV_FONT_DECLARE(font_28)
 LV_FONT_DECLARE(font_32)
 LV_FONT_DECLARE(font_48)
 
-WifiConfig *wifiEepromConfig;
-Button *btn;
-KnomiWebServer *webServer;
-KlipperApi* klipperApi;
+WifiConfig *wifiEepromConfig = nullptr;
+Button *btn = nullptr;
+KnomiWebServer *webServer = nullptr;
+KlipperApi* klipperApi = nullptr;
+SceneManager* sceneManager = nullptr;
 
 uint32_t keyscan_nowtime = 0;
 uint32_t keyscan_nexttime = 0;
 
 uint32_t netcheck_nowtime = 0;
 uint32_t netcheck_nexttime = 0;
-
 
 Ticker timer1;
 
@@ -39,306 +38,130 @@ static lv_color_t buf[TFT_WIDTH * 10]; // 定义刷新缓存
 
 TFT_eSPI tft = TFT_eSPI(240, 240);
 
-ResourceImage *ri_disconnect, *ri_standby, *ri_voron, *ri_print, *ri_bedTemp,
-    *ri_extTemp, *ri_before, *ri_after, *ri_ok, *ri_home, *ri_level;
 
 //----------------------------------------//
 using namespace std;
 
-//--------------------------------------screen1---初始化----------------------------------------------//
-void init_label_print_status() {
-  label_print_status = lv_label_create(lv_scr_act());
-
-  lv_label_set_text(label_print_status, klipperApi->getPrintStatus().c_str());
-  lv_obj_align(label_print_status, LV_ALIGN_CENTER, 0, 50); // 居中显示
-}
-
-void init_label_print_progress() {
-
-  label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
-
-  lv_style_set_text_font(&style_label_print_progress,
-                         &font_48); // 设置字体样机及大小
-  lv_style_set_text_color(&style_label_print_progress,
-                          lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-  lv_obj_add_style(label_print_progress, &style_label_print_progress,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_print_progress,
-                    String(klipperApi->getProgressData()).c_str());
-  lv_obj_align(label_print_progress, LV_ALIGN_CENTER, 0, 0); // 居中显示
-}
-
-void init_arc_print_progress() {
-  arc_print_progress = lv_arc_create(lv_scr_act()); // 创建圆弧对象
-
-  lv_style_set_arc_width(&style_arc_print_progress, 24); // 设置样式的圆弧粗细
-  lv_style_set_arc_color(&style_arc_print_progress,
-                         lv_color_hex(0x000000)); // 设置背景圆环颜色
-
-  lv_obj_add_style(arc_print_progress, &style_arc_print_progress,
-                   LV_PART_MAIN); // 将样式应用到圆弧背景
-  lv_obj_add_style(arc_print_progress, &style_arc_print_progress,
-                   LV_PART_INDICATOR); // 将样式应用到圆弧前景
-
-  lv_obj_remove_style(arc_print_progress, NULL, LV_PART_KNOB); // 移除样式
-  lv_obj_clear_flag(arc_print_progress, LV_OBJ_FLAG_CLICKABLE);
-  lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(0xFF0000),
-                             LV_PART_INDICATOR);    // 进度条颜色
-  lv_obj_set_size(arc_print_progress, 240, 240);    // 设置尺寸
-  lv_arc_set_rotation(arc_print_progress, 270);     // 设置零度位置
-  lv_arc_set_bg_angles(arc_print_progress, 0, 360); // 设置角度
-  lv_arc_set_value(arc_print_progress, 0);          // 设置初始值
-  lv_obj_center(arc_print_progress);                // 居中显示
-}
-
-//----------------------------------------screen2----初始化------------------------------------------------------//
-void init_label_extruder_actual_temp() {
-  label_ext_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
-
-  lv_style_set_text_font(&style_label_ext_actual_temp,
-                         &font_32); // 设置字体样机及大小
-  lv_style_set_text_color(&style_label_ext_actual_temp,
-                          lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-  lv_obj_add_style(label_ext_actual_temp, &style_label_ext_actual_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_ext_actual_temp, klipperApi->getExtruderActualTemp().c_str());
-  lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
-}
-
-void init_label_extruder_target_temp() {
-  label_ext_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
-
-  lv_style_set_text_font(&style_label_ext_target_temp,
-                         &font_32); // 设置字体样机及大小
-  lv_style_set_text_color(&style_label_ext_target_temp,
-                          lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-  lv_obj_add_style(label_ext_target_temp, &style_label_ext_target_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_ext_target_temp, klipperApi->getExtruderTargetTemp().c_str());
-  lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
-}
-
-void init_label_heaterbed_actual_temp() {
-  label_bed_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
-
-  lv_style_set_text_font(&style_label_bed_actual_temp,
-                         &font_32); // 设置字体样机及大小
-  lv_style_set_text_color(&style_label_bed_actual_temp,
-                          lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-  lv_obj_add_style(label_bed_actual_temp, &style_label_bed_actual_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_bed_actual_temp, klipperApi->getBedActualTemp().c_str());
-  lv_obj_align(label_bed_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
-}
-
-void init_label_heaterbed_target_temp() {
-  label_bed_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
-
-  lv_style_set_text_font(&style_label_bed_target_temp,
-                         &font_32); // 设置字体样机及大小
-  lv_style_set_text_color(&style_label_bed_target_temp,
-                          lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-  lv_obj_add_style(label_bed_target_temp, &style_label_bed_target_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_bed_target_temp, klipperApi->getBedTargetTemp().c_str());
-  lv_obj_align(label_bed_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
-}
-
-//----------------------------------------screen4----初始化------------------------------------------------------//
-void init_label_ap_config() {
-  String TEXT = "AP Config....";
-
-  label_ap_config = lv_label_create(lv_scr_act()); // 创建文字对象
-
-  lv_style_set_text_font(&style_label_ap_config,
-                         &font_20); // 设置字体样机及大小
-  lv_style_set_text_color(&style_label_ap_config,
-                          lv_color_hex(0x2400FF)); // 设置样式文本字颜色
-
-  lv_obj_add_style(label_ap_config, &style_label_ap_config,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_ap_config, TEXT.c_str());
-  lv_obj_align(label_ap_config, LV_ALIGN_CENTER, 0, 0); // 居中显示
-}
-
 //----------------------------------------screen5----初始化------------------------------------------------------//
-void init_label_no_klipper() {
-  String TEXT = "No klipper connect";
 
-  label_no_klipper = lv_label_create(lv_scr_act()); // 创建文字对象
+ResourceImage *logo;
 
-  lv_style_set_text_font(&style_label_no_klipper,
-                         &font_20); // 设置字体样机及大小
-  lv_style_set_text_color(&style_label_no_klipper,
-                          lv_color_hex(0x2400FF)); // 设置样式文本字颜色
+// 显示刷新定时器
 
-  lv_obj_add_style(label_no_klipper, &style_label_no_klipper,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_no_klipper, TEXT.c_str());
-  lv_obj_align(label_no_klipper, LV_ALIGN_CENTER, 0, 0); // 居中显示
+uint8_t exist_object_screen_flg = 0;   // 0 没有存在的屏幕对象
+uint8_t screen_begin_dis_flg = 0;      // 0 启动while循环
+// 0 开始启动http请求
+uint8_t wifi_ap_config_flg = 0;        // 0 wifi配网中
+
+// 配置界面对象定义
+lv_obj_t *label_ap_config;
+// 配置界面对象样式定义
+lv_style_t style_label_ap_config;
+
+lv_obj_t *open_anim_arc;
+lv_style_t style_spinner_open;
+lv_style_t style_bc_spinner_open;
+
+lv_timer_t *timer_open = NULL; // 用于延时处理开机问题：网络连接和动画
+lv_timer_t *timer_open_task1 = NULL;
+lv_timer_t *timer_open_task2 = NULL;
+lv_timer_t *timer_open_init = NULL;
+lv_timer_t *timer_project_init = NULL;
+
+int wifi_connect_ok = 0;   // wifi 连接成功标志
+int wifi_connect_fail = 0; // wifi 连接失败标志
+
+void Open_up_animation() {
+  lv_style_set_arc_color(&style_spinner_open,
+                         lv_color_hex(0xFF0000));  // 设置圆弧颜色
+  lv_style_set_arc_width(&style_spinner_open, 16); // 设置圆弧宽度；
+
+  lv_style_set_arc_color(&style_bc_spinner_open,
+                         lv_color_hex(0x000000)); // 设置背景圆环颜色
+  lv_style_set_arc_width(&style_bc_spinner_open, 16); // 设置背景圆环宽度
+
+  open_anim_arc = lv_spinner_create(lv_scr_act(), 1000, 45);
+
+  lv_obj_add_style(open_anim_arc, &style_spinner_open,
+                   LV_PART_INDICATOR); // 应用到圆弧部分；
+  lv_obj_add_style(open_anim_arc, &style_bc_spinner_open,
+                   LV_PART_MAIN); // 应用到背景圆环部分；
+
+  lv_obj_set_size(open_anim_arc, 240, 240);
+  lv_obj_align(open_anim_arc, LV_ALIGN_CENTER, 0, 0);
 }
 
-//----------------------------------------screen1---刷新-------------------------------------------------------//
-void update_label_print_progress() {
+void project_task_init(lv_timer_t *timer) {
 
-  String result;
-  result = String(klipperApi->getProgressData());
-  String TEXT = result;
-
-  if (klipperApi->getProgressData() == 0) {
-    TEXT = "0%";
-  } else {
-    TEXT = TEXT + "%";
+  lv_obj_del(open_anim_arc);
+  if (logo) {
+    delete logo;
+    logo = nullptr;
   }
 
-  label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
+  sceneManager->SwitchScene(SceneId::Standby, 1);
 
-  lv_obj_add_style(label_print_progress, &style_label_print_progress,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_print_progress, TEXT.c_str());
-  lv_obj_align(label_print_progress, LV_ALIGN_CENTER, 0, 0); // 居中显示
+  screen_begin_dis_flg = 1;
 }
 
-void update_arc_print_progress() {
+// 成功连接 初始化项目 删除动画
+void open_task_suc(lv_timer_t *timer) {
 
-  arc_print_progress = lv_arc_create(lv_scr_act()); // 创建圆弧对象
-
-  lv_style_set_arc_width(&style_arc_print_progress, 24); // 设置样式的圆弧粗细
-  lv_obj_add_style(arc_print_progress, &style_arc_print_progress,
-                   LV_PART_MAIN); // 将样式应用到圆弧背景
-  lv_obj_add_style(arc_print_progress, &style_arc_print_progress,
-                   LV_PART_INDICATOR); // 将样式应用到圆弧前景
-
-  lv_obj_remove_style(arc_print_progress, NULL, LV_PART_KNOB); // 移除样式
-  lv_obj_clear_flag(arc_print_progress, LV_OBJ_FLAG_CLICKABLE);
-  lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(0xFF0000),
-                             LV_PART_INDICATOR);       // 进度条颜色
-  lv_obj_set_size(arc_print_progress, 240, 240);       // 设置尺寸
-  lv_arc_set_rotation(arc_print_progress, 270);        // 设置零度位置
-  lv_arc_set_bg_angles(arc_print_progress, 0, 360);    // 设置角度
-  lv_arc_set_value(arc_print_progress, klipperApi->getProgressData()); // 设置值
-  lv_obj_center(arc_print_progress);                   // 居中显示
+  timer_project_init = lv_timer_create(project_task_init, 100, NULL);
+  lv_timer_set_repeat_count(timer_project_init, 1);
 }
 
-//-----------------------------------------------screen2--刷新-----------------------------------------------------//
-void update_label_extruder_actual_temp() {
-  label_ext_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
+// 初始化失败  重启
+void open_task_err(lv_timer_t *timer) {
+  //  ESP.restart();
 
-  lv_obj_add_style(label_ext_actual_temp, &style_label_ext_actual_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_ext_actual_temp, klipperApi->getExtruderActualTemp().c_str());
-  lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
+  timer_project_init = lv_timer_create(project_task_init, 100, NULL);
+  lv_timer_set_repeat_count(timer_project_init, 1);
 }
 
-void update_label_extruder_target_temp() {
-  label_ext_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
+// 提示是否成功连接
+void open_task_1(lv_timer_t *timer) {
 
-  lv_obj_add_style(label_ext_target_temp, &style_label_ext_target_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_ext_target_temp, klipperApi->getExtruderTargetTemp().c_str());
-  lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
+  // 成功连接wifi
+  if (wifi_connect_ok == 1) {
+    timer_open_task1 = lv_timer_create(open_task_suc, 4000, NULL);
+    lv_timer_set_repeat_count(timer_open_task1, 1);
+  }
+  // 未能成功连接wifi
+  if (wifi_connect_fail == 1) {
+    timer_open_task2 = lv_timer_create(open_task_err, 4000, NULL);
+    lv_timer_set_repeat_count(timer_open_task2, 1);
+  }
 }
 
-void update_label_heaterbed_actual_temp() {
-  label_bed_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
+void open_task_conv(lv_timer_t *timer) {
 
-  lv_obj_add_style(label_bed_actual_temp, &style_label_bed_actual_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_bed_actual_temp, klipperApi->getBedActualTemp().c_str());
-  lv_obj_align(label_bed_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
+  // 连接wifi
+  connectToWiFi(); // 连接wifi，传入的是wifi连接等待时间15s
+
+  Open_up_animation();
+
+  timer_open = lv_timer_create(open_task_1, 100, NULL);
+  lv_timer_set_repeat_count(timer_open, 1);
 }
 
-void update_label_heaterbed_target_temp() {
-  label_bed_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
+void Open_display_init() {
 
-  lv_obj_add_style(label_bed_target_temp, &style_label_bed_target_temp,
-                   LV_PART_MAIN); // 将样式添加到文字对象中
-  lv_label_set_text(label_bed_target_temp, klipperApi->getBedTargetTemp().c_str());
-  lv_obj_align(label_bed_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
+  if (wifi_ap_config_flg == 1) {
+    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0xFFFFFF));
+    logo = KnownResourceImages::get_AP_Config_Back();
+    KnownResourceImages::get_AP_Config(0, -36);
+    exist_object_screen_flg = 20;
+    screen_begin_dis_flg = 1;
+  } else {
+    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
+    logo = KnownResourceImages::get_BTT_LOGO();
+
+    timer_open_init = lv_timer_create(open_task_conv, 100, NULL);
+    lv_timer_set_repeat_count(timer_open_init, 1);
+  }
 }
 
-//-----------------------------------------------------------------------------------------------------//
-void update_screen1(lv_timer_t *timer) {
-  update_label_print_progress();
-  update_arc_print_progress();
-
-  exist_object_screen_flg = 1;
-}
-
-void update_screen7(lv_timer_t *timer) {
-  ri_standby = KnownResourceImages::get_Standby();
-
-  exist_object_screen_flg = 7;
-}
-
-void update_screen9(lv_timer_t *timer) {
-  ri_print = KnownResourceImages::get_Printing();
-
-  exist_object_screen_flg = 9;
-}
-
-void update_screen11(lv_timer_t *timer) {
-  ri_bedTemp = KnownResourceImages::get_bed_temp();
-  update_label_heaterbed_actual_temp();
-  update_label_heaterbed_target_temp();
-
-  exist_object_screen_flg = 11;
-}
-
-void update_screen12(lv_timer_t *timer) {
-  ri_extTemp = KnownResourceImages::get_ext_temp();
-  update_label_extruder_actual_temp();
-  update_label_extruder_target_temp();
-
-  exist_object_screen_flg = 12;
-}
-
-void update_screen14(lv_timer_t *timer) {
-  ri_ok = KnownResourceImages::get_Print_ok();
-
-  exist_object_screen_flg = 14;
-}
-
-void update_screen15(lv_timer_t *timer) {
-  ri_voron = KnownResourceImages::get_Voron();
-
-  exist_object_screen_flg = 15;
-}
-
-void update_screen18(lv_timer_t *timer) {
-  ri_before = KnownResourceImages::get_BeforePrinting();
-
-  exist_object_screen_flg = 18;
-}
-
-void update_screen19(lv_timer_t *timer) {
-  ri_after = KnownResourceImages::get_AfterPrinting();
-
-  exist_object_screen_flg = 19;
-}
-
-void update_screen21(lv_timer_t *timer) {
-  ri_home = KnownResourceImages::get_Home();
-
-  exist_object_screen_flg = 21;
-}
-
-void update_screen22(lv_timer_t *timer) {
-  ri_level = KnownResourceImages::get_levelling();
-
-  exist_object_screen_flg = 22;
-}
-
-void update_screen23(lv_timer_t *timer) {
-  ri_disconnect = KnownResourceImages::get_Disconnect_Back();
-
-  exist_object_screen_flg = 23;
-}
 
 //------------------------------------------------------------------------------------------------------------//
 /* Display flushing */
@@ -386,142 +209,6 @@ void timer1_cb() {
   btn->KeyScan();
 }
 
-void delete_exist_object() {
-  if (exist_object_screen_flg == 1) { // del screen1
-
-    lv_obj_del(label_print_progress);
-    lv_obj_del(arc_print_progress);
-
-  } else if (exist_object_screen_flg == 2) {
-
-  } else if (exist_object_screen_flg == 3) {
-
-    lv_obj_del(label_print_file);
-
-  } else if (exist_object_screen_flg == 4) {
-
-    lv_obj_del(label_ap_config);
-
-  } else if (exist_object_screen_flg == 5) {
-
-    lv_obj_del(label_no_klipper);
-
-  } else if (exist_object_screen_flg == 6) {
-
-    lv_obj_del(bar_fan_speed);
-
-  } else if (exist_object_screen_flg == 7) {
-
-    if (ri_standby) {
-      delete ri_standby;
-      ri_standby = nullptr;
-    }
-  } else if (exist_object_screen_flg == 9) {
-
-    if (ri_print) {
-      delete ri_print;
-      ri_print = nullptr;
-    }
-  } else if (exist_object_screen_flg == 10) {
-    if (ri_after) {
-      delete ri_after;
-      ri_after = nullptr;
-    }
-  } else if (exist_object_screen_flg == 11) {
-    if (ri_bedTemp) {
-      delete ri_bedTemp;
-      ri_bedTemp = nullptr;
-    }
-    lv_obj_del(label_bed_actual_temp);
-    lv_obj_del(label_bed_target_temp);
-  } else if (exist_object_screen_flg == 12) {
-
-    if (ri_extTemp) {
-      delete ri_extTemp;
-      ri_extTemp = nullptr;
-    }
-    lv_obj_del(label_ext_actual_temp);
-    lv_obj_del(label_ext_target_temp);
-  } else if (exist_object_screen_flg == 13) {
-
-  } else if (exist_object_screen_flg == 14) {
-
-    if (ri_ok) {
-      delete ri_ok;
-      ri_ok = nullptr;
-    }
-  } else if (exist_object_screen_flg == 15) {
-
-    if (ri_voron) {
-      delete ri_voron;
-      ri_voron = nullptr;
-    }
-  } else if (exist_object_screen_flg == 18) {
-
-    if (ri_before) {
-      delete ri_before;
-      ri_before = nullptr;
-    }
-
-  } else if (exist_object_screen_flg == 19) {
-
-    if (ri_after) {
-      delete ri_after;
-      ri_after = nullptr;
-    }
-  } else if (exist_object_screen_flg == 21) {
-
-    if (ri_home) {
-      delete ri_home;
-      ri_home = nullptr;
-    }
-  } else if (exist_object_screen_flg == 22) {
-
-    if (ri_level) {
-      delete ri_level;
-      ri_level = nullptr;
-    }
-  } else if (exist_object_screen_flg == 23) {
-    if (ri_disconnect)
-      delete ri_disconnect;
-  } else {
-  }
-}
-
-void Display_Object_Init() {
-  init_label_print_status();
-  lv_obj_del(label_print_status);
-
-  init_label_print_progress();
-  lv_obj_del(label_print_progress);
-
-  init_arc_print_progress();
-  lv_obj_del(arc_print_progress);
-
-  init_label_extruder_actual_temp();
-  lv_obj_del(label_ext_actual_temp);
-
-  init_label_extruder_target_temp();
-  lv_obj_del(label_ext_target_temp);
-
-  init_label_heaterbed_actual_temp();
-  lv_obj_del(label_bed_actual_temp);
-
-  init_label_heaterbed_target_temp();
-  lv_obj_del(label_bed_target_temp);
-
-  init_label_ap_config();
-  lv_obj_del(label_ap_config);
-
-  init_label_no_klipper();
-  lv_obj_del(label_no_klipper);
-
-  delete KnownResourceImages::get_Standby();
-
-  exist_object_screen_flg = 0;
-  screen_begin_dis_flg = 0;
-}
-
 #if LV_USE_LOG
 void logToSerial(const char *logLine) { Serial.print(logLine); }
 #endif
@@ -547,7 +234,8 @@ __attribute__((unused)) void setup() {
   lv_display_Init(); // 显示初始化
   lv_port_littlefs_init();
 
-  Display_Object_Init(); // 所有显示对象初始化一遍
+  exist_object_screen_flg = 0;
+  screen_begin_dis_flg = 0; // 所有显示对象初始化一遍
 
   Open_display_init();
 
@@ -564,215 +252,28 @@ __attribute__((unused)) void setup() {
   klipperApi = new KlipperApi(wifiEepromConfig);
 }
 
+
 __attribute__((unused)) void loop() {
   // lv_tick_inc(1);/* le the GUI do its work */
   lv_task_handler();
 
   if (WiFiClass::status() == WL_CONNECTED && !btn->isPressed()) {
-    if (First_connection_flg == 0) { // 连接上wifi 切换回正常显示
-      timer_contne = 0;
-      display_step = 2;
-      First_connection_flg = 1;
-    }
+    if (sceneManager == nullptr)
+      sceneManager = new SceneManager(klipperApi);
     klipperApi->tick();
+    if (klipperApi->isNetworkFail()) {
+      sceneManager->SwitchScene(SceneId::NoKlipper, 0);
+    }
   }
+
+  sceneManager->SwitchSceneIfRequired();
 
   if (screen_begin_dis_flg == 1) {
     //-------------HTTP请求-----------------------//
     keyscan_nowtime = millis();
     if (keyscan_nowtime > keyscan_nexttime) {
 
-      if (timer_contne > 0)
-        timer_contne--; // 显示计时
-
-      if (wifi_ap_config_flg == 0) {
-
-        if ((display_step == 2) && (timer_contne == 0)) { // Standby
-          timer_contne = 5;
-
-          if (klipperApi->isHoming()) {
-            timer_contne = 5;
-            display_step = 12;
-          } else if (klipperApi->isLeveling()) {
-            timer_contne = 5;
-            display_step = 13;
-          } else if (klipperApi->isPrinting()) {
-            timer_contne = 5;
-            display_step = 3;
-            standby_voron_dis_flg = 0;
-          } else {
-            if (standby_voron_dis_flg == 0) {
-
-              standby_voron_dis_flg = 1;
-
-              delete_exist_object();
-              update_timer = lv_timer_create(update_screen7, 0, NULL);
-              lv_timer_set_repeat_count(update_timer, 1);
-            } else {
-              display_step = 11; // to voron
-            }
-          }
-        }
-
-        if ((display_step == 11) && (timer_contne == 0)) { // voron
-          timer_contne = 5;
-
-          if (klipperApi->isPrinting()) {
-            timer_contne = 5;
-            display_step = 12;
-          } else if (klipperApi->isLeveling()) {
-            timer_contne = 5;
-            display_step = 13;
-          } else if (klipperApi->isPrinting()) {
-            timer_contne = 5;
-            display_step = 3;
-            standby_voron_dis_flg = 0;
-          } else {
-            if (standby_voron_dis_flg == 1) {
-
-              standby_voron_dis_flg = 0;
-
-              delete_exist_object();
-              update_timer = lv_timer_create(update_screen15, 0, NULL);
-              lv_timer_set_repeat_count(update_timer, 1);
-            } else {
-              display_step = 2; // to Standby
-            }
-          }
-        }
-
-        if ((display_step == 12) && (timer_contne == 0)) { // homing
-          timer_contne = 5;
-
-          if (!klipperApi->isHoming()) {
-            display_step = 2;
-            timer_contne = 1;
-          } else {
-            delete_exist_object();
-            update_timer = lv_timer_create(update_screen21, 0, NULL);
-            lv_timer_set_repeat_count(update_timer, 1);
-          }
-        }
-
-        if ((display_step == 13) && (timer_contne == 0)) { // levelling
-          timer_contne = 5;
-
-          if (!klipperApi->isLeveling()) {
-            display_step = 2;
-          } else {
-            delete_exist_object();
-            update_timer = lv_timer_create(update_screen22, 0, NULL);
-            lv_timer_set_repeat_count(update_timer, 1);
-          }
-        }
-
-        if ((display_step == 3) && (timer_contne == 0)) {
-          timer_contne = 5;
-
-          if ((klipperApi->getBedActualTempValue() >= klipperApi->getBedTargetTempValue()) && (klipperApi->getBedTargetTemp() != 0)) {
-            display_step = 4;
-          } else {
-
-            if (klipperApi->getBedTargetTemp() == 0) {
-              display_step = 4;
-            } else {
-              delete_exist_object();
-              update_timer = lv_timer_create(update_screen11, 0, NULL); // BED
-              lv_timer_set_repeat_count(update_timer, 1);
-            }
-          }
-        }
-
-        if ((display_step == 4) && (timer_contne == 0)) {
-          timer_contne = 5;
-
-          if ((klipperApi->getExtruderActualTempValue() >= klipperApi->getExtruderTargetTempValue()) && (klipperApi->getExtruderTargetTempValue() != 0)) {
-
-            if (!klipperApi->isPrinting()) {
-              display_step = 2;
-            } else {
-              display_step = 9;
-              delete_exist_object();
-              update_timer =
-                  lv_timer_create(update_screen18, 0, NULL); // BeforePrinting
-              lv_timer_set_repeat_count(update_timer, 1);
-            }
-
-          } else {
-
-            if (klipperApi->getExtruderTargetTempValue() == 0) {
-              display_step = 9;
-            } else {
-              delete_exist_object();
-              update_timer = lv_timer_create(update_screen12, 0, NULL); // EXT
-              lv_timer_set_repeat_count(update_timer, 1);
-            }
-          }
-        }
-
-        if ((display_step == 9) && (timer_contne == 0)) {
-          timer_contne = 1;
-          display_step = 5;
-        }
-
-        if ((display_step == 5) && (timer_contne == 0)) {
-          timer_contne = 5;
-
-          if (klipperApi->isPrinting()) {
-            if (klipperApi->getProgressData() == 100) {
-              display_step = 6;
-              timer_contne = 7;
-              delete_exist_object();
-              update_timer =
-                  lv_timer_create(update_screen14, 0, NULL); // print_ok
-              lv_timer_set_repeat_count(update_timer, 1);
-            } else {
-
-              if (klipperApi->getProgressData() >= 1) {
-                delete_exist_object();
-                update_timer =
-                    lv_timer_create(update_screen1, 0, NULL); // 过1%显示进度
-                lv_timer_set_repeat_count(update_timer, 1);
-              } else {
-                delete_exist_object();
-                update_timer =
-                    lv_timer_create(update_screen9, 0, NULL); // printing
-                lv_timer_set_repeat_count(update_timer, 1);
-              }
-            }
-          } else {
-            display_step = 2;
-          }
-        }
-
-        if ((display_step == 6) && (timer_contne == 0)) {
-          timer_contne = 5;
-          display_step = 10;
-
-          delete_exist_object();
-          update_timer =
-              lv_timer_create(update_screen19, 0, NULL); // AfterPrinting
-          lv_timer_set_repeat_count(update_timer, 1);
-        }
-
-        if ((display_step == 10) && (timer_contne == 0)) {
-          timer_contne = 5;
-          display_step = 2;
-        }
-
-        if ((display_step == 8) && (timer_contne == 0)) { // no klipper connect
-          timer_contne = 2;
-
-          if (screen_no_klipper_dis_flg == 0) {
-            display_step = 2;
-          } else {
-            delete_exist_object();
-            update_timer = lv_timer_create(update_screen23, 0, NULL);
-            lv_timer_set_repeat_count(update_timer, 1);
-          }
-        }
-      }
-
+      sceneManager->Timer();
       klipperApi->refreshData();
       keyscan_nexttime = keyscan_nowtime + 400;
     }
@@ -785,10 +286,6 @@ __attribute__((unused)) void loop() {
     checkConnect(true); // 检测网络连接状态，参数true表示如果断开重新连接
     checkDNS_HTTP(); // 检测客户端DNS&HTTP请求，也就是检查配网页面那部分
     webServer->tick();
-
-    if (WiFiClass::status() != WL_CONNECTED) { // wifi没有连接成功
-      First_connection_flg = 0;
-    }
     netcheck_nexttime = netcheck_nowtime + 100UL;
   }
 }

@@ -9,15 +9,13 @@ extern "C" { // extern
 // "C"表示编译生成的内部符号名使用C约定。这样在c++文件中也可以调用对应c函数
 #endif
 extern uint8_t wifi_ap_config_flg; // 0 wifi配网中
-extern uint8_t screen_no_klipper_dis_flg;
-extern uint8_t display_step;
-extern uint8_t timer_contne;
 #ifdef __cplusplus
 }
 #endif
 
 class KlipperApi {
 private:
+  uint8_t screen_no_klipper_dis_flg = 0; // 0 连接klipper失败
   uint32_t httprequest_nowtime = 0;
   uint32_t httprequest_nexttime = 0;
   WifiConfig *wifiEepromConfig;
@@ -62,6 +60,8 @@ public:
   bool isHoming() const { return homing_status == 1; }
   bool isLeveling() const { return levelling_status == 1; }
   bool isPrinting() const { return print_status == 1; }
+
+  bool isNetworkFail() const { return screen_no_klipper_dis_flg > 3; }
 
   void refreshData() {
     start_http_request_flg = 1;
@@ -151,21 +151,6 @@ public:
               }
             }
 
-            if (print_status == 0) {
-              if ((bedtemp_target > last_bedtemp_target) &&
-                  (bedtemp_target != 0)) // 启动加热
-              {
-                timer_contne = 0;
-                display_step = 3;
-              }
-
-              if ((tooltemp_target > last_tooltemp_target) &&
-                  (tooltemp_target != 0)) // 启动加热
-              {
-                timer_contne = 0;
-                display_step = 4;
-              }
-            }
             last_bedtemp_target = bedtemp_target;
             last_tooltemp_target = tooltemp_target;
 
@@ -205,8 +190,6 @@ public:
 
             if (nameStr8 == "true") {
               homing_status = 1;
-              display_step = 12; // 更快进入显示
-              timer_contne = 0;
             } else {
               homing_status = 0;
             }
@@ -221,8 +204,6 @@ public:
 
             if (nameStr9 == "true") {
               levelling_status = 1;
-              display_step = 13; // 更快进入显示
-              timer_contne = 0;
             } else {
               levelling_status = 0;
             }
@@ -237,11 +218,6 @@ public:
             screen_no_klipper_dis_flg++;
 
           LV_LOG_INFO("Error on HTTP request");
-
-          if (screen_no_klipper_dis_flg > 3) {
-            display_step = 8; // no klipper connect
-            timer_contne = 0;
-          }
         }
         http.end(); // Free the resources
       }

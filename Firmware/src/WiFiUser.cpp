@@ -1,5 +1,4 @@
 #include "WiFiUser.h"
-#include <lvgl_gui.h>
 
 bool dnsInit = false;
 
@@ -14,6 +13,9 @@ const char *HOST_NAME = "KNOMI"; // 设置设备名
 IPAddress apIP(192, 168, 20, 1); // 设置AP的IP地址
 
 DNSServer dnsServer;       // 创建dnsServer实例
+
+extern int wifi_connect_fail;
+extern int wifi_connect_ok;
 
 /*
  * 进入AP模式

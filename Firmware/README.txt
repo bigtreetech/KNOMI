@@ -6,9 +6,11 @@ To create suitable BMP files:
  Differences from original KNOMI Firmware:
  1) Firmware 2 times smaller, enabled OTA (in web browser knomi/update)
  2) All images are moved to second partition (theoretical possibility for easier theming + was required for OTA)
- 3) Code tiny bit cleaner, cut all factory-test stuff.
+ 3) Code a lot cleaner, cut all factory-test stuff.
 
  TODO:
  Cleanup code!
  Make OTA display progress on screen.
  Make BMP loading from fs a lot faster (on start)
+ Try to move lv_task_handler to native ESP32 vTask - so that delay in Arduino's HTTP Client won't freeze it.
+ Brush up web interface to allow download/upload gifs from web interface directly to FS.
