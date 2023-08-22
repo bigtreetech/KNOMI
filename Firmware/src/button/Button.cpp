@@ -1,9 +1,7 @@
 #include "Button.h"
-#include "WiFiUser.h"
-#include "lvgl.h"
 
-Button::Button(WifiConfig* config) {
-  wificonfig = config;
+Button::Button(WifiManager* manager) {
+  wifiManager = manager;
   pinMode(0, INPUT); // input mode; default -> high, pressed -> low.
   delay(200);
   currentState = HIGH;
@@ -22,9 +20,8 @@ void Button::KeyScan() {
 
     if (pressDuration > WIFI_RESET_LONG_PRESS_MS) {
       LV_LOG_INFO("Clearing wifi setup");
-      wificonfig->DeleteConfig();
-      restoreWiFi();      // 删除保存的wifi信息
-      ESP.restart();      // 重启复位esp32
+      wifiManager->resetWifi();
+      ESP.restart();
     }
   }
   lastState = currentState;

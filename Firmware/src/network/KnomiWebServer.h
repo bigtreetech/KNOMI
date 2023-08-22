@@ -1,6 +1,7 @@
 #pragma once
 #include "../Version.h"
 #include "WifiConfig.h"
+#include "WifiManager.h"
 #include "lvgl.h"
 #include <ESPmDNS.h>
 #include <ElegantOTA.h>
@@ -11,8 +12,9 @@
 class KnomiWebServer {
 private:
   const int webPort = 80;
-  WebServer *server;
-  WifiConfig *wificonfig;
+  WebServer *server = nullptr;
+  WifiConfig *wificonfig = nullptr;
+  WifiManager *wifimanager = nullptr;
 
   void handleRoot();
 
@@ -21,7 +23,7 @@ private:
   void handleNotFound() { handleRoot(); }
 
 public:
-  KnomiWebServer(WifiConfig *config);
+  KnomiWebServer(WifiConfig *config, WifiManager* manager);
   ~KnomiWebServer() {
     this->server->stop();
     delete this->server;

@@ -2,13 +2,13 @@
 #include "fs/lv_port_fs_littlefs.h"
 #include "network/KnomiWebServer.h"
 #include "network/WifiConfig.h"
+#include "network/WifiManager.h"
 #include "network/KlipperApi.h"
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <TFT_eSPI.h>
 #include <Ticker.h>
 #include <WiFi.h>
-#include <WiFiUser.h>
 #include <cstdlib>
 #include <iostream>
 #include <lvgl.h>
@@ -20,6 +20,7 @@ LV_FONT_DECLARE(font_32)
 LV_FONT_DECLARE(font_48)
 
 WifiConfig *wifiEepromConfig = nullptr;
+WifiManager* wifiManager = nullptr;
 Button *btn = nullptr;
 KnomiWebServer *webServer = nullptr;
 KlipperApi* klipperApi = nullptr;
@@ -46,30 +47,17 @@ using namespace std;
 
 ResourceImage *logo;
 
-// 显示刷新定时器
-
-uint8_t exist_object_screen_flg = 0;   // 0 没有存在的屏幕对象
 uint8_t screen_begin_dis_flg = 0;      // 0 启动while循环
-// 0 开始启动http请求
-uint8_t wifi_ap_config_flg = 0;        // 0 wifi配网中
-
-// 配置界面对象定义
-lv_obj_t *label_ap_config;
-// 配置界面对象样式定义
-lv_style_t style_label_ap_config;
 
 lv_obj_t *open_anim_arc;
 lv_style_t style_spinner_open;
 lv_style_t style_bc_spinner_open;
 
-lv_timer_t *timer_open = NULL; // 用于延时处理开机问题：网络连接和动画
+lv_timer_t *timer_open = NULL;
 lv_timer_t *timer_open_task1 = NULL;
 lv_timer_t *timer_open_task2 = NULL;
 lv_timer_t *timer_open_init = NULL;
 lv_timer_t *timer_project_init = NULL;
-
-int wifi_connect_ok = 0;   // wifi 连接成功标志
-int wifi_connect_fail = 0; // wifi 连接失败标志
 
 void Open_up_animation() {
   lv_style_set_arc_color(&style_spinner_open,
@@ -111,33 +99,17 @@ void open_task_suc(lv_timer_t *timer) {
   lv_timer_set_repeat_count(timer_project_init, 1);
 }
 
-// 初始化失败  重启
-void open_task_err(lv_timer_t *timer) {
-  //  ESP.restart();
-
-  timer_project_init = lv_timer_create(project_task_init, 100, NULL);
-  lv_timer_set_repeat_count(timer_project_init, 1);
-}
-
 // 提示是否成功连接
 void open_task_1(lv_timer_t *timer) {
-
   // 成功连接wifi
-  if (wifi_connect_ok == 1) {
-    timer_open_task1 = lv_timer_create(open_task_suc, 4000, NULL);
-    lv_timer_set_repeat_count(timer_open_task1, 1);
-  }
-  // 未能成功连接wifi
-  if (wifi_connect_fail == 1) {
-    timer_open_task2 = lv_timer_create(open_task_err, 4000, NULL);
+  if (wifiManager->isConnected()) {
+    timer_open_task2 = lv_timer_create(open_task_suc, 4000, NULL);
     lv_timer_set_repeat_count(timer_open_task2, 1);
   }
 }
 
 void open_task_conv(lv_timer_t *timer) {
-
-  // 连接wifi
-  connectToWiFi(); // 连接wifi，传入的是wifi连接等待时间15s
+  wifiManager->connectToWiFi();
 
   Open_up_animation();
 
@@ -147,11 +119,10 @@ void open_task_conv(lv_timer_t *timer) {
 
 void Open_display_init() {
 
-  if (wifi_ap_config_flg == 1) {
+  if (wifiManager->isInConfigMode()) {
     lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0xFFFFFF));
     logo = KnownResourceImages::get_AP_Config_Back();
     KnownResourceImages::get_AP_Config(0, -36);
-    exist_object_screen_flg = 20;
     screen_begin_dis_flg = 1;
   } else {
     lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
@@ -205,7 +176,7 @@ void lv_display_Init() {
 }
 
 void timer1_cb() {
-  lv_tick_inc(1); /* le the GUI do its work */
+  lv_tick_inc(1); /* le the GUI do its work */ // todo move to vApplicationTickHook
   btn->KeyScan();
 }
 
@@ -223,43 +194,36 @@ __attribute__((unused)) void setup() {
 
   wifiEepromConfig = new WifiConfig();
   wifiEepromConfig->ReadConfig();
-
-  if (wifiEepromConfig->GetApModeFlag() != '8') { // 直接进入配网
-    wifi_ap_config_flg = 1;
-  }
+  wifiManager = new WifiManager(wifiEepromConfig);
 
   LV_LOG_INFO("SSID:%s\r\n", wifiEepromConfig->getSSID().c_str());
 
-  btn = new Button(wifiEepromConfig);
+  btn = new Button(wifiManager);
   lv_display_Init(); // 显示初始化
   lv_port_littlefs_init();
 
-  exist_object_screen_flg = 0;
   screen_begin_dis_flg = 0; // 所有显示对象初始化一遍
 
   Open_display_init();
 
   lv_display_led_Init(); // 晚一点开背光
 
-  webServer = new KnomiWebServer(wifiEepromConfig);
+  webServer = new KnomiWebServer(wifiEepromConfig, wifiManager);
 
   timer1.attach(
       0.001, timer1_cb); // 定时0.001s，即1ms，回调函数为timer1_cb，并启动定时器
 
-  if (wifi_ap_config_flg == 1) {
-    wifiConfig(); // 开始配网功能
-  }
   klipperApi = new KlipperApi(wifiEepromConfig);
 }
 
 
 __attribute__((unused)) void loop() {
   // lv_tick_inc(1);/* le the GUI do its work */
-  lv_task_handler();
+  lv_task_handler(); // TODO move to interrupt?
 
   if (WiFiClass::status() == WL_CONNECTED && !btn->isPressed()) {
     if (sceneManager == nullptr)
-      sceneManager = new SceneManager(klipperApi);
+      sceneManager = new SceneManager(klipperApi, wifiManager);
     klipperApi->tick();
     if (klipperApi->isNetworkFail()) {
       sceneManager->SwitchScene(SceneId::NoKlipper, 0);
@@ -282,9 +246,7 @@ __attribute__((unused)) void loop() {
   //----------------网络连接检查，AP热点配网------------------//
   netcheck_nowtime = millis();
   if (netcheck_nowtime > netcheck_nexttime) {
-
-    checkConnect(true); // 检测网络连接状态，参数true表示如果断开重新连接
-    checkDNS_HTTP(); // 检测客户端DNS&HTTP请求，也就是检查配网页面那部分
+    wifiManager->tick();
     webServer->tick();
     netcheck_nexttime = netcheck_nowtime + 100UL;
   }

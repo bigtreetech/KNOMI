@@ -1,17 +1,18 @@
 #pragma once
-#include "../network/WifiConfig.h"
+#include "../network/WifiManager.h"
 #include <Arduino.h>
+#include "lvgl.h"
 
 class Button final {
 
 public:
-  Button(WifiConfig* wifiConfig);
+  explicit Button(WifiManager* wifiManager);
   void KeyScan();
 
   bool isPressed() const;
 
 private:
-  WifiConfig* wificonfig;
+  WifiManager* wifiManager;
 
   const int WIFI_RESET_LONG_PRESS_MS = 4000; // long press for ~4 sec
 

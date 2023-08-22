@@ -4,11 +4,10 @@
 
 #include "KnomiWebServer.h"
 
-extern void connectToWiFi();
-
-KnomiWebServer::KnomiWebServer(WifiConfig* config) {
+KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
   server = new WebServer(webPort);
   wificonfig = config;
+  wifimanager = manager;
 
   server->on("/", HTTP_GET, [&](){ handleRoot(); });
   server->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
@@ -84,7 +83,6 @@ void KnomiWebServer::handleConfigWifi() // 返回http状态
     String klipper_ip = server->arg("klipper"); // 获取html表单输入框name名为"KlipperIP"的内容
 
     wificonfig->setKlipperIp(klipper_ip);
-    wificonfig->setAccessPointMode('8');
 
     LV_LOG_INFO(klipper_ip.c_str());
   } else {
@@ -109,7 +107,7 @@ void KnomiWebServer::handleConfigWifi() // 返回http状态
   if (WiFi.status() != WL_CONNECTED) // wifi没有连接成功
   {
     LV_LOG_INFO("开始调用连接函数connectToWiFi()..");
-    connectToWiFi();
+    wifimanager->connectToWiFi();
   } else {
     LV_LOG_INFO("提交的配置信息自动连接成功..");
   }

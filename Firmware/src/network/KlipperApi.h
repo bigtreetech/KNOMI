@@ -4,15 +4,6 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 
-#ifdef __cplusplus
-extern "C" { // extern
-// "C"表示编译生成的内部符号名使用C约定。这样在c++文件中也可以调用对应c函数
-#endif
-extern uint8_t wifi_ap_config_flg; // 0 wifi配网中
-#ifdef __cplusplus
-}
-#endif
-
 class KlipperApi {
 private:
   uint8_t screen_no_klipper_dis_flg = 0; // 0 连接klipper失败
@@ -71,11 +62,9 @@ public:
     httprequest_nowtime = millis();
     if (httprequest_nowtime > httprequest_nexttime) {
 
-      if ((start_http_request_flg == 1)) { // wifi已经连接成功，发送http请求获取数据
+      if (start_http_request_flg == 1) { // wifi已经连接成功，发送http请求获取数据
 
         HTTPClient http;
-
-        wifi_ap_config_flg = 0; // 已连接上wifi
 
         String klipper_ip = wifiEepromConfig->getKlipperIp();
         if (httpswitch == 1) {

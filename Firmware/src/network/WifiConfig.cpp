@@ -15,7 +15,7 @@ void WifiConfig::SaveConfig() {
 // 删除原有eeprom中的信息
 void WifiConfig::DeleteConfig() {
   config_type deletewifi = {
-      {""}, {""}, {""}, {"5"}}; // 5 AP模式标志位 ， 8 STA模式
+      {""}, {""}, {""}}; // 5 AP模式标志位 ， 8 STA模式
   uint8_t *p = (uint8_t *)(&deletewifi);
   for (int i = 0; i < sizeof(deletewifi); i++) {
     EEPROM.write(i + wifi_addr, *(p + i)); // 在闪存内模拟写入

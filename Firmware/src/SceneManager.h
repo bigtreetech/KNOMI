@@ -3,15 +3,6 @@
 #include "scenes/SwitchSceneRequest.h"
 #include "lvgl.h"
 
-#ifdef __cplusplus
-extern "C" { // extern
-// "C"表示编译生成的内部符号名使用C约定。这样在c++文件中也可以调用对应c函数
-#endif
-extern uint8_t wifi_ap_config_flg;        // 0 wifi配网中
-#ifdef __cplusplus
-}
-#endif
-
 class SceneManager {
 private:
   uint8_t timer_contne = 0;
@@ -19,10 +10,12 @@ private:
   AbstractScene* currentScene = nullptr;
   SwitchSceneRequest* switchSceneRequest = nullptr;
   KlipperApi *klipperApi = nullptr;
+  WifiManager *manager = nullptr;
 
 public:
-  explicit SceneManager(KlipperApi* klipperApi) {
+  explicit SceneManager(KlipperApi* klipperApi, WifiManager* manager) {
     this->klipperApi = klipperApi;
+    this->manager = manager;
     switchSceneRequest = new SwitchSceneRequest(klipperApi, SceneId::Standby, 0);
   }
 
@@ -39,7 +32,7 @@ public:
     if (timer_contne > 0)
       timer_contne--;
 
-    if (wifi_ap_config_flg == 0 && timer_contne == 0) {
+    if (!manager->isInConfigMode() && timer_contne == 0) {
       if (currentScene != nullptr) {
         timer_contne = 5;
         switchSceneRequest = currentScene->NextScene();
