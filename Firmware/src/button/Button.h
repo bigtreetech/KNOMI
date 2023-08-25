@@ -1,13 +1,18 @@
 #pragma once
 #include "../network/WifiManager.h"
-#include <Arduino.h>
 #include "lvgl.h"
+#include <Arduino.h>
+#include <Ticker.h>
 
 class Button final {
 
 public:
-  explicit Button(WifiManager* wifiManager);
+  explicit Button(WifiManager* wifiManager, Ticker* timer);
   void KeyScan();
+
+  static void KeyScan(Button* button) {
+    button->KeyScan();
+  }
 
   bool isPressed() const;
 

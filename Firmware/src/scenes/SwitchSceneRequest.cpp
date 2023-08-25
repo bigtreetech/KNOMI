@@ -11,6 +11,8 @@
 #include "PrintingScene.h"
 #include "StandbyScene.h"
 #include "VoronScene.h"
+#include "APConfigScene.h"
+#include "BootupLogo.h"
 
 AbstractScene *SwitchSceneRequest::Provide() {
   switch (id) {
@@ -38,6 +40,8 @@ AbstractScene *SwitchSceneRequest::Provide() {
     return new Printing1PercentScene(api);
   case SceneId::NoKlipper:
     return new NoKlipperScene(api);
+  case SceneId::APConfig:
+    return new APConfigScene(api);
   }
   LV_LOG_WARN((String("Unhandled scene %s") + id).c_str());
   return new StandbyScene(api);

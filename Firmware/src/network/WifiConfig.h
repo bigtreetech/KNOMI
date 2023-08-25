@@ -1,6 +1,7 @@
 #pragma once
 
 #include <EEPROM.h>
+#include "lvgl.h"
 
 class WifiConfig {
 private:

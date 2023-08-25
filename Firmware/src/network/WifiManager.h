@@ -15,9 +15,9 @@ private:
   const char *HOST_NAME = "KNOMI";
 
 public:
-  WifiManager(WifiConfig *config) {
+  explicit WifiManager(WifiConfig *config) {
     this->config = config;
-    WiFi.hostname(HOST_NAME);
+    WiFiClass::hostname(HOST_NAME);
   }
 
   ~WifiManager() { delete ap; }
@@ -32,7 +32,7 @@ public:
     delay(10);
   }
 
-  bool isConnected() { return _isConnected; }
+  bool isConnected() const { return _isConnected; }
 
   bool isInConfigMode() { return this->ap != nullptr; }
 
@@ -48,7 +48,7 @@ public:
     ap = nullptr;
     sta = new WifiStation(config);
 
-    while (WiFi.status() != WL_CONNECTED) {
+    while (WiFiClass::status() != WL_CONNECTED) {
       delay(timeOut_s * 1000);
       LV_LOG_INFO("WIFI autoconnect fail, start AP for webconfig now...");
       delete sta;
@@ -58,7 +58,7 @@ public:
       return;
     }
 
-    if (WiFi.status() == WL_CONNECTED) // 如果连接成功
+    if (WiFiClass::status() == WL_CONNECTED) // 如果连接成功
     {
       config->SaveConfig();
 

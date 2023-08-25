@@ -12,10 +12,11 @@ enum SceneId {
   ExtruderHeating = 4,
   BeforePrint = 9,
   AfterPrint = 10,
-  apconfig = 7,
+  APConfig = 7,
   NoKlipper = 8,
   Printing1Percent = 99,
-  Printing100Percent = 100
+  Printing100Percent = 100,
+  BootupLogo = 1
 };
 
 class SwitchSceneRequest {

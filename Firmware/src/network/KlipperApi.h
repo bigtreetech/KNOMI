@@ -52,7 +52,7 @@ public:
   bool isLeveling() const { return levelling_status == 1; }
   bool isPrinting() const { return print_status == 1; }
 
-  bool isNetworkFail() const { return screen_no_klipper_dis_flg > 3; }
+  bool isKlipperNotAvailable() const { return screen_no_klipper_dis_flg > 3; }
 
   void refreshData() {
     start_http_request_flg = 1;

@@ -31,4 +31,5 @@ void WifiConfig::ReadConfig() {
   for (int i = 0; i < sizeof(wificonf); i++) {
     *(p + i) = EEPROM.read(i + wifi_addr);
   }
+  LV_LOG_INFO("SSID:%s\r\n", getSSID().c_str());
 }

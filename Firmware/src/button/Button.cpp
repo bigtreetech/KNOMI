@@ -1,11 +1,13 @@
 #include "Button.h"
 
-Button::Button(WifiManager* manager) {
+Button::Button(WifiManager* manager, Ticker* timer) {
   wifiManager = manager;
   pinMode(0, INPUT); // input mode; default -> high, pressed -> low.
   delay(200);
   currentState = HIGH;
   lastState = HIGH;
+
+  timer->attach(0.001, Button::KeyScan, this);
 }
 
 void Button::KeyScan() {

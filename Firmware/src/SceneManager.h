@@ -1,6 +1,8 @@
 #pragma once
 #include "scenes/AbstractScene.h"
 #include "scenes/SwitchSceneRequest.h"
+#include "scenes/BootupLogo.h"
+#include "network/WifiManager.h"
 #include "lvgl.h"
 
 class SceneManager {
@@ -16,7 +18,7 @@ public:
   explicit SceneManager(KlipperApi* klipperApi, WifiManager* manager) {
     this->klipperApi = klipperApi;
     this->manager = manager;
-    switchSceneRequest = new SwitchSceneRequest(klipperApi, SceneId::Standby, 0);
+    this->currentScene = new BootupLogoScene(klipperApi, manager);
   }
 
   void SwitchSceneIfRequired() {
