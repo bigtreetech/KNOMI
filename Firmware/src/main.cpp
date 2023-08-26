@@ -13,10 +13,7 @@
 #include <iostream>
 #include <lvgl.h>
 
-LV_FONT_DECLARE(font_20)
-LV_FONT_DECLARE(font_28)
-LV_FONT_DECLARE(font_32)
-LV_FONT_DECLARE(font_48)
+using namespace std;
 
 WifiConfig *wifiEepromConfig = nullptr;
 WifiManager *wifiManager = nullptr;
@@ -29,8 +26,6 @@ Ticker *timer = nullptr;
 
 uint32_t keyscan_nexttime = 0;
 uint32_t netcheck_nexttime = 0;
-
-using namespace std;
 
 #if LV_USE_LOG
 void logToSerial(const char *logLine) { Serial.print(logLine); }
@@ -47,7 +42,6 @@ __attribute__((unused)) void setup() {
   wifiEepromConfig = new WifiConfig();
   wifiEepromConfig->ReadConfig();
   wifiManager = new WifiManager(wifiEepromConfig);
-
   timer = new Ticker();
   btn = new Button(wifiManager, timer);
   displayhal = new DisplayHAL(timer);
