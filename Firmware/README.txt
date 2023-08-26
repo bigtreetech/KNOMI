@@ -2,6 +2,7 @@ To create suitable BMP files:
 
  # ffmpeg -i source.gif -sws_flags neighbor -sws_dither none -pix_fmt rgb565 -y result.bmp
 
+For building you need nodejs installed and available on path.
 
  Differences from original KNOMI Firmware:
  1) Firmware 2 times smaller, enabled OTA (in web browser knomi/update)
@@ -9,7 +10,6 @@ To create suitable BMP files:
  3) Code a lot cleaner, cut all factory-test stuff.
 
  TODO:
- Cleanup code!
  Make OTA display progress on screen.
  Make BMP loading from fs a lot faster (on start)
  Try to move lv_task_handler to native ESP32 vTask - so that delay in Arduino's HTTP Client won't freeze it.

@@ -13,11 +13,72 @@ KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
   server->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
 
   server->onNotFound([&](){ handleNotFound(); });
+
+  server->on("/update", HTTP_GET, [&]() {
+    server->sendHeader("Content-Encoding", "gzip");
+    server->send_P(200, "text/html", (const char *)ELEGANT_HTML,
+                    ELEGANT_HTML_SIZE);
+  });
+
+  server->on("/update/identity", HTTP_GET, [&]() {
+    server->send(200, "application/json", id);
+  });
+
+  server->on(
+      "/update", HTTP_POST,
+      [&]() {
+        server->sendHeader("Connection", "close");
+        server->send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+        // Needs some time for Core 0 to send response
+        delay(100);
+        yield();
+        delay(100);
+        ESP.restart();
+      },
+      [&]() {
+        // Actual OTA Download
+        HTTPUpload &upload = server->upload();
+        if (upload.status == UPLOAD_FILE_START) {
+          // Serial output must be active to see the callback serial prints
+          //            Serial.setDebugOutput(true);
+          //            Serial.printf("Update Received: %s\n",
+          //            upload.filename.c_str());
+          if (upload.name == "filesystem") {
+            if (!Update.begin(UPDATE_SIZE_UNKNOWN,
+                              U_SPIFFS)) { // start with max available size
+              Update.printError(Serial);
+            }
+          } else {
+            if (!Update.begin(UPDATE_SIZE_UNKNOWN,
+                              U_FLASH)) { // start with max available size
+              Update.printError(Serial);
+            }
+          }
+        } else if (upload.status == UPLOAD_FILE_WRITE) {
+          if (Update.write(upload.buf, upload.currentSize) !=
+              upload.currentSize) {
+            Update.printError(Serial);
+          }
+        } else if (upload.status == UPLOAD_FILE_END) {
+          if (Update.end(true)) { // true to set the size to the current
+                                  // progress
+            //                Serial.printf("Update Success:
+            //                %u\nRebooting...\n", upload.totalSize);
+          } else {
+            Update.printError(Serial);
+          }
+          //            Serial.setDebugOutput(false);
+        } else {
+          //            Serial.printf("Update Failed Unexpectedly (likely broken
+          //            connection): status=%d\n", upload.status);
+        }
+      });
+
   String shortSha = Version::getGitCommitSha1().substring(0, 8);
   String timestamp = Version::getBuildTimestamp();
-  String id = shortSha + " - " + timestamp;
-  ElegantOTA.setID(id.c_str());
-  ElegantOTA.begin(server);
+  id = shortSha + " - " + timestamp;
+  id = R"({ "id": ")" + id + R"(", "hardware": "ESP32" })";
+
   server->begin();
 
   LV_LOG_INFO("WebServer started!");

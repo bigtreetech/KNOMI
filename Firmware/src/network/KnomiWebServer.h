@@ -4,13 +4,17 @@
 #include "WifiManager.h"
 #include "lvgl.h"
 #include <ESPmDNS.h>
-#include "../ota/ElegantOTA.h"
 #include <WebServer.h>
-
-// 端口号,最大连接数
+#include "Arduino.h"
+#include "WiFi.h"
+#include "WiFiClient.h"
+#include "WebServer.h"
+#include "Update.h"
+#include "../generated/elegantWebpage.h"
 
 class KnomiWebServer {
 private:
+  String id;
   const int webPort = 80;
   WebServer *server = nullptr;
   WifiConfig *wificonfig = nullptr;
