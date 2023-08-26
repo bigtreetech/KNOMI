@@ -4,7 +4,7 @@
 #include "WifiManager.h"
 #include "lvgl.h"
 #include <ESPmDNS.h>
-#include <ElegantOTA.h>
+#include "../ota/ElegantOTA.h"
 #include <WebServer.h>
 
 // 端口号,最大连接数
