@@ -11,6 +11,7 @@
 #include "WebServer.h"
 #include "Update.h"
 #include "../generated/elegantWebpage.h"
+#include "../generated/knomiWebpage.h"
 
 class KnomiWebServer {
 private:

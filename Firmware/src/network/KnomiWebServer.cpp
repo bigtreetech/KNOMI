@@ -91,23 +91,10 @@ KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
   "method=\"POST\" action=\"configwifi\"></label><p><span> Submission "        \
   "successful!</P><p><span> You may now close this page.</P> </form>"
 
-#define ROOT_HTML                                                              \
-  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" "     \
-  "content=\"width=device-width, initial-scale=1\"></head><style "             \
-  "type=\"text/css\">.input{display: block; margin-top: 10px;}.input "         \
-  "span{width: 100px; float: left; float: left; height: 36px; line-height: "   \
-  "36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: "  \
-  "50px; background-color: #438EF0; border-radius:8px; "                       \
-  "font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; "      \
-  "margin-left:104px;}</style><body><form method=\"POST\" "                    \
-  "action=\"configwifi\"><p><span> KNOMI :-)</P><label "                       \
-  "class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" "  \
-  "value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input "   \
-  "type=\"text\"  name=\"pass\"><label class=\"input\"><span>Klipper "         \
-  "IP</span> <input type=\"text\"  name=\"klipper\"></label><input "           \
-  "class=\"btn\" type=\"submit\" name=\"submit\" value=\"SUBMIT\"> </form>"
-
-void KnomiWebServer::handleRoot() { server->send(200, "text/html", ROOT_HTML); }
+void KnomiWebServer::handleRoot() {
+  server->sendHeader("Content-Encoding", "gzip");
+  server->send_P(200, "text/html", (const char *) KNOMI_HTML, KNOMI_HTML_SIZE);
+}
 
 void KnomiWebServer::handleConfigWifi() // 返回http状态
 {
