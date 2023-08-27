@@ -6,12 +6,12 @@
 </script>
 
 <main>
-    <div>
-      <span class="logo">
-        {@html voronLogo}
-      </span>
-    </div>
-    <h1>KNOMI</h1>
+    <span class="logo">
+           {@html voronLogo}
+    </span>
+    <h1>
+        KNOMI
+    </h1>
 
     <div class="card">
         <Setup/>

@@ -9,7 +9,14 @@ export default defineConfig({
     root: 'src',
     build: {
         outDir: '../dist',
-        emptyOutDir: true
+        emptyOutDir: true,
+        rollupOptions: {
+            output: {
+                entryFileNames: `assets/[name].js`,
+                chunkFileNames: `assets/[name].js`,
+                assetFileNames: `assets/[name].[ext]`
+            }
+        }
     },
-    plugins: [svg(), svelte(), viteSingleFile(), viteCompression({algorithm: "gzip", deleteOriginalAssets: false })],
+    plugins: [svg(), svelte(), viteSingleFile(), viteCompression({algorithm: "gzip", deleteOriginalAssets: false})],
 })
