@@ -1,5 +1,8 @@
 name: PlatformIO CI
 
+permissions:
+  contents: write
+
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
@@ -10,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
         with:
-          path: |
+          path: 
             ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
@@ -21,7 +24,35 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: cd Firmware && pio run -e esp32dev
+        run: cd Firmware && pio run -e esp32dev && cp .pio/build/esp32dev/firmware.bin ../firmware.bin
 
       - name: Build LightFS
-        run: cd Firmware && pio run -e fsbuild
+        run: cd Firmware && pio run -e esp32dev -t buildfs && cp .pio/build/esp32dev/littlefs.bin ../littlefs.bin
+          
+      - name: Archive Firmware Files
+        uses: actions/upload-artifact@v3
+        with: 
+          name: firmware
+          path: |
+            firmware.bin
+            littlefs.bin
+
+  release:
+    needs: build
+    if: startsWith(github.event.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: 
+      name: github-releases
+    steps:
+    - name: Download Firmware Files
+      id: download
+      uses: actions/download-artifact@v2
+      with:
+        name: firmware
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: | 
+          ${{steps.download.outputs.download-path}}/firmware.bin
+          ${{steps.download.outputs.download-path}}/littlefs.bin
