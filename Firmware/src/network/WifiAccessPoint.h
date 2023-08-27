@@ -1,6 +1,7 @@
 #pragma once
 #include <DNSServer.h>
 #include <WiFi.h>
+#include "lvgl.h"
 
 class WifiAccessPoint {
 private:

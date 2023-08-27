@@ -30,9 +30,6 @@ public:
     }
     lv_label_set_text(label_bed_actual_temp, klipperApi->getBedActualTemp().c_str());
     lv_label_set_text(label_bed_target_temp, klipperApi->getBedTargetTemp().c_str());
-
-    update_label_heaterbed_actual_temp();
-    update_label_heaterbed_target_temp();
     return nullptr;
   }
 
