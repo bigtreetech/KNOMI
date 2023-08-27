@@ -30,6 +30,14 @@ jobs:
         run: cd Firmware && pio run -e fsbuild
       - name: Rename artifact
         run: |
+          find . | grep bin
+          ls -la
+          ls -la Firmware
+          ls -la Firmware/.pio
+          ls -la Firmware/.pio/build
+          ls -la Firmware/.pio/build/esp32dev
+          ls -la Firmware/.pio/build/fsbuild
+
           cp Firmware/.pio/build/esp32dev/firmware.bin firmware.bin
           cp Firmware/.pio/build/fsbuild/littlefs.bin littlefs.bin
       - name: Archive Firmware Files
@@ -43,6 +51,8 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    environment: 
+      name: github-releases
     steps:
     - name: Download Firmware Files
       uses: actions/download-artifact@v2
@@ -50,9 +60,8 @@ jobs:
         path: release
     - name: Release Firmware
       uses: ncipollo/release-action@v1
-      if: startsWith(github.ref, 'refs/tags/') 
       with:
-        artifacts: release/*/*.bin
+        artifacts: release/*.bin
         generateReleaseNotes: true
         allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
