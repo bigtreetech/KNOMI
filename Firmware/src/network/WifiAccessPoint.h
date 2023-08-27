@@ -1,11 +1,12 @@
 #pragma once
-#include "DnsService.h"
+#include <DNSServer.h>
 #include <WiFi.h>
 
 class WifiAccessPoint {
 private:
   const char *AP_SSID = "BTT-KNOMI";
-  DnsService* dnsService = nullptr;
+  const byte DNS_PORT = 53; // 设置DNS端口号
+  DNSServer* dnsService = nullptr;
 
 public:
   WifiAccessPoint() {
@@ -14,7 +15,8 @@ public:
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     if (WiFi.softAP(AP_SSID)) // 开启AP热点,如需要密码则添加第二个参数
     {
-      dnsService = new DnsService(apIP);
+      dnsService = new DNSServer();
+      dnsService->start(DNS_PORT, "*", apIP);
       LV_LOG_INFO("ESP-32S SoftAP is right.");
       LV_LOG_INFO("Soft-AP IP address = ");
       LV_LOG_INFO(WiFi.softAPIP().toString().c_str());
@@ -29,12 +31,13 @@ public:
   }
 
   ~WifiAccessPoint() {
+    dnsService->stop();
     delete dnsService;
   }
 
   void tick() {
     if (dnsService != nullptr) {
-      dnsService->tick();
+      dnsService->processNextRequest();
     }
   }
 };
