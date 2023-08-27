@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
         with:
-          path: |
+          path: 
             ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
@@ -27,7 +27,7 @@ jobs:
         run: cd Firmware && pio run -e esp32dev && cp .pio/build/esp32dev/firmware.bin ../firmware.bin
 
       - name: Build LightFS
-        run: cd Firmware && pio run -e fsbuild && cp .pio/build/fsbuild/littlefs.bin ../littlefs.bin
+        run: cd Firmware && pio run -e esp32dev -t buildfs && cp .pio/build/esp32dev/littlefs.bin ../littlefs.bin
           
       - name: Archive Firmware Files
         uses: actions/upload-artifact@v3
@@ -45,13 +45,14 @@ jobs:
       name: github-releases
     steps:
     - name: Download Firmware Files
+      id: download
       uses: actions/download-artifact@v2
       with:
-        path: release
+        name: firmware
 
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: | 
-          release/firmware.bin
-          release/littlefs.bin
+          ${{steps.download.outputs.download-path}}/firmware.bin
+          ${{steps.download.outputs.download-path}}/littlefs.bin
