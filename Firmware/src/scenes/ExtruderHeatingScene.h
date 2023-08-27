@@ -43,13 +43,12 @@ public:
       }
     }
 
-    update_label_extruder_actual_temp();
-    update_label_extruder_target_temp();
+    lv_label_set_text(label_ext_actual_temp, klipperApi->getExtruderActualTemp().c_str());
+    lv_label_set_text(label_ext_target_temp, klipperApi->getExtruderTargetTemp().c_str());
 
     return nullptr;
   }
 
-  //----------------------------------------screen2----初始化------------------------------------------------------//
   void init_label_extruder_actual_temp() {
     label_ext_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
@@ -72,27 +71,6 @@ public:
                            &font_32); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_ext_target_temp,
                             lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-    lv_obj_add_style(label_ext_target_temp, &style_label_ext_target_temp,
-                     LV_PART_MAIN); // 将样式添加到文字对象中
-    lv_label_set_text(label_ext_target_temp,
-                      klipperApi->getExtruderTargetTemp().c_str());
-    lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
-  }
-
-  //-----------------------------------------------screen2--刷新-----------------------------------------------------//
-  void update_label_extruder_actual_temp() {
-    label_ext_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
-
-    lv_obj_add_style(label_ext_actual_temp, &style_label_ext_actual_temp,
-                     LV_PART_MAIN); // 将样式添加到文字对象中
-    lv_label_set_text(label_ext_actual_temp,
-                      klipperApi->getExtruderActualTemp().c_str());
-    lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
-  }
-
-  void update_label_extruder_target_temp() {
-    label_ext_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
     lv_obj_add_style(label_ext_target_temp, &style_label_ext_target_temp,
                      LV_PART_MAIN); // 将样式添加到文字对象中

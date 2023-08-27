@@ -31,8 +31,10 @@ public:
   }
 
   ~WifiAccessPoint() {
-    dnsService->stop();
-    delete dnsService;
+    if (dnsService != nullptr) {
+      dnsService->stop();
+      delete dnsService;
+    }
   }
 
   void tick() {
