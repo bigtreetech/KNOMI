@@ -8,7 +8,8 @@ import svg from 'vite-plugin-svgo';
 export default defineConfig({
     root: 'src',
     build: {
-        outDir: '../dist'
+        outDir: '../dist',
+        emptyOutDir: true
     },
     plugins: [svg(), svelte(), viteSingleFile(), viteCompression({algorithm: "gzip", deleteOriginalAssets: false })],
 })
