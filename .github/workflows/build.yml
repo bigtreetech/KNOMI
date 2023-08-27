@@ -24,22 +24,11 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: cd Firmware && pio run -e esp32dev
+        run: cd Firmware && pio run -e esp32dev && cp .pio/build/esp32dev/firmware.bin ../firmware.bin
 
       - name: Build LightFS
-        run: cd Firmware && pio run -e fsbuild
-      - name: Rename artifact
-        run: |
-          find . | grep bin
-          ls -la
-          ls -la Firmware
-          ls -la Firmware/.pio
-          ls -la Firmware/.pio/build
-          ls -la Firmware/.pio/build/esp32dev
-          ls -la Firmware/.pio/build/fsbuild
-
-          cp Firmware/.pio/build/esp32dev/firmware.bin firmware.bin
-          cp Firmware/.pio/build/fsbuild/littlefs.bin littlefs.bin
+        run: cd Firmware && pio run -e fsbuild && cp .pio/build/fsbuild/littlefs.bin ../littlefs.bin
+          
       - name: Archive Firmware Files
         uses: actions/upload-artifact@v3
         with: 
