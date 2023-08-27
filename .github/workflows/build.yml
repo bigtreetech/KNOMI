@@ -39,6 +39,7 @@ jobs:
 
   release:
     needs: build
+    if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: 
       name: github-releases
@@ -47,10 +48,10 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         path: release
-    - name: Release Firmware
-      uses: ncipollo/release-action@v1
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
       with:
-        artifacts: release/*.bin
-        generateReleaseNotes: true
-        allowUpdates: true
-        token: ${{ secrets.GITHUB_TOKEN }}
+        files: | 
+          release/firmware.bin
+          release/littlefs.bin
