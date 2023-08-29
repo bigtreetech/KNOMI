@@ -9,26 +9,89 @@ KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
   wificonfig = config;
   wifimanager = manager;
 
-  pServer->on("/", HTTP_GET, [&](){ handleRoot(); });
-  pServer->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
-
-  server->onNotFound([&](){ handleNotFound(); });
-
-  server->on("/update", HTTP_GET, [&]() {
+  pServer->on("/", HTTP_GET, [&](){
     server->sendHeader("Content-Encoding", "gzip");
-    server->send_P(200, "text/html", (const char *)ELEGANT_HTML,
-                    ELEGANT_HTML_SIZE);
+    server->send_P(200, "text/html", (const char *) KNOMI_HTML, KNOMI_HTML_SIZE);
+  });
+  pServer->onNotFound([&](){
+    server->send_P(404, "text/html", "Not found");
   });
 
-  server->on("/update/identity", HTTP_GET, [&]() {
-    server->send(200, "application/json", id);
+  pServer->on("/api/status", HTTP_GET, [&]() {
+
+         });
+  
+
+  pServer->on("/configwifi", HTTP_POST, [&](){
+    if (server->hasArg("ssid")) // 判断是否有账号参数
+    {
+      LV_LOG_INFO("got ssid:");
+      String wifi_ssid = server->arg("ssid"); // 获取html表单输入框name名为"ssid"的内容
+
+      wificonfig->setSSID(wifi_ssid);
+      LV_LOG_INFO(wifi_ssid.c_str());
+    } else // 没有参数
+    {
+      LV_LOG_INFO("error, not found ssid");
+      server->send(200, "text/html",
+                   "<meta charset='UTF-8'>error, not found ssid"); // 返回错误页面
+      return;
+    }
+    // 密码与账号同理
+    if (server->hasArg("pass")) {
+      LV_LOG_INFO("got password:");
+      String wifi_pass = server->arg("pass"); // 获取html表单输入框name名为"pwd"的内容
+
+      wificonfig->setPassword(wifi_pass);
+      LV_LOG_INFO(wifi_pass.c_str());
+    } else {
+      LV_LOG_INFO("error, not found password");
+      server->send(200, "text/html",
+                   "<meta charset='UTF-8'>error, not found password");
+      return;
+    }
+    // klipper ip
+    if (server->hasArg("klipper")) {
+      LV_LOG_INFO("got KlipperIP:");
+      String klipper_ip = server->arg("klipper"); // 获取html表单输入框name名为"KlipperIP"的内容
+
+      wificonfig->setKlipperIp(klipper_ip);
+
+      LV_LOG_INFO(klipper_ip.c_str());
+    } else {
+      LV_LOG_INFO("error, not found klipper ip");
+      server->send(200, "text/html",
+                   "<meta charset='UTF-8'>error, not found klipper ip");
+      return;
+    }
+    delay(200);
+
+    // server->send(200, "text/html", "<meta charset='UTF-8'>SSID：" + wifi_ssid +
+    // "<br />password:" + wifi_pass + "<br />Trying to connect Trying to connect,
+    // please manually close this page."); //返回保存成功页面
+    server->send(200, "text/html", "OK"); // 返回保存成功页面
+    LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
+    wifimanager->connectToWiFi();
   });
 
-  server->on(
+  pServer->on("/update", HTTP_GET, [&]() {
+    pServer->sendHeader("Content-Encoding", "gzip");
+    pServer->send_P(200, "text/html", (const char *)ELEGANT_HTML, ELEGANT_HTML_SIZE);
+  });
+
+  pServer->on("/update/identity", HTTP_GET, [&]() {
+    String shortSha = Version::getGitCommitSha1().substring(0, 8);
+    String timestamp = Version::getBuildTimestamp();
+    String id = shortSha + " - " + timestamp;
+    id = R"({ "id": ")" + id + R"("})";
+    pServer->send(200, "application/json", id);
+  });
+
+  pServer->on(
       "/update", HTTP_POST,
       [&]() {
-        server->sendHeader("Connection", "close");
-        server->send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+        pServer->sendHeader("Connection", "close");
+        pServer->send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
         // Needs some time for Core 0 to send response
         delay(100);
         yield();
@@ -37,7 +100,7 @@ KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
       },
       [&]() {
         // Actual OTA Download
-        HTTPUpload &upload = server->upload();
+        HTTPUpload &upload = pServer->upload();
         if (upload.status == UPLOAD_FILE_START) {
           // Serial output must be active to see the callback serial prints
           //            Serial.setDebugOutput(true);
@@ -74,78 +137,10 @@ KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
         }
       });
 
-  String shortSha = Version::getGitCommitSha1().substring(0, 8);
-  String timestamp = Version::getBuildTimestamp();
-  id = shortSha + " - " + timestamp;
-  id = R"({ "id": ")" + id + R"(", "hardware": "ESP32" })";
 
-  server->begin();
+
+  pServer->begin();
 
   this->server = pServer;
   LV_LOG_INFO("WebServer started!");
-}
-
-#define ROOT_HTML_OK                                                           \
-  "<!DOCTYPE html><html><head><title>WIFI SET</title><meta name=\"viewport\" " \
-  "content=\"width=device-width, initial-scale=1\"></head><style "             \
-  "type=\"text/css\">.c,body {text-align: center}</style><body><form "         \
-  "method=\"POST\" action=\"configwifi\"></label><p><span> Submission "        \
-  "successful!</P><p><span> You may now close this page.</P> </form>"
-
-void KnomiWebServer::handleRoot() {
-  server->sendHeader("Content-Encoding", "gzip");
-  server->send_P(200, "text/html", (const char *) KNOMI_HTML, KNOMI_HTML_SIZE);
-}
-
-void KnomiWebServer::handleConfigWifi() // 返回http状态
-{
-  if (server->hasArg("ssid")) // 判断是否有账号参数
-  {
-    LV_LOG_INFO("got ssid:");
-    String wifi_ssid = server->arg("ssid"); // 获取html表单输入框name名为"ssid"的内容
-
-    wificonfig->setSSID(wifi_ssid);
-    LV_LOG_INFO(wifi_ssid.c_str());
-  } else // 没有参数
-  {
-    LV_LOG_INFO("error, not found ssid");
-    server->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found ssid"); // 返回错误页面
-    return;
-  }
-  // 密码与账号同理
-  if (server->hasArg("pass")) {
-    LV_LOG_INFO("got password:");
-    String wifi_pass = server->arg("pass"); // 获取html表单输入框name名为"pwd"的内容
-
-    wificonfig->setPassword(wifi_pass);
-    LV_LOG_INFO(wifi_pass.c_str());
-  } else {
-    LV_LOG_INFO("error, not found password");
-    server->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found password");
-    return;
-  }
-  // klipper ip
-  if (server->hasArg("klipper")) {
-    LV_LOG_INFO("got KlipperIP:");
-    String klipper_ip = server->arg("klipper"); // 获取html表单输入框name名为"KlipperIP"的内容
-
-    wificonfig->setKlipperIp(klipper_ip);
-
-    LV_LOG_INFO(klipper_ip.c_str());
-  } else {
-    LV_LOG_INFO("error, not found klipper ip");
-    server->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found klipper ip");
-    return;
-  }
-  delay(200);
-
-  // server->send(200, "text/html", "<meta charset='UTF-8'>SSID：" + wifi_ssid +
-  // "<br />password:" + wifi_pass + "<br />Trying to connect Trying to connect,
-  // please manually close this page."); //返回保存成功页面
-  server->send(200, "text/html", ROOT_HTML_OK); // 返回保存成功页面
-  LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
-  wifimanager->connectToWiFi();
 }

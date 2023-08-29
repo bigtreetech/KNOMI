@@ -15,18 +15,11 @@
 
 class KnomiWebServer {
 private:
-  String id;
   const int webPort = 80;
   bool started = false;
   WebServer *server = nullptr;
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
-
-  void handleRoot();
-
-  void handleConfigWifi();
-
-  void handleNotFound() { handleRoot(); }
 
 public:
   KnomiWebServer(WifiConfig *config, WifiManager* manager);
