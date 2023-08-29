@@ -14,3 +14,4 @@ To create suitable BMP files:
  Make BMP loading from fs a lot faster (on start)
  Try to move lv_task_handler to native ESP32 vTask - so that delay in Arduino's HTTP Client won't freeze it.
  Brush up web interface to allow download/upload gifs from web interface directly to FS.
+ Handle safe firmware check / boot to previous version using OTA
