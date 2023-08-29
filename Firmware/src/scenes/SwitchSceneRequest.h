@@ -21,10 +21,10 @@ enum SceneId {
 
 class SwitchSceneRequest {
 private:
-  SceneId id;
   KlipperApi *api;
 
 public:
+  SceneId id;
   int timerOverride;
 
   explicit SwitchSceneRequest(KlipperApi *api, SceneId id, int timerOverride = -1) {

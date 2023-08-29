@@ -52,6 +52,7 @@ public:
   void init_label_extruder_actual_temp() {
     label_ext_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
+    lv_style_init(&style_label_ext_actual_temp);
     lv_style_set_text_font(&style_label_ext_actual_temp,
                            &font_32); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_ext_actual_temp,
@@ -67,6 +68,7 @@ public:
   void init_label_extruder_target_temp() {
     label_ext_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
+    lv_style_init(&style_label_ext_target_temp);
     lv_style_set_text_font(&style_label_ext_target_temp,
                            &font_32); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_ext_target_temp,

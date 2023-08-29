@@ -7,7 +7,7 @@
 class Button final {
 
 public:
-  explicit Button(WifiManager* wifiManager, Ticker* timer);
+  explicit Button(WifiManager* wifiManager);
   void KeyScan();
 
   static void KeyScan(Button* button) {
@@ -18,6 +18,7 @@ public:
 
 private:
   WifiManager* wifiManager;
+  Ticker timer;
 
   const int WIFI_RESET_LONG_PRESS_MS = 4000; // long press for ~4 sec
 

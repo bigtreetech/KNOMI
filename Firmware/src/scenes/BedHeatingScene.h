@@ -36,6 +36,7 @@ public:
   void init_label_heaterbed_actual_temp() {
     label_bed_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
+    lv_style_init(&style_label_bed_actual_temp);
     lv_style_set_text_font(&style_label_bed_actual_temp, &font_32); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_bed_actual_temp, lv_color_hex(0xFF0000)); // 设置样式文本字颜色
 
@@ -46,6 +47,7 @@ public:
   void init_label_heaterbed_target_temp() {
     label_bed_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
 
+    lv_style_init(&style_label_bed_target_temp);
     lv_style_set_text_font(&style_label_bed_target_temp, &font_32); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_bed_target_temp, lv_color_hex(0xFF0000)); // 设置样式文本字颜色
 

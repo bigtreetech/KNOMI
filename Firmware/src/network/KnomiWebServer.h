@@ -12,6 +12,7 @@
 class KnomiWebServer {
 private:
   const int webPort = 80;
+  bool started;
   WebServer *server = nullptr;
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
@@ -29,6 +30,14 @@ public:
     delete this->server;
   }
 
-  void tick() { this->server->handleClient(); }
+  void tick()
+  {
+    if (!this->started && WiFiClass::status() == WL_CONNECTED) {
+      this->started = true;
+      this->server->begin(webPort);
+      LV_LOG_INFO("WebServer started");
+    }
+    this->server->handleClient();
+  }
+
 };
-;

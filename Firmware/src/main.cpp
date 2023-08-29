@@ -21,8 +21,7 @@ Button *btn = nullptr;
 KnomiWebServer *webServer = nullptr;
 KlipperApi *klipperApi = nullptr;
 SceneManager *sceneManager = nullptr;
-DisplayHAL *displayhal = nullptr;
-Ticker *timer = nullptr;
+__attribute__((unused)) DisplayHAL *displayhal = nullptr;
 
 uint32_t keyscan_nexttime = 0;
 uint32_t netcheck_nexttime = 0;
@@ -41,19 +40,31 @@ __attribute__((unused)) void setup() {
 
   wifiEepromConfig = new WifiConfig();
   wifiEepromConfig->ReadConfig();
+  LV_LOG_INFO(("WifiConfig created, free heap = " + String(esp_get_free_heap_size())).c_str());
   wifiManager = new WifiManager(wifiEepromConfig);
-  timer = new Ticker();
-  btn = new Button(wifiManager, timer);
-  displayhal = new DisplayHAL(timer);
+  LV_LOG_INFO(("WifiManager created, free heap = " + String(esp_get_free_heap_size())).c_str());
+  btn = new Button(wifiManager);
+  LV_LOG_INFO(("Timer and button created, free heap = " + String(esp_get_free_heap_size())).c_str());
+  displayhal = new DisplayHAL();
+  LV_LOG_INFO(("DisplayHAL created, free heap = " + String(esp_get_free_heap_size())).c_str());
   lv_port_littlefs_init();
+  LV_LOG_INFO(("LVFS-Littlefs proxy enabled, free heap = " + String(esp_get_free_heap_size())).c_str());
 
   webServer = new KnomiWebServer(wifiEepromConfig, wifiManager);
+  LV_LOG_INFO(("WebServer started, free heap = " + String(esp_get_free_heap_size())).c_str());
   klipperApi = new KlipperApi(wifiEepromConfig);
+  LV_LOG_INFO(("KlipperAPI started, free heap = " + String(esp_get_free_heap_size())).c_str());
   sceneManager = new SceneManager(klipperApi, wifiManager);
+  lv_timer_handler_run_in_period(40); // 25fps
+  LV_LOG_INFO(("SceneManager started, free heap = " + String(esp_get_free_heap_size())).c_str());
+  if (!wifiManager->isInConfigMode()) {
+    wifiManager->connectToWiFi();
+  }
+  LV_LOG_INFO(("Connected to wifi, free heap = " + String(esp_get_free_heap_size())).c_str());
 }
 
 __attribute__((unused)) void loop() {
-  lv_task_handler(); // TODO move to interrupt?
+  lv_timer_handler_run_in_period(40); // 25fps
 
   if (WiFiClass::status() == WL_CONNECTED && !btn->isPressed()) {
     klipperApi->tick();

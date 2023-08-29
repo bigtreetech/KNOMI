@@ -5,21 +5,21 @@
 #include "KnomiWebServer.h"
 
 KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
-  server = new WebServer(webPort);
+  WebServer *pServer = new WebServer(webPort);
   wificonfig = config;
   wifimanager = manager;
 
-  server->on("/", HTTP_GET, [&](){ handleRoot(); });
-  server->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
+  pServer->on("/", HTTP_GET, [&](){ handleRoot(); });
+  pServer->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
 
-  server->onNotFound([&](){ handleNotFound(); });
+  pServer->onNotFound([&](){ handleNotFound(); });
   String shortSha = Version::getGitCommitSha1().substring(0, 8);
   String timestamp = Version::getBuildTimestamp();
   String id = shortSha + " - " + timestamp;
   ElegantOTA.setID(id.c_str());
-  ElegantOTA.begin(server);
-  server->begin();
+  ElegantOTA.begin(pServer);
 
+  this->server = pServer;
   LV_LOG_INFO("WebServer started!");
 }
 

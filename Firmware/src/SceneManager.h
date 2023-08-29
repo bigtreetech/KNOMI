@@ -8,7 +8,6 @@
 class SceneManager {
 private:
   uint8_t timer_contne = 0;
-  lv_timer_t *update_timer = nullptr;
   AbstractScene* currentScene = nullptr;
   SwitchSceneRequest* switchSceneRequest = nullptr;
   KlipperApi *klipperApi = nullptr;
@@ -19,14 +18,18 @@ public:
     this->klipperApi = klipperApi;
     this->manager = manager;
     this->currentScene = new BootupLogoScene(klipperApi, manager);
+
   }
 
   void SwitchSceneIfRequired() {
     if (switchSceneRequest != nullptr) {
+      LV_LOG_INFO("Deleting current scene");
       delete currentScene;
       currentScene = nullptr;
-      update_timer = lv_timer_create(sceneTimer, 0, this);
-      lv_timer_set_repeat_count(update_timer, 1);
+      LV_LOG_INFO((String("Switching scene to ") + String(switchSceneRequest->id)).c_str());
+      currentScene = switchSceneRequest->Provide();
+      delete switchSceneRequest;
+      switchSceneRequest = nullptr;
     }
   }
 
@@ -46,12 +49,6 @@ public:
 
   }
 
-  static void sceneTimer(lv_timer_t* timer) {
-    auto* that = (SceneManager*) timer->user_data;
-    that->currentScene = that->switchSceneRequest->Provide();
-    delete that->switchSceneRequest;
-    that->switchSceneRequest = nullptr;
-  }
   void SwitchScene(SceneId id, int timerOverride = -1) {
     switchSceneRequest = new SwitchSceneRequest(klipperApi, id, timerOverride);
   }

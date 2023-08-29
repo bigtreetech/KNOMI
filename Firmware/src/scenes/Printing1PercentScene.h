@@ -39,6 +39,7 @@ public:
 
     label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
 
+    lv_style_init(&style_arc_print_progress);
     lv_style_set_text_font(&style_label_print_progress,
                            &font_48); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_print_progress,
@@ -54,6 +55,7 @@ public:
   void init_arc_print_progress() {
     arc_print_progress = lv_arc_create(lv_scr_act()); // 创建圆弧对象
 
+    lv_style_init(&style_arc_print_progress);
     lv_style_set_arc_width(&style_arc_print_progress, 24); // 设置样式的圆弧粗细
     lv_style_set_arc_color(&style_arc_print_progress,
                            lv_color_hex(0x000000)); // 设置背景圆环颜色
