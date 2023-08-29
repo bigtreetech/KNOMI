@@ -32,7 +32,7 @@ public:
 
   void tick()
   {
-    if (!this->started && WiFiClass::status() == WL_CONNECTED) {
+    if (!this->started) {
       this->started = true;
       this->server->begin(webPort);
       LV_LOG_INFO("WebServer started");

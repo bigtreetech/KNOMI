@@ -37,7 +37,7 @@ public:
     if (timer_contne > 0)
       timer_contne--;
 
-    if (!manager->isInConfigMode() && timer_contne == 0) {
+    if (timer_contne == 0) {
       if (currentScene != nullptr) {
         timer_contne = 5;
         switchSceneRequest = currentScene->NextScene();

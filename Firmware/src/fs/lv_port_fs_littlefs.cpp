@@ -2,6 +2,12 @@
 #include "lv_port_fs_littlefs.h"
 #include "littlefile.h"
 
+#if LV_LOG_TRACE_FS
+#define LV_LOG_TRACEFS(...) LV_LOG_LEVEL_TRACE(__VA_ARGS__)
+#else
+#define LV_LOG_TRACEFS(...) do {}while(0)
+#endif
+
 static void fs_init(void);
 
 static void* fs_open(lv_fs_drv_t* drv, const char* path, lv_fs_mode_t mode);
@@ -29,7 +35,7 @@ void lv_port_littlefs_init(void) {
   fs_drv.write_cb = fs_write;
   fs_drv.seek_cb = fs_seek;
   fs_drv.tell_cb = fs_tell;
-  fs_drv.cache_size = 1024;
+  fs_drv.cache_size = 8192;
 
   fs_drv.dir_close_cb = fs_dir_close;
   fs_drv.dir_open_cb = fs_dir_open;
@@ -103,7 +109,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t* drv, void* file_p) {
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t* drv, void* file_p, void* buf, uint32_t btr, uint32_t* br) {
   LV_UNUSED(drv);
-  LV_LOG_TRACE(String(btr).c_str());
+  LV_LOG_TRACEFS(String(btr).c_str());
   LittleFile* lf = (LittleFile*)file_p;
 
   *br = lf->file.read((uint8_t*)buf, btr);
@@ -122,7 +128,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t* drv, void* file_p, void* buf, uint32_t b
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t* drv, void* file_p, const void* buf, uint32_t btw, uint32_t* bw) {
   LV_UNUSED(drv);
-  LV_LOG_TRACE(String(btw).c_str());
+  LV_LOG_TRACEFS(String(btw).c_str());
   LittleFile* lf = (LittleFile*)file_p;
   *bw = lf->file.write((uint8_t*)buf, btw);
   return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -139,7 +145,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t* drv, void* file_p, const void* buf, uin
 static lv_fs_res_t fs_seek(lv_fs_drv_t* drv, void* file_p, uint32_t pos, lv_fs_whence_t whence) {
   LV_UNUSED(drv);
 
-  LV_LOG_TRACE(String(pos).c_str());
+  LV_LOG_TRACEFS(String(pos).c_str());
   SeekMode mode;
   if (whence == LV_FS_SEEK_SET)
     mode = SeekSet;
@@ -155,7 +161,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t* drv, void* file_p, uint32_t pos, lv_fs_w
 
 static lv_fs_res_t fs_tell(lv_fs_drv_t* drv, void* file_p, uint32_t* pos_p) {
   LV_UNUSED(drv);
-  LV_LOG_TRACE("fs_tell");
+  LV_LOG_TRACEFS("fs_tell");
   LittleFile* lf = (LittleFile*)file_p;
   *pos_p = lf->file.position();
   return LV_FS_RES_OK;

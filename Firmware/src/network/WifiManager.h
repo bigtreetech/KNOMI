@@ -54,7 +54,7 @@ public:
       delete sta;
       sta = nullptr;
       this->ap = new WifiAccessPoint();
-      this->_isConnected = true;
+      config->setSSID("");
       return;
     }
 

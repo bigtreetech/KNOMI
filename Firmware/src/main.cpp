@@ -66,7 +66,7 @@ __attribute__((unused)) void setup() {
 __attribute__((unused)) void loop() {
   lv_timer_handler_run_in_period(40); // 25fps
 
-  if (WiFiClass::status() == WL_CONNECTED && !btn->isPressed()) {
+  if (WiFi.isConnected() && !btn->isPressed()) {
     klipperApi->tick();
     if (klipperApi->isKlipperNotAvailable()) {
       sceneManager->SwitchScene(SceneId::NoKlipper, 0);
