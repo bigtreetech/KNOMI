@@ -12,7 +12,7 @@
 class KnomiWebServer {
 private:
   const int webPort = 80;
-  bool started;
+  bool started = false;
   WebServer *server = nullptr;
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
@@ -35,7 +35,6 @@ public:
     if (!this->started) {
       this->started = true;
       this->server->begin(webPort);
-      LV_LOG_INFO("WebServer started");
     }
     this->server->handleClient();
   }

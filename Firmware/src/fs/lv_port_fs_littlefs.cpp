@@ -59,7 +59,7 @@ static void fs_init(void) { LittleFS.begin(); }
  * @return          a file descriptor or NULL on error
  */
 static void* fs_open(lv_fs_drv_t* drv, const char* path, lv_fs_mode_t mode) {
-  LV_LOG_INFO(path);
+  LV_LOG_TRACEFS(path);
   LV_UNUSED(drv);
 
   const char* flags = "";
@@ -89,7 +89,7 @@ static void* fs_open(lv_fs_drv_t* drv, const char* path, lv_fs_mode_t mode) {
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t* drv, void* file_p) {
   LV_UNUSED(drv);
-  LV_LOG_INFO("fs_close");
+  LV_LOG_TRACEFS("fs_close");
   LittleFile* lf = (LittleFile*)file_p;
 
   lf->file.close();
