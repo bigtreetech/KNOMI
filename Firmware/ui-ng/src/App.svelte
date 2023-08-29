@@ -4,26 +4,48 @@
 
     import SetupDone from "./lib/SetupDone.svelte";
     import Setup from "./lib/Setup.svelte";
+
+    var id = "unknown";
+
+    async function load() {
+        let response = await fetch("/update/identity");
+        let json = await response.json();
+        id = json.id;
+    }
+
+    load();
 </script>
 
 <main>
-    <header class="navbar">
-        <section class="navbar-section">
-            <span class="logo">{@html voronLogo}</span>
-            <a href="/" class="navbar-brand mr-2">
-                KNOMI
-            </a>
-            <a href="/setup">Setup</a>
-        </section>
-    </header>
+    <nav>
+        <ul>
+            <li>
+                <span class="logo">{@html voronLogo}</span>
+                <a href="/">Setup</a>
+            </li>
+        </ul>
+        <ul>
+            <li>
+            </li>
+        </ul>
+    </nav>
 
-    <Route path="/"><h1>This is the main page</h1></Route>
-    <Route path="/setup"><Setup/></Route>
-    <Route path="/setupdone"><SetupDone/></Route>
+    <Route path="/">
+        <Setup/>
+    </Route>
+    <Route path="/setupdone">
+        <SetupDone/>
+    </Route>
 
-    <p class="read-the-docs">
-        Check our <a href="https://github.com/DiverOfDark/KNOMI" target="_blank">repository</a> for more details.
-    </p>
+    <footer>
+        <hr/>
+        <p class="read-the-docs">
+            <small>
+                Firmware: {id}. Check our <a href="https://github.com/DiverOfDark/KNOMI" target="_blank">repository</a> for more
+                details.
+            </small>
+        </p>
+    </footer>
 </main>
 <style>
     .logo {
@@ -31,6 +53,7 @@
         height: 32px;
         display: inline-block;
         padding: 1em;
+        padding-left: 0;
         box-sizing: content-box;
         will-change: filter;
         transition: filter 300ms;

@@ -1,7 +1,7 @@
 // Override default variables
-$primary-500: #e91e63;
-$primary-600: #d81b60;
-$primary-700: #c2185b;
+$primary-500: darken(red, 0.5);
+$primary-600: red;
+$primary-700: lighten(red, 0.5);
 
 // Import Pico
 @import "@picocss/pico/scss/pico";
