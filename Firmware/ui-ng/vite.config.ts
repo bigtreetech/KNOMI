@@ -18,5 +18,7 @@ export default defineConfig({
             }
         }
     },
+    logLevel: "silent",
+    clearScreen: false,
     plugins: [svg(), svelte(), viteSingleFile(), viteCompression({algorithm: "gzip", deleteOriginalAssets: false})],
 })
