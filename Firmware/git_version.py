@@ -8,7 +8,7 @@ VERSION_FILE = 'version.cpp'
 
 result = subprocess.run(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8').replace("\n", "").replace("\r", "")
 
-VERSION_CONTENTS = """#include "version.h"
+VERSION_CONTENTS = """#include "../Version.h"
 
 String Version::getGitCommitSha1() {
  return "$1";
