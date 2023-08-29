@@ -15,6 +15,7 @@ public:
   ~APConfigScene() override {
     delete logo;
     delete apcfg;
+    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
   }
 
   SwitchSceneRequest *NextScene() override {
