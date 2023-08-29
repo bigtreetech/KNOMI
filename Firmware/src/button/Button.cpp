@@ -23,7 +23,6 @@ void Button::KeyScan() {
     if (pressDuration > WIFI_RESET_LONG_PRESS_MS) {
       LV_LOG_INFO("Clearing wifi setup");
       wifiManager->resetWifi();
-      ESP.restart();
     }
   }
   lastState = currentState;

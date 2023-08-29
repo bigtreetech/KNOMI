@@ -35,7 +35,7 @@ void lv_port_littlefs_init(void) {
   fs_drv.write_cb = fs_write;
   fs_drv.seek_cb = fs_seek;
   fs_drv.tell_cb = fs_tell;
-  fs_drv.cache_size = 8192;
+  fs_drv.cache_size = 1024;
 
   fs_drv.dir_close_cb = fs_dir_close;
   fs_drv.dir_open_cb = fs_dir_open;

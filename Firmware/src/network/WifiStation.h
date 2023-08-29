@@ -13,4 +13,8 @@ public:
 
     WiFi.begin(config->getSSID(), config->getPassword());
   }
+
+  ~WifiStation() {
+    WiFi.disconnect(true);
+  }
 };

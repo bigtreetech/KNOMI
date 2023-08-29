@@ -55,16 +55,14 @@ __attribute__((unused)) void setup() {
   klipperApi = new KlipperApi(wifiEepromConfig);
   LV_LOG_INFO(("KlipperAPI started, free heap = " + String(esp_get_free_heap_size())).c_str());
   sceneManager = new SceneManager(klipperApi, wifiManager);
-  lv_timer_handler_run_in_period(40); // 25fps
+  lv_timer_handler_run_in_period(33); // 30fps
   LV_LOG_INFO(("SceneManager started, free heap = " + String(esp_get_free_heap_size())).c_str());
-  if (!wifiManager->isInConfigMode()) {
-    wifiManager->connectToWiFi();
-  }
+  wifiManager->connectToWiFi();
   LV_LOG_INFO(("Connected to wifi, free heap = " + String(esp_get_free_heap_size())).c_str());
 }
 
 __attribute__((unused)) void loop() {
-  lv_timer_handler_run_in_period(40); // 25fps
+  lv_timer_handler_run_in_period(33); // 30fps
 
   if (WiFi.isConnected() && !btn->isPressed()) {
     klipperApi->tick();
@@ -77,7 +75,6 @@ __attribute__((unused)) void loop() {
 
   uint32_t nowtime = millis();
   if (nowtime > keyscan_nexttime) {
-
     sceneManager->Timer();
     klipperApi->refreshData();
     keyscan_nexttime = nowtime + 400;

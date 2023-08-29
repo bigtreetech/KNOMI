@@ -16,6 +16,7 @@ public:
       img = lv_gif_create(screen);
       lv_gif_set_src(img, filename.begin());
     } else {
+      // TODO in case of BMP manually decode image and store it in ram - this may increase speed a lot.
       img = lv_img_create(screen);
       lv_img_set_src(img, filename.begin());
     }

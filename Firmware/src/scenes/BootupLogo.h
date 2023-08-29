@@ -13,7 +13,7 @@ private:
 
 public:
   explicit BootupLogoScene(KlipperApi *api, WifiManager *mgr)
-      : AbstractScene(api) {
+      : AbstractScene(api, mgr) {
     this->wifiManager = mgr;
 
     lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
@@ -50,9 +50,9 @@ public:
 
   SwitchSceneRequest *NextScene() override {
     if (wifiManager->isInConfigMode()) {
-      return new SwitchSceneRequest(klipperApi, SceneId::APConfig, 0);
+      return new SwitchSceneRequest(klipperApi, mgr, SceneId::APConfig, 0);
     } else if (wifiManager->isConnected()) {
-      return new SwitchSceneRequest(klipperApi, SceneId::Standby);
+      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
     }
     return nullptr;
   }

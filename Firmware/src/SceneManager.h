@@ -50,7 +50,7 @@ public:
   }
 
   void SwitchScene(SceneId id, int timerOverride = -1) {
-    switchSceneRequest = new SwitchSceneRequest(klipperApi, id, timerOverride);
+    switchSceneRequest = new SwitchSceneRequest(klipperApi, manager, id, timerOverride);
   }
 };
 

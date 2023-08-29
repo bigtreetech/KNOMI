@@ -1,6 +1,7 @@
 #pragma once
 class AbstractScene;
 class KlipperApi;
+class WifiManager;
 
 enum SceneId {
   Homing = 12,
@@ -22,13 +23,15 @@ enum SceneId {
 class SwitchSceneRequest {
 private:
   KlipperApi *api;
+  WifiManager* mgr;
 
 public:
   SceneId id;
   int timerOverride;
 
-  explicit SwitchSceneRequest(KlipperApi *api, SceneId id, int timerOverride = -1) {
+  explicit SwitchSceneRequest(KlipperApi *api, WifiManager *mgr, SceneId id, int timerOverride = -1) {
     this->api = api;
+    this->mgr = mgr;
     this->id = id;
     this->timerOverride = timerOverride;
   }

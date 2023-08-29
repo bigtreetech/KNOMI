@@ -17,32 +17,34 @@
 AbstractScene *SwitchSceneRequest::Provide() {
   switch (id) {
   case SceneId::Voron:
-    return new VoronScene(api);
-  case SceneId::Standby:
-    return new StandbyScene(api);
+    return new VoronScene(api, mgr);
   case SceneId::Leveling:
-    return new LevelingScene(api);
+    return new LevelingScene(api, mgr);
   case SceneId::Homing:
-    return new HomingScene(api);
+    return new HomingScene(api, mgr);
   case SceneId::BedHeating:
-    return new BedHeatingScene(api);
+    return new BedHeatingScene(api, mgr);
   case SceneId::ExtruderHeating:
-    return new ExtruderHeatingScene(api);
+    return new ExtruderHeatingScene(api, mgr);
   case SceneId::BeforePrint:
-    return new BeforePrintingScene(api);
+    return new BeforePrintingScene(api, mgr);
   case SceneId::Printing:
-    return new PrintingScene(api);
+    return new PrintingScene(api, mgr);
   case SceneId::AfterPrint:
-    return new AfterPrintingScene(api);
+    return new AfterPrintingScene(api, mgr);
   case SceneId::Printing100Percent:
-    return new Printing100PercentScene(api);
+    return new Printing100PercentScene(api, mgr);
   case SceneId::Printing1Percent:
-    return new Printing1PercentScene(api);
+    return new Printing1PercentScene(api, mgr);
   case SceneId::NoKlipper:
-    return new NoKlipperScene(api);
+    return new NoKlipperScene(api, mgr);
   case SceneId::APConfig:
-    return new APConfigScene(api);
+    return new APConfigScene(api, mgr);
+  case BootupLogo:
+    return new BootupLogoScene(api, mgr);
+  case SceneId::Standby:
+    return new StandbyScene(api, mgr);
   }
   LV_LOG_WARN((String("Unhandled scene %s") + id).c_str());
-  return new StandbyScene(api);
+  return new StandbyScene(api, mgr);
 }

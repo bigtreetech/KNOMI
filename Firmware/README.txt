@@ -17,3 +17,4 @@ To create suitable BMP files:
   - Handle safe firmware check / boot to previous version using OTA
   - Change first experience of wifi setup with smth better - e.g. WiFiManager lib
   - Switch webserver to ESPAsyncWebserver
+  - More universal captive portal - https://github.com/CDFER/Captive-Portal-ESP32/blob/main/src/main.cpp

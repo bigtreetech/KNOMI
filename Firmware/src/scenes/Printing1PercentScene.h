@@ -12,7 +12,7 @@ private:
   lv_style_t style_arc_print_progress;
 
 public:
-  explicit Printing1PercentScene(KlipperApi *api) : AbstractScene(api) {
+  explicit Printing1PercentScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
     init_label_print_progress();
     init_arc_print_progress();
   }
@@ -24,10 +24,10 @@ public:
   SwitchSceneRequest *NextScene() override {
     if (klipperApi->isPrinting()) {
       if (klipperApi->getProgressData() == 100) {
-        return new SwitchSceneRequest(klipperApi, SceneId::Printing100Percent, 7);
+        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Printing100Percent, 7);
       }
     } else {
-      return new SwitchSceneRequest(klipperApi, SceneId::Standby);
+      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
     }
     String result = String(klipperApi->getProgressData()) + "%";
     lv_label_set_text(label_print_progress, result.c_str());

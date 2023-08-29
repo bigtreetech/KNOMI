@@ -12,7 +12,7 @@ private:
   lv_style_t style_label_bed_target_temp;
 
 public:
-  explicit BedHeatingScene(KlipperApi *api) : AbstractScene(api) {
+  explicit BedHeatingScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
     ri_bed = KnownResourceImages::get_bed_temp();
     init_label_heaterbed_actual_temp();
     init_label_heaterbed_target_temp();
@@ -26,7 +26,7 @@ public:
 
   SwitchSceneRequest* NextScene() override {
     if (klipperApi->getBedActualTempValue() >= klipperApi->getBedTargetTempValue() && klipperApi->getBedTargetTemp() != 0 || klipperApi->getBedTargetTemp() == 0) {
-      return new SwitchSceneRequest(klipperApi, SceneId::ExtruderHeating);
+      return new SwitchSceneRequest(klipperApi, mgr, SceneId::ExtruderHeating);
     }
     lv_label_set_text(label_bed_actual_temp, klipperApi->getBedActualTemp().c_str());
     lv_label_set_text(label_bed_target_temp, klipperApi->getBedTargetTemp().c_str());

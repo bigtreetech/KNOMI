@@ -13,7 +13,7 @@ private:
   lv_style_t style_label_ext_target_temp;
 
 public:
-  explicit ExtruderHeatingScene(KlipperApi *api) : AbstractScene(api) {
+  explicit ExtruderHeatingScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
     ri_ext = KnownResourceImages::get_ext_temp();
     init_label_extruder_actual_temp();
     init_label_extruder_target_temp();
@@ -33,13 +33,13 @@ public:
       // heated fully...
 
       if (!klipperApi->isPrinting()) {
-        return new SwitchSceneRequest(klipperApi, SceneId::Standby);
+        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
       } else {
-        return new SwitchSceneRequest(klipperApi, SceneId::BeforePrint);
+        return new SwitchSceneRequest(klipperApi, mgr, SceneId::BeforePrint);
       }
     } else {
       if (klipperApi->getExtruderTargetTempValue() == 0) {
-        return new SwitchSceneRequest(klipperApi, SceneId::Printing);
+        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Printing);
       }
     }
 
