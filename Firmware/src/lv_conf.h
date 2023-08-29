@@ -85,7 +85,7 @@
 
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#define LV_TICK_CUSTOM 0
+#define LV_TICK_CUSTOM 1
 #if LV_TICK_CUSTOM
     #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
     #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
@@ -236,8 +236,9 @@
     #define LV_LOG_PRINTF 0
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
+    #define LV_LOG_TRACE_FS         0
     #define LV_LOG_TRACE_MEM        0
-    #define LV_LOG_TRACE_TIMER      0
+    #define LV_LOG_TRACE_TIMER      1
     #define LV_LOG_TRACE_INDEV      1
     #define LV_LOG_TRACE_DISP_REFR  0
     #define LV_LOG_TRACE_EVENT      0
@@ -255,7 +256,7 @@
  *If LV_USE_LOG is enabled an error message will be printed on failure*/
 #define LV_USE_ASSERT_NULL          1   /*Check if the parameter is NULL. (Very fast, recommended)*/
 #define LV_USE_ASSERT_MALLOC        1   /*Checks is the memory is successfully allocated or no. (Very fast, recommended)*/
-#define LV_USE_ASSERT_STYLE         0   /*Check if the styles are properly initialized. (Very fast, recommended)*/
+#define LV_USE_ASSERT_STYLE         1   /*Check if the styles are properly initialized. (Very fast, recommended)*/
 #define LV_USE_ASSERT_MEM_INTEGRITY 0   /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
 #define LV_USE_ASSERT_OBJ           0   /*Check the object's type and existence (e.g. not deleted). (Slow)*/
 

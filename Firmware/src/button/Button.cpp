@@ -1,13 +1,13 @@
 #include "Button.h"
 
-Button::Button(WifiManager* manager, Ticker* timer) {
+Button::Button(WifiManager* manager) {
   wifiManager = manager;
   pinMode(0, INPUT); // input mode; default -> high, pressed -> low.
   delay(200);
   currentState = HIGH;
   lastState = HIGH;
 
-  timer->attach(0.001, Button::KeyScan, this);
+  timer.attach(0.001, Button::KeyScan, this);
 }
 
 void Button::KeyScan() {
@@ -23,7 +23,6 @@ void Button::KeyScan() {
     if (pressDuration > WIFI_RESET_LONG_PRESS_MS) {
       LV_LOG_INFO("Clearing wifi setup");
       wifiManager->resetWifi();
-      ESP.restart();
     }
   }
   lastState = currentState;

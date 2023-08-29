@@ -5,12 +5,12 @@
 #include "KnomiWebServer.h"
 
 KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
-  server = new WebServer(webPort);
+  WebServer *pServer = new WebServer(webPort);
   wificonfig = config;
   wifimanager = manager;
 
-  server->on("/", HTTP_GET, [&](){ handleRoot(); });
-  server->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
+  pServer->on("/", HTTP_GET, [&](){ handleRoot(); });
+  pServer->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
 
   server->onNotFound([&](){ handleNotFound(); });
 
@@ -81,6 +81,7 @@ KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
 
   server->begin();
 
+  this->server = pServer;
   LV_LOG_INFO("WebServer started!");
 }
 
@@ -145,18 +146,6 @@ void KnomiWebServer::handleConfigWifi() // 返回http状态
   // "<br />password:" + wifi_pass + "<br />Trying to connect Trying to connect,
   // please manually close this page."); //返回保存成功页面
   server->send(200, "text/html", ROOT_HTML_OK); // 返回保存成功页面
-  delay(2000);
-  WiFi.softAPdisconnect(
-      true); // 参数设置为true，设备将直接关闭接入点模式，即关闭设备所建立的WiFi网络。
-  server->close();          // 关闭web服务
-  WiFi.softAPdisconnect(); // 在不输入参数的情况下调用该函数,将关闭接入点模式,并将当前配置的AP热点网络名和密码设置为空值.
   LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
-
-  if (WiFi.status() != WL_CONNECTED) // wifi没有连接成功
-  {
-    LV_LOG_INFO("开始调用连接函数connectToWiFi()..");
-    wifimanager->connectToWiFi();
-  } else {
-    LV_LOG_INFO("提交的配置信息自动连接成功..");
-  }
+  wifimanager->connectToWiFi();
 }

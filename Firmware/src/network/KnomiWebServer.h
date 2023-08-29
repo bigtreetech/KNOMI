@@ -17,6 +17,7 @@ class KnomiWebServer {
 private:
   String id;
   const int webPort = 80;
+  bool started = false;
   WebServer *server = nullptr;
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
@@ -34,6 +35,13 @@ public:
     delete this->server;
   }
 
-  void tick() { this->server->handleClient(); }
+  void tick()
+  {
+    if (!this->started) {
+      this->started = true;
+      this->server->begin(webPort);
+    }
+    this->server->handleClient();
+  }
+
 };
-;

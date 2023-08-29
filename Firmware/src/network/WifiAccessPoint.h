@@ -1,20 +1,33 @@
 #pragma once
-#include "DnsService.h"
+#include <DNSServer.h>
 #include <WiFi.h>
+#include "lvgl.h"
+#include "esp_wifi.h"
 
 class WifiAccessPoint {
 private:
   const char *AP_SSID = "BTT-KNOMI";
-  DnsService* dnsService = nullptr;
+  const byte DNS_PORT = 53; // 设置DNS端口号
+  DNSServer* dnsService = nullptr;
 
 public:
   WifiAccessPoint() {
-    IPAddress apIP(192, 168, 20, 1);
+    IPAddress apIP(4, 3, 2, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     if (WiFi.softAP(AP_SSID)) // 开启AP热点,如需要密码则添加第二个参数
     {
-      dnsService = new DnsService(apIP);
+      // Disable AMPDU RX on the ESP32 WiFi to fix a bug on Android
+      esp_wifi_stop();
+      esp_wifi_deinit();
+      wifi_init_config_t my_config = WIFI_INIT_CONFIG_DEFAULT();
+      my_config.ampdu_rx_enable = false;
+      esp_wifi_init(&my_config);
+      esp_wifi_start();
+      vTaskDelay(100 / portTICK_PERIOD_MS);  // Add a small delay
+
+      dnsService = new DNSServer();
+      dnsService->start(DNS_PORT, "*", apIP);
       LV_LOG_INFO("ESP-32S SoftAP is right.");
       LV_LOG_INFO("Soft-AP IP address = ");
       LV_LOG_INFO(WiFi.softAPIP().toString().c_str());
@@ -29,12 +42,18 @@ public:
   }
 
   ~WifiAccessPoint() {
-    delete dnsService;
+    if (dnsService != nullptr) {
+      dnsService->stop();
+      delete dnsService;
+    }
+    WiFi.softAPdisconnect(true);
+    delay(2000);
+    WiFi.softAPdisconnect();
   }
 
   void tick() {
     if (dnsService != nullptr) {
-      dnsService->tick();
+      dnsService->processNextRequest();
     }
   }
 };

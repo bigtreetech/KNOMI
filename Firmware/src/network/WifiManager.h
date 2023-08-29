@@ -25,11 +25,11 @@ public:
   void resetWifi() {
     config->DeleteConfig();
     delay(500);
-
+    WiFi.disconnect(true, true);
     esp_wifi_restore();
-    LV_LOG_INFO(
-        "Saved wifi config deleted and switched mode to AP. Resetting...");
+    LV_LOG_INFO("Saved wifi config deleted and switched mode to AP. Resetting...");
     delay(10);
+    ESP.restart();
   }
 
   bool isConnected() const { return _isConnected; }
@@ -37,26 +37,32 @@ public:
   bool isInConfigMode() { return this->ap != nullptr; }
 
   void connectToWiFi() {
-    const int timeOut_s = 15;
+    int timeOut_s = 30;
 
     if (config->getSSID().isEmpty()) {
       ap = new WifiAccessPoint();
       return;
     }
+    LV_LOG_INFO("We have config - let's try STA");
 
     delete ap;
     ap = nullptr;
     sta = new WifiStation(config);
 
-    while (WiFiClass::status() != WL_CONNECTED) {
-      delay(timeOut_s * 1000);
+    while (WiFiClass::status() != WL_CONNECTED && timeOut_s > 0) {
+      timeOut_s -= 1;
+      delay(1000);
+    }
+
+    if (WiFiClass::status() != WL_CONNECTED) {
       LV_LOG_INFO("WIFI autoconnect fail, start AP for webconfig now...");
       delete sta;
       sta = nullptr;
       this->ap = new WifiAccessPoint();
-      this->_isConnected = true;
+      config->setSSID("");
       return;
     }
+    LV_LOG_INFO("STA connected");
 
     if (WiFiClass::status() == WL_CONNECTED) // 如果连接成功
     {

@@ -10,7 +10,11 @@ For building you need nodejs installed and available on path.
  3) Code a lot cleaner, cut all factory-test stuff.
 
  TODO:
- Make OTA display progress on screen.
- Make BMP loading from fs a lot faster (on start)
- Try to move lv_task_handler to native ESP32 vTask - so that delay in Arduino's HTTP Client won't freeze it.
- Brush up web interface to allow download/upload gifs from web interface directly to FS.
+  - Make OTA display progress on screen.
+  - Make BMP loading from fs a lot faster (on start)  (e.g. try to make them an binary format instead of just bmp on spiffs) - especially noticeable on first launch / AP Config
+  - Try to move lv_task_handler to native ESP32 vTask - so that delay in Arduino's HTTP Client won't freeze it.
+  - Brush up web interface to allow download/upload gifs from web interface directly to FS.
+  - Handle safe firmware check / boot to previous version using OTA
+  - Change first experience of wifi setup with smth better - e.g. WiFiManager lib
+  - Switch webserver to ESPAsyncWebserver
+  - More universal captive portal - https://github.com/CDFER/Captive-Portal-ESP32/blob/main/src/main.cpp
