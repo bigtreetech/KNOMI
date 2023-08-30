@@ -7,10 +7,18 @@
 
     var id = "unknown";
 
+    var ssid = "";
+    var pass = "";
+    var ip = "";
+
     async function load() {
-        let response = await fetch("/update/identity");
+        let response = await fetch("/api/status");
         let json = await response.json();
-        id = json.id;
+        id = JSON.stringify(json);
+
+        ssid = json.ssid;
+        pass = json.pass;
+        ip = json.ip;
     }
 
     load();
@@ -49,8 +57,8 @@
 </main>
 <style>
     .logo {
-        width: 32px;
-        height: 32px;
+        width: 64px;
+        height: 64px;
         display: inline-block;
         padding: 1em;
         padding-left: 0;
@@ -59,12 +67,12 @@
         transition: filter 300ms;
     }
 
-    header a {
+    nav a {
         padding: 1em;
     }
 
-    header a:hover {
-        filter: drop-shadow(0 0 1em #ffffffff);
+    nav a:hover {
+        filter: drop-shadow(0 0 1px #ffffffff);
     }
 
     .logo:hover {

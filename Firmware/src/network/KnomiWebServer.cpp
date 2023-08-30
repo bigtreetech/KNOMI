@@ -3,143 +3,140 @@
 //
 
 #include "KnomiWebServer.h"
+#include "ArduinoJson.h"
+#include "LittleFS.h"
 
-KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
-  WebServer *pServer = new WebServer(webPort);
+KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
+  AsyncWebServer *pServer = new AsyncWebServer(webPort);
   wificonfig = config;
   wifimanager = manager;
 
-  pServer->on("/", HTTP_GET, [&](){
-    server->sendHeader("Content-Encoding", "gzip");
-    server->send_P(200, "text/html", (const char *) KNOMI_HTML, KNOMI_HTML_SIZE);
+  pServer->on("/", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *pResponse =
+        request->beginResponse_P(200, "text/html", KNOMI_HTML, KNOMI_HTML_SIZE);
+    pResponse->addHeader("Content-Encoding", "gzip");
+    request->send(pResponse);
   });
-  pServer->onNotFound([&](){
-    server->send_P(404, "text/html", "Not found");
+
+  pServer->onNotFound([&](AsyncWebServerRequest *req) {
+    req->send(404, "text/html", "Not found");
   });
 
-  pServer->on("/api/status", HTTP_GET, [&]() {
+  pServer->on("/api/status", HTTP_GET, [&](AsyncWebServerRequest *req) {
+    AsyncResponseStream *response =
+        req->beginResponseStream("application/json");
+    DynamicJsonDocument doc(512);
+    doc["hash"] = Version::getGitCommitSha1();
+    doc["branch"] = Version::getGitBranch();
+    doc["gitTimestamp"] = Version::getGitTimestamp();
+    doc["buildTimestamp"] = Version::getBuildTimestamp();
+    doc["ssid"] = wificonfig->getSSID();
+    doc["pass"] = wificonfig->getPassword();
+    doc["ip"] = wificonfig->getKlipperIp();
+    serializeJson(doc, *response);
+    req->send(response);
+  });
 
-         });
-  
+  pServer->serveStatic("/fs/", LittleFS, "/");
 
-  pServer->on("/configwifi", HTTP_POST, [&](){
-    if (server->hasArg("ssid")) // 判断是否有账号参数
-    {
+  pServer->on("/configwifi", HTTP_POST, [&](AsyncWebServerRequest *req) {
+    if (req->hasArg("ssid")) {
       LV_LOG_INFO("got ssid:");
-      String wifi_ssid = server->arg("ssid"); // 获取html表单输入框name名为"ssid"的内容
+      String wifi_ssid = req->arg("ssid");
 
       wificonfig->setSSID(wifi_ssid);
       LV_LOG_INFO(wifi_ssid.c_str());
     } else // 没有参数
     {
       LV_LOG_INFO("error, not found ssid");
-      server->send(200, "text/html",
-                   "<meta charset='UTF-8'>error, not found ssid"); // 返回错误页面
+      req->send(200, "text/html",
+                "<meta charset='UTF-8'>error, not found ssid");
       return;
     }
     // 密码与账号同理
-    if (server->hasArg("pass")) {
+    if (req->hasArg("pass")) {
       LV_LOG_INFO("got password:");
-      String wifi_pass = server->arg("pass"); // 获取html表单输入框name名为"pwd"的内容
+      String wifi_pass = req->arg("pass");
 
       wificonfig->setPassword(wifi_pass);
       LV_LOG_INFO(wifi_pass.c_str());
     } else {
       LV_LOG_INFO("error, not found password");
-      server->send(200, "text/html",
-                   "<meta charset='UTF-8'>error, not found password");
+      req->send(200, "text/html",
+                "<meta charset='UTF-8'>error, not found password");
       return;
     }
     // klipper ip
-    if (server->hasArg("klipper")) {
+    if (req->hasArg("klipper")) {
       LV_LOG_INFO("got KlipperIP:");
-      String klipper_ip = server->arg("klipper"); // 获取html表单输入框name名为"KlipperIP"的内容
+      String klipper_ip = req->arg("klipper");
 
       wificonfig->setKlipperIp(klipper_ip);
 
       LV_LOG_INFO(klipper_ip.c_str());
     } else {
       LV_LOG_INFO("error, not found klipper ip");
-      server->send(200, "text/html",
-                   "<meta charset='UTF-8'>error, not found klipper ip");
+      req->send(200, "text/html",
+                "<meta charset='UTF-8'>error, not found klipper ip");
       return;
     }
     delay(200);
 
-    // server->send(200, "text/html", "<meta charset='UTF-8'>SSID：" + wifi_ssid +
-    // "<br />password:" + wifi_pass + "<br />Trying to connect Trying to connect,
-    // please manually close this page."); //返回保存成功页面
-    server->send(200, "text/html", "OK"); // 返回保存成功页面
-    LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
+    req->send(200, "text/html", "OK"); // 返回保存成功页面
+    LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() +
+                 "  PASS:" + wificonfig->getPassword())
+                    .c_str());
     wifimanager->connectToWiFi();
-  });
-
-  pServer->on("/update", HTTP_GET, [&]() {
-    pServer->sendHeader("Content-Encoding", "gzip");
-    pServer->send_P(200, "text/html", (const char *)ELEGANT_HTML, ELEGANT_HTML_SIZE);
-  });
-
-  pServer->on("/update/identity", HTTP_GET, [&]() {
-    String shortSha = Version::getGitCommitSha1().substring(0, 8);
-    String timestamp = Version::getBuildTimestamp();
-    String id = shortSha + " - " + timestamp;
-    id = R"({ "id": ")" + id + R"("})";
-    pServer->send(200, "application/json", id);
   });
 
   pServer->on(
       "/update", HTTP_POST,
-      [&]() {
-        pServer->sendHeader("Connection", "close");
-        pServer->send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+      [&](AsyncWebServerRequest *req) {
+        AsyncWebServerResponse *pResponse = req->beginResponse(
+            200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+        pResponse->addHeader("Connection", "close");
+        pResponse->addHeader("Access-Control-Allow-Origin", "*");
+        req->send(pResponse);
         // Needs some time for Core 0 to send response
         delay(100);
         yield();
         delay(100);
         ESP.restart();
       },
-      [&]() {
-        // Actual OTA Download
-        HTTPUpload &upload = pServer->upload();
-        if (upload.status == UPLOAD_FILE_START) {
-          // Serial output must be active to see the callback serial prints
-          //            Serial.setDebugOutput(true);
-          //            Serial.printf("Update Received: %s\n",
-          //            upload.filename.c_str());
-          if (upload.name == "filesystem") {
-            if (!Update.begin(UPDATE_SIZE_UNKNOWN,
-                              U_SPIFFS)) { // start with max available size
-              Update.printError(Serial);
-            }
-          } else {
-            if (!Update.begin(UPDATE_SIZE_UNKNOWN,
-                              U_FLASH)) { // start with max available size
-              Update.printError(Serial);
-            }
-          }
-        } else if (upload.status == UPLOAD_FILE_WRITE) {
-          if (Update.write(upload.buf, upload.currentSize) !=
-              upload.currentSize) {
-            Update.printError(Serial);
-          }
-        } else if (upload.status == UPLOAD_FILE_END) {
-          if (Update.end(true)) { // true to set the size to the current
-                                  // progress
-            //                Serial.printf("Update Success:
-            //                %u\nRebooting...\n", upload.totalSize);
-          } else {
-            Update.printError(Serial);
-          }
-          //            Serial.setDebugOutput(false);
-        } else {
-          //            Serial.printf("Update Failed Unexpectedly (likely broken
-          //            connection): status=%d\n", upload.status);
-        }
+      [&](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
+
+         if (!index) {
+           if(!request->hasParam("MD5", true)) {
+             return request->send(400, "text/plain", "MD5 parameter missing");
+           }
+
+           if(!Update.setMD5(request->getParam("MD5", true)->value().c_str())) {
+             return request->send(400, "text/plain", "MD5 parameter invalid");
+           }
+
+           int cmd = (filename == "filesystem") ? U_SPIFFS : U_FLASH;
+           if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { // Start with max available size
+             Update.printError(Serial);
+             return request->send(400, "text/plain", "OTA could not begin");
+           }
+         }
+
+         // Write chunked data to the free sketch space
+         if(len){
+           if (Update.write(data, len) != len) {
+             return request->send(400, "text/plain", "OTA could not begin");
+           }
+         }
+
+         if (final) { // if the final flag is set then this is the last frame of data
+           if (!Update.end(true)) { //true to set the size to the current progress
+             Update.printError(Serial);
+             return request->send(400, "text/plain", "Could not end OTA");
+           }
+         }else{
+           return;
+         }
       });
-
-
-
-  pServer->begin();
 
   this->server = pServer;
   LV_LOG_INFO("WebServer started!");

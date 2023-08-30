@@ -4,27 +4,25 @@
 #include "WifiManager.h"
 #include "lvgl.h"
 #include <ESPmDNS.h>
-#include <WebServer.h>
 #include "Arduino.h"
 #include "WiFi.h"
 #include "WiFiClient.h"
-#include "WebServer.h"
+#include "ESPAsyncWebServer.h"
 #include "Update.h"
-#include "../generated/elegantWebpage.h"
 #include "../generated/knomiWebpage.h"
 
 class KnomiWebServer {
 private:
   const int webPort = 80;
   bool started = false;
-  WebServer *server = nullptr;
+  AsyncWebServer *server = nullptr;
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
 
 public:
   KnomiWebServer(WifiConfig *config, WifiManager* manager);
   ~KnomiWebServer() {
-    this->server->stop();
+    this->server->end();
     delete this->server;
   }
 
@@ -32,9 +30,8 @@ public:
   {
     if (!this->started) {
       this->started = true;
-      this->server->begin(webPort);
+      this->server->begin();
     }
-    this->server->handleClient();
   }
 
 };

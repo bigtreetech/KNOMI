@@ -8,6 +8,14 @@ import svg from "vite-plugin-svgo";
 export default defineConfig({
   root: "src",
 
+  server: {
+    proxy: {
+      '/update': 'http://knomi',
+      '/api': 'http://knomi',
+      '/fs': 'http://knomi',
+    }
+  },
+
   build: {
     outDir: "../dist",
     emptyOutDir: true,
