@@ -46,7 +46,7 @@ jobs:
     steps:
     - name: Download Firmware Files
       id: download
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: firmware
 
