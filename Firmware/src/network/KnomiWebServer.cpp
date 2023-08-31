@@ -39,53 +39,38 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
 
   pServer->serveStatic("/fs/", LittleFS, "/");
 
-  pServer->on("/configwifi", HTTP_POST, [&](AsyncWebServerRequest *req) {
+  pServer->on("/api/configwifi", HTTP_POST, [&](AsyncWebServerRequest *req) {
     if (req->hasArg("ssid")) {
-      LV_LOG_INFO("got ssid:");
       String wifi_ssid = req->arg("ssid");
-
       wificonfig->setSSID(wifi_ssid);
-      LV_LOG_INFO(wifi_ssid.c_str());
-    } else // 没有参数
-    {
+      LV_LOG_INFO(("got ssid:" + wifi_ssid).c_str());
+    } else {
       LV_LOG_INFO("error, not found ssid");
-      req->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found ssid");
+      req->send(500, "application/json", "{error:\"SSID is not found\"}");
       return;
     }
-    // 密码与账号同理
     if (req->hasArg("pass")) {
-      LV_LOG_INFO("got password:");
       String wifi_pass = req->arg("pass");
-
       wificonfig->setPassword(wifi_pass);
-      LV_LOG_INFO(wifi_pass.c_str());
+      LV_LOG_INFO(("got password:" + wifi_pass).c_str());
     } else {
       LV_LOG_INFO("error, not found password");
-      req->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found password");
+      req->send(500, "application/json", "{error:\"PASS is not found\"}");
       return;
     }
-    // klipper ip
     if (req->hasArg("klipper")) {
-      LV_LOG_INFO("got KlipperIP:");
       String klipper_ip = req->arg("klipper");
-
       wificonfig->setKlipperIp(klipper_ip);
-
-      LV_LOG_INFO(klipper_ip.c_str());
+      LV_LOG_INFO(("got KlipperIP:" + klipper_ip).c_str());
     } else {
       LV_LOG_INFO("error, not found klipper ip");
-      req->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found klipper ip");
+      req->send(500, "application/json", "{error:\"KLIPPER is not found\"}");
       return;
     }
     delay(200);
 
-    req->send(200, "text/html", "OK"); // 返回保存成功页面
-    LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() +
-                 "  PASS:" + wificonfig->getPassword())
-                    .c_str());
+    req->send(200, "application/json", "{result: \"ok\"}");
+    LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
     wifimanager->connectToWiFi();
   });
 

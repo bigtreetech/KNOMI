@@ -1,15 +1,18 @@
 <script lang="ts">
-    import {Route} from 'tinro';
+    import {Route, router, active} from 'tinro';
     import voronLogo from './assets/voron.svg'
-
-    import SetupDone from "./lib/SetupDone.svelte";
-    import Setup from "./lib/Setup.svelte";
 
     var id = "unknown";
 
     var ssid = "";
     var pass = "";
     var ip = "";
+    var hash = "";
+    var branch = "";
+    var gitTimestamp = "";
+    var buildTimestamp = "";
+
+    var isSaving = false;
 
     async function load() {
         let response = await fetch("/api/status");
@@ -19,6 +22,32 @@
         ssid = json.ssid;
         pass = json.pass;
         ip = json.ip;
+        hash = json.hash;
+        branch = json.branch;
+        gitTimestamp = new Date(json.gitTimestamp).toLocaleString();
+        buildTimestamp = new Date(json.buildTimestamp).toLocaleString();
+    }
+
+    async function saveSetup() {
+        isSaving = true;
+        console.log(ssid + "/" + pass + "/" + ip);
+        const data = new URLSearchParams();
+        data.append("ssid", ssid);
+        data.append("pass", pass);
+        data.append("klipper", ip);
+
+        const res = await fetch('/api/configwifi', {
+            method: "POST",
+            body: data
+        })
+        if (res.status == 200) {
+            isSaving = false;
+            router.goto("/setupdone");
+        } else if (res.status == 500) {
+            const error = res.json().error;
+            alert(error);
+        }
+        isSaving = false;
     }
 
     load();
@@ -29,7 +58,7 @@
         <ul>
             <li>
                 <span class="logo">{@html voronLogo}</span>
-                <a href="/">Setup</a>
+                <a href="/" use:active>Setup</a>
             </li>
         </ul>
         <ul>
@@ -39,18 +68,41 @@
     </nav>
 
     <Route path="/">
-        <Setup/>
+        <div>
+            <form on:submit|preventDefault={saveSetup}>
+                <h3>Setup your KNOMI display</h3>
+                <label class="input">
+                    <span>WiFi SSID</span>
+                    <input disabled={ isSaving } type="text" bind:value="{ssid}">
+                </label>
+                <label class="input">
+                    <span>WiFi PASS</span>
+                    <input disabled={ isSaving } type="text" bind:value="{pass}">
+                </label>
+                <label class="input">
+                    <span>Klipper IP</span>
+                    <input disabled={ isSaving } type="text" bind:value="{ip}">
+                </label>
+                <button disabled={ isSaving } type=submit>SAVE</button>
+            </form>
+        </div>
     </Route>
     <Route path="/setupdone">
-        <SetupDone/>
+        <span>
+            Submission successful!
+        </span>
+        <span>
+            You may now close this page.
+        </span>
     </Route>
 
     <footer>
         <hr/>
         <p class="read-the-docs">
             <small>
-                Firmware: {id}. Check our <a href="https://github.com/DiverOfDark/KNOMI" target="_blank">repository</a> for more
-                details.
+                Firmware built from <span
+                    title="Commit {hash} from {gitTimestamp}"><b>{branch}</b> at <b>{buildTimestamp}</b></span>. <br/>
+                Check <a href="https://github.com/DiverOfDark/KNOMI" target="_blank">repository</a> for more details.
             </small>
         </p>
     </footer>
