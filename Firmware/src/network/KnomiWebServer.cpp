@@ -19,7 +19,8 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
   });
 
   pServer->onNotFound([&](AsyncWebServerRequest *req) {
-    req->send(404, "text/html", "Not found");
+    req->redirect("/");
+    // req->send(404, "text/html", "Not found");
   });
 
   pServer->on("/api/status", HTTP_GET, [&](AsyncWebServerRequest *req) {

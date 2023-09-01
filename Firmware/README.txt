@@ -20,3 +20,4 @@ For building you need nodejs installed and available on path.
   - Change first experience of wifi setup with smth better - e.g. WiFiManager lib
   - More universal captive portal - https://github.com/CDFER/Captive-Portal-ESP32/blob/main/src/main.cpp
   - Handle updates from github (both firmware and spiffs contents)
+  - Add an option to select wifi from found networks.
