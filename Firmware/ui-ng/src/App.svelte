@@ -306,6 +306,7 @@
 
     nav a {
         padding: 1em;
+        margin: 0;
     }
 
     :global(.active) {
