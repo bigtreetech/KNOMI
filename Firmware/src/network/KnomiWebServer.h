@@ -4,29 +4,25 @@
 #include "WifiManager.h"
 #include "lvgl.h"
 #include <ESPmDNS.h>
-#include <ElegantOTA.h>
-#include <WebServer.h>
-
-// 端口号,最大连接数
+#include "Arduino.h"
+#include "WiFi.h"
+#include "WiFiClient.h"
+#include "ESPAsyncWebServer.h"
+#include "Update.h"
+#include "../generated/knomiWebpage.h"
 
 class KnomiWebServer {
 private:
   const int webPort = 80;
   bool started = false;
-  WebServer *server = nullptr;
+  AsyncWebServer *server = nullptr;
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
-
-  void handleRoot();
-
-  void handleConfigWifi();
-
-  void handleNotFound() { handleRoot(); }
 
 public:
   KnomiWebServer(WifiConfig *config, WifiManager* manager);
   ~KnomiWebServer() {
-    this->server->stop();
+    this->server->end();
     delete this->server;
   }
 
@@ -34,9 +30,8 @@ public:
   {
     if (!this->started) {
       this->started = true;
-      this->server->begin(webPort);
+      this->server->begin();
     }
-    this->server->handleClient();
   }
 
 };

@@ -3,100 +3,127 @@
 //
 
 #include "KnomiWebServer.h"
+#include "ArduinoJson.h"
+#include "LittleFS.h"
 
-KnomiWebServer::KnomiWebServer(WifiConfig* config, WifiManager* manager) {
-  WebServer *pServer = new WebServer(webPort);
+KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
+  AsyncWebServer *pServer = new AsyncWebServer(webPort);
   wificonfig = config;
   wifimanager = manager;
 
-  pServer->on("/", HTTP_GET, [&](){ handleRoot(); });
-  pServer->on("/configwifi", HTTP_POST, [&](){ handleConfigWifi(); });
+  pServer->on("/", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *pResponse =
+        request->beginResponse_P(200, "text/html", KNOMI_HTML, KNOMI_HTML_SIZE);
+    pResponse->addHeader("Content-Encoding", "gzip");
+    request->send(pResponse);
+  });
 
-  pServer->onNotFound([&](){ handleNotFound(); });
-  String shortSha = Version::getGitCommitSha1().substring(0, 8);
-  String timestamp = Version::getBuildTimestamp();
-  String id = shortSha + " - " + timestamp;
-  ElegantOTA.setID(id.c_str());
-  ElegantOTA.begin(pServer);
+  pServer->onNotFound([&](AsyncWebServerRequest *req) {
+    req->redirect("/");
+    // req->send(404, "text/html", "Not found");
+  });
+
+  pServer->on("/api/status", HTTP_GET, [&](AsyncWebServerRequest *req) {
+    AsyncResponseStream *response =
+        req->beginResponseStream("application/json");
+    DynamicJsonDocument doc(512);
+    doc["hash"] = Version::getGitCommitSha1();
+    doc["branch"] = Version::getGitBranch();
+    doc["gitTimestamp"] = Version::getGitTimestamp();
+    doc["buildTimestamp"] = Version::getBuildTimestamp();
+    doc["ssid"] = wificonfig->getSSID();
+    doc["pass"] = wificonfig->getPassword();
+    doc["ip"] = wificonfig->getKlipperIp();
+    serializeJson(doc, *response);
+    req->send(response);
+  });
+
+  pServer->serveStatic("/fs/", LittleFS, "/");
+
+  pServer->on("/api/configwifi", HTTP_POST, [&](AsyncWebServerRequest *req) {
+    if (req->hasArg("ssid")) {
+      String wifi_ssid = req->arg("ssid");
+      wificonfig->setSSID(wifi_ssid);
+      LV_LOG_INFO(("got ssid:" + wifi_ssid).c_str());
+    } else {
+      LV_LOG_INFO("error, not found ssid");
+      req->send(500, "application/json", "{error:\"SSID is not found\"}");
+      return;
+    }
+    if (req->hasArg("pass")) {
+      String wifi_pass = req->arg("pass");
+      wificonfig->setPassword(wifi_pass);
+      LV_LOG_INFO(("got password:" + wifi_pass).c_str());
+    } else {
+      LV_LOG_INFO("error, not found password");
+      req->send(500, "application/json", "{error:\"PASS is not found\"}");
+      return;
+    }
+    if (req->hasArg("klipper")) {
+      String klipper_ip = req->arg("klipper");
+      wificonfig->setKlipperIp(klipper_ip);
+      LV_LOG_INFO(("got KlipperIP:" + klipper_ip).c_str());
+    } else {
+      LV_LOG_INFO("error, not found klipper ip");
+      req->send(500, "application/json", "{error:\"KLIPPER is not found\"}");
+      return;
+    }
+    delay(200);
+
+    req->send(200, "application/json", "{result: \"ok\"}");
+    LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
+    wifimanager->connectToWiFi();
+  });
+
+  pServer->on(
+      "/update", HTTP_POST,
+      [&](AsyncWebServerRequest *req) {
+        AsyncWebServerResponse *pResponse = req->beginResponse(
+            200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+        pResponse->addHeader("Connection", "close");
+        pResponse->addHeader("Access-Control-Allow-Origin", "*");
+        req->send(pResponse);
+        // Needs some time for Core 0 to send response
+        delay(100);
+        yield();
+        delay(100);
+        ESP.restart();
+      },
+      [&](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
+
+         if (!index) {
+           if(!request->hasParam("MD5", true)) {
+             return request->send(400, "text/plain", "MD5 parameter missing");
+           }
+
+           if(!Update.setMD5(request->getParam("MD5", true)->value().c_str())) {
+             return request->send(400, "text/plain", "MD5 parameter invalid");
+           }
+
+           int cmd = (filename == "filesystem") ? U_SPIFFS : U_FLASH;
+           if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { // Start with max available size
+             Update.printError(Serial);
+             return request->send(400, "text/plain", "OTA could not begin");
+           }
+         }
+
+         // Write chunked data to the free sketch space
+         if(len){
+           if (Update.write(data, len) != len) {
+             return request->send(400, "text/plain", "OTA could not begin");
+           }
+         }
+
+         if (final) { // if the final flag is set then this is the last frame of data
+           if (!Update.end(true)) { //true to set the size to the current progress
+             Update.printError(Serial);
+             return request->send(400, "text/plain", "Could not end OTA");
+           }
+         }else{
+           return;
+         }
+      });
 
   this->server = pServer;
   LV_LOG_INFO("WebServer started!");
-}
-
-#define ROOT_HTML_OK                                                           \
-  "<!DOCTYPE html><html><head><title>WIFI SET</title><meta name=\"viewport\" " \
-  "content=\"width=device-width, initial-scale=1\"></head><style "             \
-  "type=\"text/css\">.c,body {text-align: center}</style><body><form "         \
-  "method=\"POST\" action=\"configwifi\"></label><p><span> Submission "        \
-  "successful!</P><p><span> You may now close this page.</P> </form>"
-
-#define ROOT_HTML                                                              \
-  "<!DOCTYPE html><html><head><title>WIFI</title><meta name=\"viewport\" "     \
-  "content=\"width=device-width, initial-scale=1\"></head><style "             \
-  "type=\"text/css\">.input{display: block; margin-top: 10px;}.input "         \
-  "span{width: 100px; float: left; float: left; height: 36px; line-height: "   \
-  "36px;}.input input{height: 30px;width: 200px;}.btn{width: 110px; height: "  \
-  "50px; background-color: #438EF0; border-radius:8px; "                       \
-  "font-size:20px;color:#ffffff;border-color: #438EF0; margin-top:16px; "      \
-  "margin-left:104px;}</style><body><form method=\"POST\" "                    \
-  "action=\"configwifi\"><p><span> KNOMI :-)</P><label "                       \
-  "class=\"input\"><span>WiFi SSID</span><input type=\"text\" name=\"ssid\" "  \
-  "value=\"\"></label><label class=\"input\"><span>WiFi PASS</span> <input "   \
-  "type=\"text\"  name=\"pass\"><label class=\"input\"><span>Klipper "         \
-  "IP</span> <input type=\"text\"  name=\"klipper\"></label><input "           \
-  "class=\"btn\" type=\"submit\" name=\"submit\" value=\"SUBMIT\"> </form>"
-
-void KnomiWebServer::handleRoot() { server->send(200, "text/html", ROOT_HTML); }
-
-void KnomiWebServer::handleConfigWifi() // 返回http状态
-{
-  if (server->hasArg("ssid")) // 判断是否有账号参数
-  {
-    LV_LOG_INFO("got ssid:");
-    String wifi_ssid = server->arg("ssid"); // 获取html表单输入框name名为"ssid"的内容
-
-    wificonfig->setSSID(wifi_ssid);
-    LV_LOG_INFO(wifi_ssid.c_str());
-  } else // 没有参数
-  {
-    LV_LOG_INFO("error, not found ssid");
-    server->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found ssid"); // 返回错误页面
-    return;
-  }
-  // 密码与账号同理
-  if (server->hasArg("pass")) {
-    LV_LOG_INFO("got password:");
-    String wifi_pass = server->arg("pass"); // 获取html表单输入框name名为"pwd"的内容
-
-    wificonfig->setPassword(wifi_pass);
-    LV_LOG_INFO(wifi_pass.c_str());
-  } else {
-    LV_LOG_INFO("error, not found password");
-    server->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found password");
-    return;
-  }
-  // klipper ip
-  if (server->hasArg("klipper")) {
-    LV_LOG_INFO("got KlipperIP:");
-    String klipper_ip = server->arg("klipper"); // 获取html表单输入框name名为"KlipperIP"的内容
-
-    wificonfig->setKlipperIp(klipper_ip);
-
-    LV_LOG_INFO(klipper_ip.c_str());
-  } else {
-    LV_LOG_INFO("error, not found klipper ip");
-    server->send(200, "text/html",
-                "<meta charset='UTF-8'>error, not found klipper ip");
-    return;
-  }
-  delay(200);
-
-  // server->send(200, "text/html", "<meta charset='UTF-8'>SSID：" + wifi_ssid +
-  // "<br />password:" + wifi_pass + "<br />Trying to connect Trying to connect,
-  // please manually close this page."); //返回保存成功页面
-  server->send(200, "text/html", ROOT_HTML_OK); // 返回保存成功页面
-  LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
-  wifimanager->connectToWiFi();
 }
