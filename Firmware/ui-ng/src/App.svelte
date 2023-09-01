@@ -72,6 +72,9 @@
     function clear() {
         otaError = null;
         otaSuccess = false;
+        otaProgress = false;
+        otaPercentage = 0;
+        selectedFile = null;
     }
 
     function fileMD5(file) {
@@ -113,8 +116,8 @@
     }
 
     async function otaUpdate() {
-        debugger;
         otaProgress = true;
+        otaPercentage = 0;
         const formData = new FormData();
         const request = new XMLHttpRequest();
 
