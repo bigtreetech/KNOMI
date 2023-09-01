@@ -14,7 +14,6 @@ For building you need nodejs installed and available on path.
   - Make OTA display progress on screen.
   - Hardcode version to frontend same way as in backend (if frontend to be moved to LittleFS)
   - Handle safe firmware check / boot to previous version using OTA
-  - Merge ElegantOTA web interface into KNOMI one.
   - Make BMP loading from fs a lot faster (on start)  (e.g. try to make them an binary format instead of just bmp on spiffs) - especially noticeable on first launch / AP Config
   - Try to move lv_task_handler to native ESP32 vTask - so that delay in Arduino's HTTP Client won't freeze it.
   - Change first experience of wifi setup with smth better - e.g. WiFiManager lib
