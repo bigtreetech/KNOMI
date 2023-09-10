@@ -19,6 +19,7 @@
 #include <lvgl_gif.h>
 #include <test.h>
 
+#include "color_settings.hpp"
 
 //全局变量
 const char * statedata;
@@ -118,7 +119,7 @@ void init_label_print_progress()
     label_print_progress = lv_label_create(lv_scr_act()); //创建文字对象
 
     lv_style_set_text_font(&style_label_print_progress, &lv_font_montserrat_48);  //设置字体样机及大小
-    lv_style_set_text_color(&style_label_print_progress,lv_color_hex(0xFF0000));     //设置样式文本字颜色
+    lv_style_set_text_color(&style_label_print_progress,lv_color_hex(knomi_main_color));     //设置样式文本字颜色
 
     lv_obj_add_style(label_print_progress,&style_label_print_progress,LV_PART_MAIN);           //将样式添加到文字对象中
     lv_label_set_text(label_print_progress,TEXT.c_str());
@@ -138,7 +139,7 @@ void init_arc_print_progress()
 
     lv_obj_remove_style(arc_print_progress,NULL,LV_PART_KNOB);  //移除样式
     lv_obj_clear_flag(arc_print_progress, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(0xFF0000), LV_PART_INDICATOR);//进度条颜色
+    lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(knomi_main_color), LV_PART_INDICATOR);//进度条颜色
     lv_obj_set_size(arc_print_progress,240,240);                   //设置尺寸
     lv_arc_set_rotation(arc_print_progress,270);                   //设置零度位置
     lv_arc_set_bg_angles(arc_print_progress,0,360);                //设置角度
@@ -152,7 +153,7 @@ void init_label_extruder_actual_temp()
     label_ext_actual_temp = lv_label_create(lv_scr_act()); //创建文字对象
 
     lv_style_set_text_font(&style_label_ext_actual_temp, &lv_font_montserrat_32);  //设置字体样机及大小
-    lv_style_set_text_color(&style_label_ext_actual_temp,lv_color_hex(0xFF0000));     //设置样式文本字颜色
+    lv_style_set_text_color(&style_label_ext_actual_temp,lv_color_hex(knomi_main_color));     //设置样式文本字颜色
 
     lv_obj_add_style(label_ext_actual_temp,&style_label_ext_actual_temp,LV_PART_MAIN);           //将样式添加到文字对象中
     lv_label_set_text(label_ext_actual_temp,text_ext_actual_temp.c_str());
@@ -165,7 +166,7 @@ void init_label_extruder_target_temp()
     label_ext_target_temp = lv_label_create(lv_scr_act()); //创建文字对象
 
     lv_style_set_text_font(&style_label_ext_target_temp, &lv_font_montserrat_32);  //设置字体样机及大小
-    lv_style_set_text_color(&style_label_ext_target_temp,lv_color_hex(0xFF0000));     //设置样式文本字颜色
+    lv_style_set_text_color(&style_label_ext_target_temp,lv_color_hex(knomi_main_color));     //设置样式文本字颜色
 
     lv_obj_add_style(label_ext_target_temp,&style_label_ext_target_temp,LV_PART_MAIN);           //将样式添加到文字对象中
     lv_label_set_text(label_ext_target_temp,text_ext_target_temp.c_str());
@@ -177,7 +178,7 @@ void init_label_heaterbed_actual_temp()
     label_bed_actual_temp = lv_label_create(lv_scr_act()); //创建文字对象
 
     lv_style_set_text_font(&style_label_bed_actual_temp, &lv_font_montserrat_32);  //设置字体样机及大小
-    lv_style_set_text_color(&style_label_bed_actual_temp,lv_color_hex(0xFF0000));     //设置样式文本字颜色
+    lv_style_set_text_color(&style_label_bed_actual_temp,lv_color_hex(knomi_main_color));     //设置样式文本字颜色
 
     lv_obj_add_style(label_bed_actual_temp,&style_label_bed_actual_temp,LV_PART_MAIN);           //将样式添加到文字对象中
     lv_label_set_text(label_bed_actual_temp,text_bed_actual_temp.c_str());
@@ -189,7 +190,7 @@ void init_label_heaterbed_target_temp()
     label_bed_target_temp = lv_label_create(lv_scr_act()); //创建文字对象
 
     lv_style_set_text_font(&style_label_bed_target_temp, &lv_font_montserrat_32);  //设置字体样机及大小
-    lv_style_set_text_color(&style_label_bed_target_temp,lv_color_hex(0xFF0000));     //设置样式文本字颜色
+    lv_style_set_text_color(&style_label_bed_target_temp,lv_color_hex(knomi_main_color));     //设置样式文本字颜色
 
     lv_obj_add_style(label_bed_target_temp,&style_label_bed_target_temp,LV_PART_MAIN);           //将样式添加到文字对象中
     lv_label_set_text(label_bed_target_temp,text_bed_target_temp.c_str());
@@ -357,7 +358,7 @@ void update_arc_print_progress(){
 
   lv_obj_remove_style(arc_print_progress,NULL,LV_PART_KNOB);  //移除样式
   lv_obj_clear_flag(arc_print_progress, LV_OBJ_FLAG_CLICKABLE);
-  lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(0xFF0000), LV_PART_INDICATOR);//进度条颜色
+  lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(knomi_main_color), LV_PART_INDICATOR);//进度条颜色
   lv_obj_set_size(arc_print_progress,240,240);                   //设置尺寸
   lv_arc_set_rotation(arc_print_progress,270);                   //设置零度位置
   lv_arc_set_bg_angles(arc_print_progress,0,360);                //设置角度
