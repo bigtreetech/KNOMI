@@ -16,6 +16,7 @@ private:
   const int webPort = 80;
   bool started = false;
   AsyncWebServer *server = nullptr;
+  AsyncWebSocket *socket = nullptr;
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
 
@@ -24,6 +25,7 @@ public:
   ~KnomiWebServer() {
     this->server->end();
     delete this->server;
+    delete this->socket;
   }
 
   void tick()
@@ -34,4 +36,9 @@ public:
     }
   }
 
+  void websocketLog(const char *logString) {
+    if (socket != nullptr && !socket->getClients().isEmpty()) {
+      socket->textAll(logString);
+    }
+  }
 };

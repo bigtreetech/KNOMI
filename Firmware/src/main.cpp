@@ -8,7 +8,6 @@
 #include "network/WifiManager.h"
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <Ticker.h>
 #include <WiFi.h>
 #include <iostream>
 #include <lvgl.h>
@@ -27,7 +26,13 @@ uint32_t keyscan_nexttime = 0;
 uint32_t netcheck_nexttime = 0;
 
 #if LV_USE_LOG
-void logToSerial(const char *logLine) { Serial.print(logLine); }
+void logToSerial(const char *logLine)
+{
+  Serial.print(logLine);
+  if (webServer != nullptr) {
+    webServer->websocketLog(logLine);
+  }
+}
 #endif
 
 __attribute__((unused)) void setup() {

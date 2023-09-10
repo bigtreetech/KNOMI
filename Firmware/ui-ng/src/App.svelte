@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Route, router, active} from 'tinro';
+    import {active, Route, router} from 'tinro';
     import voronLogo from './assets/voron.svg'
     import prettyBytes from 'pretty-bytes';
     import SparkMD5 from 'spark-md5/spark-md5';
@@ -23,6 +23,8 @@
     var otaPercentage = 0;
     var otaKind = "";
 
+    var gateway = `ws://${window.location.hostname}/ws`;
+    var websocket;
 
     async function load() {
         let response = await fetch("/api/status");
@@ -35,6 +37,19 @@
         branch = json.branch;
         gitTimestamp = new Date(json.gitTimestamp).toLocaleString();
         buildTimestamp = new Date(json.buildTimestamp).toLocaleString();
+
+        initWebSocket();
+    }
+
+    function initWebSocket() {
+        console.log('Trying to open a WebSocket connection…');
+        websocket = new WebSocket(gateway);
+        websocket.onopen = () => console.log('Connection opened');
+        websocket.onclose = () => {
+            console.log('Connection closed');
+            setTimeout(initWebSocket, 2000);
+        };
+        websocket.onmessage = event => console.log(event.data);
     }
 
     async function saveSetup() {
