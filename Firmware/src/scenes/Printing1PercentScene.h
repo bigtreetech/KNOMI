@@ -12,7 +12,8 @@ private:
   lv_style_t style_arc_print_progress;
 
 public:
-  explicit Printing1PercentScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
+  explicit Printing1PercentScene(KlipperApi *api, WifiManager *mgr)
+      : AbstractScene(api, mgr) {
     init_label_print_progress();
     init_arc_print_progress();
   }
@@ -24,7 +25,8 @@ public:
   SwitchSceneRequest *NextScene() override {
     if (klipperApi->isPrinting()) {
       if (klipperApi->getProgressData() == 100) {
-        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Printing100Percent, 7);
+        return new SwitchSceneRequest(klipperApi, mgr,
+                                      SceneId::Printing100Percent, 7);
       }
     } else {
       return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
@@ -39,7 +41,7 @@ public:
 
     label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
 
-    lv_style_init(&style_arc_print_progress);
+    lv_style_init(&style_label_print_progress);
     lv_style_set_text_font(&style_label_print_progress,
                            &font_48); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_print_progress,
