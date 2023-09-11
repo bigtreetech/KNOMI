@@ -1,14 +1,14 @@
 #pragma once
 #include "WifiConfig.h"
 #include "lvgl.h"
-#include <ArduinoJson.h>
-#include <HTTPClient.h>
-#include <queue>
 #include "requests/KlipperApiRequest.h"
 #include "requests/Request1.h"
 #include "requests/Request2.h"
 #include "requests/Request3.h"
 #include "requests/Request4.h"
+#include <ArduinoJson.h>
+#include <AsyncHTTPRequest_Generic.hpp>
+#include <queue>
 
 class KlipperApi {
 private:
@@ -63,15 +63,16 @@ public:
         requests.pop();
         requests.push(request);
         String klipper_ip = wifiEepromConfig->getKlipperIp();
-        if (request->Execute(klipper_ip)) {
-          screen_no_klipper_dis_flg = 0;
-        } else {
-          if (screen_no_klipper_dis_flg < 10)
-            screen_no_klipper_dis_flg++;
-        }
-      }
+        request->Execute(klipper_ip);
 
-      httprequest_nexttime = httprequest_nowtime + 97UL;
+        if (request->getFailCount() == 0)
+          screen_no_klipper_dis_flg = 0;
+      } else {
+        if (screen_no_klipper_dis_flg < 10)
+          screen_no_klipper_dis_flg++;
+      }
     }
+
+    httprequest_nexttime = httprequest_nowtime + 97UL;
   }
 };

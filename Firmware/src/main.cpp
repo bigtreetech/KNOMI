@@ -11,6 +11,7 @@
 #include <WiFi.h>
 #include <iostream>
 #include <lvgl.h>
+#include <AsyncHTTPRequest_Generic.h>
 
 using namespace std;
 
