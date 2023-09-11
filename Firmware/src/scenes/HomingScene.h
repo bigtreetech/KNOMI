@@ -7,15 +7,15 @@ private:
   ResourceImage *ri_home;
 
 public:
-  explicit HomingScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
+  explicit HomingScene(SceneDeps deps) : AbstractScene(deps) {
     ri_home = KnownResourceImages::get_Home();
   }
 
   ~HomingScene() override { delete ri_home; }
 
   SwitchSceneRequest* NextScene() override {
-      if (!klipperApi->isHoming()) {
-        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby, 1);
+      if (!deps.klipperApi->isHoming()) {
+        return new SwitchSceneRequest(deps, SceneId::Standby, 1);
       }
       return nullptr;
   }

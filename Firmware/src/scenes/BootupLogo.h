@@ -12,9 +12,8 @@ private:
   lv_obj_t *open_anim_arc;
 
 public:
-  explicit BootupLogoScene(KlipperApi *api, WifiManager *mgr)
-      : AbstractScene(api, mgr) {
-    this->wifiManager = mgr;
+  explicit BootupLogoScene(SceneDeps deps) : AbstractScene(deps) {
+    this->wifiManager = deps.mgr;
 
     lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
 
@@ -50,9 +49,9 @@ public:
 
   SwitchSceneRequest *NextScene() override {
     if (wifiManager->isInConfigMode()) {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::APConfig, 0);
+      return new SwitchSceneRequest(deps, SceneId::APConfig, 0);
     } else if (wifiManager->isConnected()) {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
   }

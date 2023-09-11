@@ -9,17 +9,17 @@ class SceneManager {
 private:
   uint8_t timer_contne = 0;
   AbstractScene* currentScene = nullptr;
+  SceneId currentSceneId;
   SwitchSceneRequest* switchSceneRequest = nullptr;
-  KlipperApi *klipperApi = nullptr;
-  WifiManager *manager = nullptr;
+  SceneDeps deps;
 
 public:
-  explicit SceneManager(KlipperApi* klipperApi, WifiManager* manager) {
-    this->klipperApi = klipperApi;
-    this->manager = manager;
-    this->currentScene = new BootupLogoScene(klipperApi, manager);
-
+  explicit SceneManager(KnomiWebServer* webServer, KlipperApi* klipperApi, WifiManager* manager): deps(klipperApi, manager, webServer) {
+    this->currentScene = new BootupLogoScene(deps);
+    this->currentSceneId = SceneId::BootupLogo;
   }
+
+  SceneId getCurrentSceneId() { return currentSceneId; }
 
   void SwitchSceneIfRequired() {
     if (switchSceneRequest != nullptr) {
@@ -28,6 +28,7 @@ public:
       currentScene = nullptr;
       LV_LOG_INFO((String("Switching scene to ") + String(switchSceneRequest->id)).c_str());
       currentScene = switchSceneRequest->Provide();
+      currentSceneId = switchSceneRequest->id;
       delete switchSceneRequest;
       switchSceneRequest = nullptr;
     }
@@ -50,7 +51,8 @@ public:
   }
 
   void SwitchScene(SceneId id, int timerOverride = -1) {
-    switchSceneRequest = new SwitchSceneRequest(klipperApi, manager, id, timerOverride);
+    switchSceneRequest = new SwitchSceneRequest(deps, id, timerOverride);
+    SwitchSceneIfRequired();
   }
 };
 

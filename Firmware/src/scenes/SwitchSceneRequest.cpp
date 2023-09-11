@@ -1,8 +1,11 @@
 #include "SwitchSceneRequest.h"
+#include "APConfigScene.h"
 #include "AfterPrintingScene.h"
 #include "BedHeatingScene.h"
 #include "BeforePrintingScene.h"
+#include "BootupLogo.h"
 #include "ExtruderHeatingScene.h"
+#include "FirmwareUpdateScene.h"
 #include "HomingScene.h"
 #include "LevelingScene.h"
 #include "NoKlipperScene.h"
@@ -11,40 +14,40 @@
 #include "PrintingScene.h"
 #include "StandbyScene.h"
 #include "VoronScene.h"
-#include "APConfigScene.h"
-#include "BootupLogo.h"
 
 AbstractScene *SwitchSceneRequest::Provide() {
   switch (id) {
   case SceneId::Voron:
-    return new VoronScene(api, mgr);
+    return new VoronScene(deps);
   case SceneId::Leveling:
-    return new LevelingScene(api, mgr);
+    return new LevelingScene(deps);
   case SceneId::Homing:
-    return new HomingScene(api, mgr);
+    return new HomingScene(deps);
   case SceneId::BedHeating:
-    return new BedHeatingScene(api, mgr);
+    return new BedHeatingScene(deps);
   case SceneId::ExtruderHeating:
-    return new ExtruderHeatingScene(api, mgr);
+    return new ExtruderHeatingScene(deps);
   case SceneId::BeforePrint:
-    return new BeforePrintingScene(api, mgr);
+    return new BeforePrintingScene(deps);
   case SceneId::Printing:
-    return new PrintingScene(api, mgr);
+    return new PrintingScene(deps);
   case SceneId::AfterPrint:
-    return new AfterPrintingScene(api, mgr);
+    return new AfterPrintingScene(deps);
   case SceneId::Printing100Percent:
-    return new Printing100PercentScene(api, mgr);
+    return new Printing100PercentScene(deps);
   case SceneId::Printing1Percent:
-    return new Printing1PercentScene(api, mgr);
+    return new Printing1PercentScene(deps);
   case SceneId::NoKlipper:
-    return new NoKlipperScene(api, mgr);
+    return new NoKlipperScene(deps);
   case SceneId::APConfig:
-    return new APConfigScene(api, mgr);
-  case BootupLogo:
-    return new BootupLogoScene(api, mgr);
+    return new APConfigScene(deps);
+  case SceneId::BootupLogo:
+    return new BootupLogoScene(deps);
   case SceneId::Standby:
-    return new StandbyScene(api, mgr);
+    return new StandbyScene(deps);
+  case SceneId::FirmwareUpdate:
+    return new FirmwareUpdateScene(deps);
   }
   LV_LOG_WARN((String("Unhandled scene %s") + id).c_str());
-  return new StandbyScene(api, mgr);
+  return new StandbyScene(deps);
 }

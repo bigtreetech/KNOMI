@@ -6,15 +6,15 @@ private:
   ResourceImage *ri_leveling;
 
 public:
-  explicit LevelingScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
+  explicit LevelingScene(SceneDeps deps) : AbstractScene(deps) {
     ri_leveling = KnownResourceImages::get_levelling();
   }
 
   ~LevelingScene() override { delete ri_leveling; }
 
   SwitchSceneRequest* NextScene() override {
-    if (!klipperApi->isLeveling()) {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
+    if (!deps.klipperApi->isLeveling()) {
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
   }

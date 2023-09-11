@@ -11,7 +11,6 @@ For building you need nodejs installed and available on path.
 
  TODO:
   - Brush up web interface to allow download/upload gifs from web interface directly to FS.
-  - Make OTA display progress on screen.
   - Hardcode version to frontend same way as in backend (if frontend to be moved to LittleFS)
   - Handle safe firmware check / boot to previous version using OTA
   - Make BMP loading from fs a lot faster (on start)  (e.g. try to make them an binary format instead of just bmp on spiffs) - especially noticeable on first launch / AP Config

@@ -20,6 +20,10 @@ private:
   WifiConfig *wificonfig = nullptr;
   WifiManager *wifimanager = nullptr;
 
+  bool updateInProgress = false;
+  ulong updateTotal = 0;
+  ulong updateDone = 0;
+
 public:
   KnomiWebServer(WifiConfig *config, WifiManager* manager);
   ~KnomiWebServer() {
@@ -27,6 +31,11 @@ public:
     delete this->server;
     delete this->socket;
   }
+
+  bool isUpdateInProgress() { return updateInProgress; }
+
+  ulong getUpdateDone() { return updateDone; }
+  ulong getUpdateTotal() { return updateTotal; }
 
   void tick()
   {

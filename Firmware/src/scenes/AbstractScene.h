@@ -3,15 +3,14 @@
 #include "../network/KlipperApi.h"
 #include "../network/WifiManager.h"
 #include "SwitchSceneRequest.h"
+#include "SceneDeps.h"
 #include "lvgl.h"
 
 class AbstractScene {
 protected:
-  KlipperApi *klipperApi = nullptr;
-  WifiManager *mgr = nullptr;
-  explicit AbstractScene(KlipperApi *api, WifiManager *mgr) {
-    this->klipperApi = api;
-    this->mgr = mgr;
+  SceneDeps deps;
+
+  explicit AbstractScene(SceneDeps deps) : deps(deps) {
   }
 
 public:

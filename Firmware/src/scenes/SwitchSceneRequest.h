@@ -1,7 +1,7 @@
 #pragma once
+#include "SceneDeps.h"
+
 class AbstractScene;
-class KlipperApi;
-class WifiManager;
 
 enum SceneId {
   Homing = 12,
@@ -17,21 +17,20 @@ enum SceneId {
   NoKlipper = 8,
   Printing1Percent = 99,
   Printing100Percent = 100,
-  BootupLogo = 1
+  BootupLogo = 1,
+  FirmwareUpdate = 666
 };
 
 class SwitchSceneRequest {
 private:
-  KlipperApi *api;
-  WifiManager* mgr;
+  SceneDeps deps;
 
 public:
   SceneId id;
   int timerOverride;
 
-  explicit SwitchSceneRequest(KlipperApi *api, WifiManager *mgr, SceneId id, int timerOverride = -1) {
-    this->api = api;
-    this->mgr = mgr;
+  explicit SwitchSceneRequest(SceneDeps deps, SceneId id, int timerOverride = -1): deps(deps) {
+    this->deps = deps;
     this->id = id;
     this->timerOverride = timerOverride;
   }
