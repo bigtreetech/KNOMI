@@ -159,6 +159,7 @@
         fileMD5(selectedFile)
             .then((md5) => {
                 formData.append('MD5', md5);
+                formData.append('size', selectedFile.size)
                 formData.append(otaKind, selectedFile, otaKind);
                 request.open('post', '/update');
                 request.send(formData);

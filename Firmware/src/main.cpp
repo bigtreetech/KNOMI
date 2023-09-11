@@ -11,6 +11,7 @@
 #include <WiFi.h>
 #include <iostream>
 #include <lvgl.h>
+#include <AsyncHTTPRequest_Generic.h>
 
 using namespace std;
 
@@ -54,12 +55,11 @@ __attribute__((unused)) void setup() {
   LV_LOG_INFO(("DisplayHAL created, free heap = " + String(esp_get_free_heap_size())).c_str());
   lv_port_littlefs_init();
   LV_LOG_INFO(("LVFS-Littlefs proxy enabled, free heap = " + String(esp_get_free_heap_size())).c_str());
-
-  webServer = new KnomiWebServer(wifiEepromConfig, wifiManager);
-  LV_LOG_INFO(("WebServer started, free heap = " + String(esp_get_free_heap_size())).c_str());
   klipperApi = new KlipperApi(wifiEepromConfig);
   LV_LOG_INFO(("KlipperAPI started, free heap = " + String(esp_get_free_heap_size())).c_str());
-  sceneManager = new SceneManager(klipperApi, wifiManager);
+  webServer = new KnomiWebServer(wifiEepromConfig, wifiManager);
+  LV_LOG_INFO(("WebServer started, free heap = " + String(esp_get_free_heap_size())).c_str());
+  sceneManager = new SceneManager(webServer, klipperApi, wifiManager);
   lv_timer_handler_run_in_period(33); // 30fps
   LV_LOG_INFO(("SceneManager started, free heap = " + String(esp_get_free_heap_size())).c_str());
   wifiManager->connectToWiFi();
@@ -69,9 +69,11 @@ __attribute__((unused)) void setup() {
 __attribute__((unused)) void loop() {
   lv_timer_handler_run_in_period(33); // 30fps
 
-  if (WiFi.isConnected() && !btn->isPressed()) {
+  if (webServer->isUpdateInProgress() && sceneManager->getCurrentSceneId() != SceneId::FirmwareUpdate) {
+    sceneManager->SwitchScene(SceneId::FirmwareUpdate, 0);
+  } else if (WiFi.isConnected() && !btn->isPressed()) {
     klipperApi->tick();
-    if (klipperApi->isKlipperNotAvailable()) {
+    if (klipperApi->isKlipperNotAvailable() && sceneManager->getCurrentSceneId() != SceneId::NoKlipper) {
       sceneManager->SwitchScene(SceneId::NoKlipper, 0);
     }
   }

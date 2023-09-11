@@ -8,14 +8,14 @@ private:
   ResourceImage *ri_disconnect;
 
 public:
-  explicit NoKlipperScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
+  explicit NoKlipperScene(SceneDeps deps) : AbstractScene(deps) {
     ri_disconnect = KnownResourceImages::get_Disconnect_Back();
   }
 
   ~NoKlipperScene() override { delete ri_disconnect; }
   SwitchSceneRequest *NextScene() override {
-    if (!klipperApi->isKlipperNotAvailable()) {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby, 0);
+    if (!deps.klipperApi->isKlipperNotAvailable()) {
+      return new SwitchSceneRequest(deps, SceneId::Standby, 0);
     }
     return nullptr;
   }

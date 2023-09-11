@@ -13,7 +13,7 @@ private:
   lv_style_t style_label_ext_target_temp;
 
 public:
-  explicit ExtruderHeatingScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
+  explicit ExtruderHeatingScene(SceneDeps deps) : AbstractScene(deps) {
     ri_ext = KnownResourceImages::get_ext_temp();
     init_label_extruder_actual_temp();
     init_label_extruder_target_temp();
@@ -27,24 +27,24 @@ public:
   }
 
   SwitchSceneRequest *NextScene() override {
-    if ((klipperApi->getExtruderActualTempValue() >=
-         klipperApi->getExtruderTargetTempValue()) &&
-        (klipperApi->getExtruderTargetTempValue() != 0)) {
+    if ((deps.klipperApi->getExtruderActualTempValue() >=
+         deps.klipperApi->getExtruderTargetTempValue()) &&
+        (deps.klipperApi->getExtruderTargetTempValue() != 0)) {
       // heated fully...
 
-      if (!klipperApi->isPrinting()) {
-        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
+      if (!deps.klipperApi->isPrinting()) {
+        return new SwitchSceneRequest(deps, SceneId::Standby);
       } else {
-        return new SwitchSceneRequest(klipperApi, mgr, SceneId::BeforePrint);
+        return new SwitchSceneRequest(deps, SceneId::BeforePrint);
       }
     } else {
-      if (klipperApi->getExtruderTargetTempValue() == 0) {
-        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Printing);
+      if (deps.klipperApi->getExtruderTargetTempValue() == 0) {
+        return new SwitchSceneRequest(deps, SceneId::Printing);
       }
     }
 
-    lv_label_set_text(label_ext_actual_temp, klipperApi->getExtruderActualTemp().c_str());
-    lv_label_set_text(label_ext_target_temp, klipperApi->getExtruderTargetTemp().c_str());
+    lv_label_set_text(label_ext_actual_temp, deps.klipperApi->getExtruderActualTemp().c_str());
+    lv_label_set_text(label_ext_target_temp, deps.klipperApi->getExtruderTargetTemp().c_str());
 
     return nullptr;
   }
@@ -61,7 +61,7 @@ public:
     lv_obj_add_style(label_ext_actual_temp, &style_label_ext_actual_temp,
                      LV_PART_MAIN); // 将样式添加到文字对象中
     lv_label_set_text(label_ext_actual_temp,
-                      klipperApi->getExtruderActualTemp().c_str());
+                      deps.klipperApi->getExtruderActualTemp().c_str());
     lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
   }
 
@@ -77,7 +77,7 @@ public:
     lv_obj_add_style(label_ext_target_temp, &style_label_ext_target_temp,
                      LV_PART_MAIN); // 将样式添加到文字对象中
     lv_label_set_text(label_ext_target_temp,
-                      klipperApi->getExtruderTargetTemp().c_str());
+                      deps.klipperApi->getExtruderTargetTemp().c_str());
     lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
   }
 };

@@ -8,21 +8,21 @@ private:
   ResourceImage *ri_standby;
 
 public:
-  explicit StandbyScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
+  explicit StandbyScene(SceneDeps deps) : AbstractScene(deps) {
     ri_standby = KnownResourceImages::get_Standby();
   }
 
   ~StandbyScene() override { delete ri_standby; }
 
   SwitchSceneRequest* NextScene() override {
-    if (klipperApi->isHoming()) {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Homing);
-    } else if (klipperApi->isLeveling()) {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Leveling);
-    } else if (klipperApi->isPrinting()) {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::BedHeating);
+    if (deps.klipperApi->isHoming()) {
+      return new SwitchSceneRequest(deps, SceneId::Homing);
+    } else if (deps.klipperApi->isLeveling()) {
+      return new SwitchSceneRequest(deps, SceneId::Leveling);
+    } else if (deps.klipperApi->isPrinting()) {
+      return new SwitchSceneRequest(deps, SceneId::BedHeating);
     } else {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Voron);
+      return new SwitchSceneRequest(deps, SceneId::Voron);
     }
   }
 };

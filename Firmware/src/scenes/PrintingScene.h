@@ -6,20 +6,20 @@ private:
   ResourceImage *ri_printing;
 
 public:
-  explicit PrintingScene(KlipperApi *api, WifiManager* mgr) : AbstractScene(api, mgr) {
+  explicit PrintingScene(SceneDeps deps) : AbstractScene(deps) {
     ri_printing = KnownResourceImages::get_Printing();
   }
   ~PrintingScene() override { delete ri_printing; }
 
   SwitchSceneRequest *NextScene() override {
-    if (klipperApi->isPrinting()) {
-      if (klipperApi->getProgressData() == 100) {
-        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Printing100Percent, 7);
-      } else if (klipperApi->getProgressData() >= 1) {
-        return new SwitchSceneRequest(klipperApi, mgr, SceneId::Printing1Percent);
+    if (deps.klipperApi->isPrinting()) {
+      if (deps.klipperApi->getProgressData() == 100) {
+        return new SwitchSceneRequest(deps, SceneId::Printing100Percent, 7);
+      } else if (deps.klipperApi->getProgressData() >= 1) {
+        return new SwitchSceneRequest(deps, SceneId::Printing1Percent);
       }
     } else {
-      return new SwitchSceneRequest(klipperApi, mgr, SceneId::Standby);
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
   }

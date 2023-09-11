@@ -1,28 +1,47 @@
 #pragma once
+#include "AsyncHTTPRequest_Generic.hpp"
+#include "ArduinoJson.h"
 
 class KlipperApiRequest {
+private:
+  AsyncHTTPRequest request;
+
 protected:
+  int failCount = 0;
+
   virtual String getUrl(String klipper_ip) = 0;
   virtual void processJson(DynamicJsonDocument &doc) = 0;
 
 public:
-  bool Execute(String klipper_ip) {
-    bool result = true;
-    HTTPClient http;
-    http.begin(getUrl(klipper_ip)); // 获取温度
-    int httpCode = http.GET();      // Make the request
-    if (httpCode > 0) {
+  int getFailCount() { return failCount; }
 
-      String payload = http.getString();
-      DynamicJsonDocument doc(payload.length() * 2);
-      deserializeJson(doc, payload);
-      processJson(doc);
-    } else {
+  KlipperApiRequest() {
+    request.onReadyStateChange([&](void *optParm, AsyncHTTPRequest* req, int readyState) {
+             ((KlipperApiRequest *)optParm)->requestCB(req, readyState);
+           }, this);
+  }
 
-      LV_LOG_INFO("Error on HTTP request");
-      result = false;
+  void requestCB(AsyncHTTPRequest *asyncHttpRequest, int readyState) {
+    if (readyState == readyStateDone) {
+      if (asyncHttpRequest->responseHTTPcode() == 200) {
+        String payload = asyncHttpRequest->responseText();
+        DynamicJsonDocument doc(payload.length() * 2);
+        deserializeJson(doc, payload);
+        failCount = 0;
+        processJson(doc);
+      } else {
+        LV_LOG_INFO("Error on HTTP asyncHttpRequest");
+        failCount++;
+      }
     }
-    http.end(); // Free the resources
-    return result;
+  }
+
+  void Execute(String& klipper_ip) {
+    if (request.readyState() == readyStateUnsent ||
+        request.readyState() == readyStateDone) {
+      if (request.open("GET", getUrl(klipper_ip).c_str())) {
+        request.send();
+      }
+    }
   }
 };

@@ -1,11 +1,14 @@
 #pragma once
 #include "AbstractScene.h"
+#include "../network/KnomiWebServer.h"
 
 LV_FONT_DECLARE(font_48);
 
 
-class Printing1PercentScene : public AbstractScene {
+class FirmwareUpdateScene : public AbstractScene {
 private:
+  KnomiWebServer *webServer;
+
   lv_obj_t *label_print_progress;
   lv_obj_t *arc_print_progress;
 
@@ -13,31 +16,32 @@ private:
   lv_style_t style_arc_print_progress;
 
 public:
-  explicit Printing1PercentScene(SceneDeps deps) : AbstractScene(deps) {
+  explicit FirmwareUpdateScene(SceneDeps deps) : AbstractScene(deps) {
+    this->webServer = deps.webServer;
     init_label_print_progress();
     init_arc_print_progress();
   }
-  ~Printing1PercentScene() override {
+  ~FirmwareUpdateScene() override {
     lv_obj_del(label_print_progress);
     lv_obj_del(arc_print_progress);
   }
 
   SwitchSceneRequest *NextScene() override {
-    if (deps.klipperApi->isPrinting()) {
-      if (deps.klipperApi->getProgressData() == 100) {
-        return new SwitchSceneRequest(deps, SceneId::Printing100Percent, 7);
-      }
-    } else {
-      return new SwitchSceneRequest(deps, SceneId::Standby);
+    if (webServer->getUpdateTotal() > 0) {
+      auto value = (int16_t) (100.0 * webServer->getUpdateDone() / webServer->getUpdateTotal());
+      String result = String(value) + "%";
+      lv_label_set_text(label_print_progress, result.c_str());
+      lv_arc_set_value(arc_print_progress, value);
     }
-    String result = String(deps.klipperApi->getProgressData()) + "%";
-    lv_label_set_text(label_print_progress, result.c_str());
-    lv_arc_set_value(arc_print_progress, deps.klipperApi->getProgressData());
+    else {
+      String result = "...";
+      lv_label_set_text(label_print_progress, result.c_str());
+    }
+
     return nullptr;
   }
 
   void init_label_print_progress() {
-
     label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
 
     lv_style_init(&style_label_print_progress);
@@ -48,8 +52,7 @@ public:
 
     lv_obj_add_style(label_print_progress, &style_label_print_progress,
                      LV_PART_MAIN); // 将样式添加到文字对象中
-    lv_label_set_text(label_print_progress,
-                      String(deps.klipperApi->getProgressData()).c_str());
+    lv_label_set_text(label_print_progress, String("").c_str());
     lv_obj_align(label_print_progress, LV_ALIGN_CENTER, 0, 0); // 居中显示
   }
 
@@ -76,4 +79,5 @@ public:
     lv_arc_set_value(arc_print_progress, 0);          // 设置初始值
     lv_obj_center(arc_print_progress);                // 居中显示
   }
+
 };

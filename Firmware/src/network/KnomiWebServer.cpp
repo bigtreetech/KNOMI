@@ -52,6 +52,28 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
     req->redirect("/");
     // req->send(404, "text/html", "Not found");
   });
+  
+  pServer->on("/api/listFiles", HTTP_GET, [&](AsyncWebServerRequest *req) {
+    AsyncResponseStream *response =
+        req->beginResponseStream("application/json");
+    DynamicJsonDocument doc(512);
+    doc["total"] = LittleFS.totalBytes();
+    doc["used"] = LittleFS.usedBytes();
+    const JsonArray &array = doc.createNestedArray("files");
+    File root = LittleFS.open("/");
+    File file = root.openNextFile();
+    while(file) {
+      const JsonObject &item = array.createNestedObject();
+      item["name"] = String(file.name());
+      item["size"] = file.size();
+
+      file = root.openNextFile();
+    }
+    root.close();
+
+    serializeJson(doc, *response);
+    req->send(response);       
+  });
 
   pServer->on("/api/status", HTTP_GET, [&](AsyncWebServerRequest *req) {
     AsyncResponseStream *response =
@@ -113,6 +135,9 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
             200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
         pResponse->addHeader("Connection", "close");
         pResponse->addHeader("Access-Control-Allow-Origin", "*");
+        updateInProgress = false;
+        updateTotal = 0;
+        updateDone = 0;
         req->send(pResponse);
         // Needs some time for Core 0 to send response
         delay(100);
@@ -121,11 +146,11 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
         ESP.restart();
       },
       [&](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
-
-         if (!index) {
+        if (!index) {
            if(!request->hasParam("MD5", true)) {
              return request->send(400, "text/plain", "MD5 parameter missing");
            }
+
 
            if(!Update.setMD5(request->getParam("MD5", true)->value().c_str())) {
              return request->send(400, "text/plain", "MD5 parameter invalid");
@@ -138,8 +163,15 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
            }
          }
 
+         if (!updateInProgress) {
+           updateInProgress = true;
+           updateTotal = atoi(request->getParam("size", true)->value().c_str());
+           updateDone = 0;
+         }
+
          // Write chunked data to the free sketch space
          if(len){
+           updateDone += len;
            if (Update.write(data, len) != len) {
              return request->send(400, "text/plain", "OTA could not begin");
            }
