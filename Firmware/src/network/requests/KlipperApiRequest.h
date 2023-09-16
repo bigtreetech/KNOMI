@@ -37,6 +37,7 @@ public:
   }
 
   void Execute(String& klipper_ip) {
+    LV_LOG_INFO("Executing request, state is %d", request.readyState());
     if (request.readyState() == readyStateUnsent ||
         request.readyState() == readyStateDone) {
       if (request.open("GET", getUrl(klipper_ip).c_str())) {

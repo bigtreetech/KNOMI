@@ -25,6 +25,7 @@ __attribute__((unused)) DisplayHAL *displayhal = nullptr;
 
 uint32_t keyscan_nexttime = 0;
 uint32_t netcheck_nexttime = 0;
+uint32_t klipper_nexttime = 0;
 
 #if LV_USE_LOG
 void logToSerial(const char *logLine)
@@ -72,7 +73,6 @@ __attribute__((unused)) void loop() {
   if (webServer->isUpdateInProgress() && sceneManager->getCurrentSceneId() != SceneId::FirmwareUpdate) {
     sceneManager->SwitchScene(SceneId::FirmwareUpdate, 0);
   } else if (WiFi.isConnected() && !btn->isPressed()) {
-    klipperApi->tick();
     if (klipperApi->isKlipperNotAvailable() && sceneManager->getCurrentSceneId() != SceneId::NoKlipper) {
       sceneManager->SwitchScene(SceneId::NoKlipper, 0);
     }
@@ -83,8 +83,12 @@ __attribute__((unused)) void loop() {
   uint32_t nowtime = millis();
   if (nowtime > keyscan_nexttime) {
     sceneManager->Timer();
-    klipperApi->refreshData();
     keyscan_nexttime = nowtime + 400;
+  }
+
+  if (nowtime > klipper_nexttime) {
+    klipperApi->refreshData();
+    klipper_nexttime = nowtime + 2000;
   }
 
   if (nowtime > netcheck_nexttime) {

@@ -12,7 +12,6 @@
 
 class KlipperApi {
 private:
-  uint8_t screen_no_klipper_dis_flg = 0; // 0 连接klipper失败
   uint32_t httprequest_nowtime = 0;
   uint32_t httprequest_nexttime = 0;
   WifiConfig *wifiEepromConfig;
@@ -20,7 +19,6 @@ private:
 
   String text_print_file_name = "No Printfile"; // 打印文件名
 
-  std::queue<KlipperApiRequest *> requests;
   Request1 req1;
   Request2 req2;
   Request3 req3;
@@ -29,10 +27,6 @@ private:
 public:
   KlipperApi(WifiConfig *config) {
     wifiEepromConfig = config;
-    requests.push(&req1);
-    requests.push(&req2);
-    requests.push(&req3);
-    requests.push(&req4);
   }
 
   String getExtruderActualTemp() { return {req1.text_ext_actual_temp}; }
@@ -50,29 +44,16 @@ public:
   bool isLeveling() const { return req4.levelling_status == 1; }
   bool isPrinting() const { return req1.print_status == 1; }
 
-  bool isKlipperNotAvailable() const { return screen_no_klipper_dis_flg > 3; }
+  bool isKlipperNotAvailable() {
+    int failCount = req1.getFailCount() + req2.getFailCount() + req3.getFailCount() + req4.getFailCount();
+    return failCount > 3; 
+  }
 
-  void refreshData() { start_http_request_flg = 1; }
-
-  void tick() {
-    httprequest_nowtime = millis();
-    if (httprequest_nowtime > httprequest_nexttime) {
-
-      if (start_http_request_flg == 1) {
-        KlipperApiRequest *request = requests.front();
-        requests.pop();
-        requests.push(request);
-        String klipper_ip = wifiEepromConfig->getKlipperIp();
-        request->Execute(klipper_ip);
-
-        if (request->getFailCount() == 0)
-          screen_no_klipper_dis_flg = 0;
-      } else {
-        if (screen_no_klipper_dis_flg < 10)
-          screen_no_klipper_dis_flg++;
-      }
-    }
-
-    httprequest_nexttime = httprequest_nowtime + 97UL;
+  void refreshData() { 
+    String klipper_ip = wifiEepromConfig->getKlipperIp();
+    req1.Execute(klipper_ip);
+    req2.Execute(klipper_ip);
+    req3.Execute(klipper_ip);
+    req4.Execute(klipper_ip);
   }
 };
