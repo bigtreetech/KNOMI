@@ -17,17 +17,3 @@ To create suitable BMP files:
  # ffmpeg -i source.gif -sws_flags neighbor -sws_dither none -pix_fmt rgb565 -y result.bmp
 
 For building you need nodejs installed and available on path.
-
-
-TODO:
-  - Brush up web interface to allow download/upload gifs and bmps from web interface directly to FS. Checks must be on frontend.
-  - Hardcode version to frontend same way as in backend (if frontend to be moved to LittleFS)
-    - Move frontend to LittleFS
-  - Handle safe firmware check / boot to previous version using OTA
-  - Make BMP loading from fs a lot faster (on start)  (e.g. try to make them an binary format instead of just bmp on spiffs) - especially noticeable on first launch / AP Config
-  - Handle updates from github (both firmware and spiffs contents)
-  - Add an option to select wifi from found networks.
-  - To investigate:
-      - Change first experience of wifi setup with smth better - e.g. WiFiManager lib
-      - More universal captive portal - https://github.com/CDFER/Captive-Portal-ESP32/blob/main/src/main.cpp
-
