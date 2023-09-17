@@ -1,7 +1,9 @@
-const FS = require('fs');
-const path = require('path');
+const FS = require("fs");
+const path = require("path");
 
-const BUNDLE_PAGE = FS.readFileSync(path.resolve(__dirname, './dist/index.html.gz'));
+const BUNDLE_PAGE = FS.readFileSync(
+    path.resolve(__dirname, "./dist/index.html.gz"),
+);
 
 function chunkArray(myArray, chunk_size) {
     let index = 0;
@@ -16,17 +18,16 @@ function chunkArray(myArray, chunk_size) {
 }
 
 function addLineBreaks(buffer) {
-    let data = '';
+    let data = "";
     const chunks = chunkArray(buffer, 30);
     chunks.forEach((chunk, index) => {
-        data += chunk.join(',');
+        data += chunk.join(",");
         if (index + 1 !== chunks.length) {
-            data += ',\n';
+            data += ",\n";
         }
     });
     return data;
 }
-
 
 const FILE = `#pragma once
 
@@ -36,5 +37,12 @@ ${addLineBreaks(BUNDLE_PAGE)}
 };
 `;
 
-FS.writeFileSync(path.resolve(__dirname, '../src/generated/knomiWebpage.h'), FILE);
-console.log(`[Generated] Generated webpage to knomiWebpage.h: ${(BUNDLE_PAGE.length / 1024).toFixed(2)}KB`);
+FS.writeFileSync(
+    path.resolve(__dirname, "../src/generated/knomiWebpage.h"),
+    FILE,
+);
+console.log(
+    `[Generated] Generated webpage to knomiWebpage.h: ${(
+        BUNDLE_PAGE.length / 1024
+    ).toFixed(2)}KB`,
+);

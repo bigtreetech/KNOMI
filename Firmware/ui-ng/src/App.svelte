@@ -187,7 +187,9 @@
     <nav>
         <ul>
             <li>
-                <span class="logo">{@html voronLogo}</span>
+                <span class="logo"
+                    ><!-- eslint-disable -->{@html voronLogo}<!-- eslint-enable --></span
+                >
                 <a href="/setup" use:active disabled={otaProgress}>Setup</a>
                 <a href="/update" use:active>Update</a>
             </li>

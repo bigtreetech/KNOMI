@@ -1,0 +1,4 @@
+{
+    "plugins": ["prettier-plugin-svelte"],
+    "tabWidth": 4
+}
