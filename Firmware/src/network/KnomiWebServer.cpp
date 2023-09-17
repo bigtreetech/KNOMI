@@ -75,6 +75,17 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
     req->send(response);       
   });
 
+  pServer->on("/api/coredump", HTTP_GET, [&](AsyncWebServerRequest * req) {
+    req->send("application/binary", 0x10000, [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
+      const esp_partition_t* partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_COREDUMP, "coredump");
+      if (partition != nullptr) {
+        esp_partition_read(partition, index, buffer, maxLen);
+        return maxLen;
+      }
+      return 0;
+    });
+  });
+
   pServer->on("/api/status", HTTP_GET, [&](AsyncWebServerRequest *req) {
     AsyncResponseStream *response =
         req->beginResponseStream("application/json");
