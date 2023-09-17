@@ -47,8 +47,11 @@ public:
     }
     LV_LOG_INFO("We have config - let's try STA");
 
-    delete ap;
-    ap = nullptr;
+    if (ap != nullptr) {
+      delete ap;
+      ap = nullptr;
+    }
+
     sta = new WifiStation(networkConfig);
 
     while (WiFiClass::status() != WL_CONNECTED && timeOut_s > 0) {

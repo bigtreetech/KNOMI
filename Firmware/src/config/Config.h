@@ -25,7 +25,7 @@ public:
   NetworkConfig *getNetworkConfig() { return this->networkConfig; }
   KlipperConfig *getKlipperConfig() { return this->klipperConfig; }
   bool isInitailised() { return this->initialised; }
-  void setInitailised(bool initialised) { this->initialised = initialised; }
+  void setInitailised() { this->initialised = true; }
   void save();
   void reset();
 };

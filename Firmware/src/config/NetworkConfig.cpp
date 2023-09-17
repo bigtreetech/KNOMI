@@ -5,7 +5,7 @@ void NetworkConfig::load() {
   prefs.begin(this->getConfigNamespace().c_str(), true);
   this->ssid = prefs.getString("ssid");
   this->psk = prefs.getString("psk");
-  this->hostname = prefs.getString("hostname");
+  this->hostname = prefs.getString("hostname", "KNOMI");
   prefs.end();
 }
 

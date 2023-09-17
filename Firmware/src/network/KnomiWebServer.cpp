@@ -120,7 +120,8 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     // TODO: Support configuring hostname
 
     this->config->getNetworkConfig()->save();
-    this->config->setInitailised(true);
+
+    this->config->setInitailised();
     this->config->save();
 
     if (req->hasArg("klipper")) {
