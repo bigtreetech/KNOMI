@@ -26,7 +26,13 @@ void Config::save() {
 
 void Config::reset() {
   this->initialised = false;
+  nvs_flash_erase();
+  nvs_flash_init();
+
   this->save();
+
+  delay(100);
+  ESP.restart();
 }
 
 void Config::migrateLegacyConfig() {
