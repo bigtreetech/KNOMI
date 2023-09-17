@@ -47,10 +47,8 @@ public:
     }
     LV_LOG_INFO("We have config - let's try STA");
 
-    if (ap != nullptr) {
-      delete ap;
-      ap = nullptr;
-    }
+    delete ap;
+    ap = nullptr;
 
     sta = new WifiStation(networkConfig);
 
