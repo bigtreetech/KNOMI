@@ -1,20 +1,18 @@
 #pragma once
-#include "WifiConfig.h"
+#include "../config/NetworkConfig.h"
 
 class WifiStation {
 private:
-  WifiConfig *config;
+  NetworkConfig *config;
 
 public:
-  WifiStation(WifiConfig* config) {
+  WifiStation(NetworkConfig *config) {
     this->config = config;
     WiFi.mode(WIFI_STA);
     WiFi.setAutoConnect(true);
 
-    WiFi.begin(config->getSSID(), config->getPassword());
+    WiFi.begin(config->getSsid(), config->getPsk());
   }
 
-  ~WifiStation() {
-    WiFi.disconnect(true);
-  }
+  ~WifiStation() { WiFi.disconnect(true); }
 };

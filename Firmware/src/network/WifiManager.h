@@ -1,33 +1,34 @@
 #pragma once
+#include "../config/Config.h"
 #include "WifiAccessPoint.h"
-#include "WifiConfig.h"
 #include "WifiStation.h"
 #include <esp_wifi.h>
 
 class WifiManager {
 private:
-  WifiConfig *config;
+  Config *config;
+  NetworkConfig *networkConfig;
   WifiAccessPoint *ap = nullptr;
   WifiStation *sta = nullptr;
 
   bool _isConnected = false;
 
-  const char *HOST_NAME = "KNOMI";
-
 public:
-  explicit WifiManager(WifiConfig *config) {
+  explicit WifiManager(Config *config) {
     this->config = config;
-    WiFiClass::hostname(HOST_NAME);
+    this->networkConfig = config->getNetworkConfig();
+    WiFiClass::hostname(this->networkConfig->getHostname().c_str());
   }
 
   ~WifiManager() { delete ap; }
 
   void resetWifi() {
-    config->DeleteConfig();
+    config->reset();
     delay(500);
     WiFi.disconnect(true, true);
     esp_wifi_restore();
-    LV_LOG_INFO("Saved wifi config deleted and switched mode to AP. Resetting...");
+    LV_LOG_INFO(
+        "Saved wifi config deleted and switched mode to AP. Resetting...");
     delay(10);
     ESP.restart();
   }
@@ -39,7 +40,8 @@ public:
   void connectToWiFi() {
     int timeOut_s = 30;
 
-    if (config->getSSID().isEmpty()) {
+    if (networkConfig->getSsid().isEmpty() || !config->isInitailised()) {
+      LV_LOG_INFO("Config is not initailised starting AP mode");
       ap = new WifiAccessPoint();
       return;
     }
@@ -47,7 +49,7 @@ public:
 
     delete ap;
     ap = nullptr;
-    sta = new WifiStation(config);
+    sta = new WifiStation(networkConfig);
 
     while (WiFiClass::status() != WL_CONNECTED && timeOut_s > 0) {
       timeOut_s -= 1;
@@ -59,15 +61,13 @@ public:
       delete sta;
       sta = nullptr;
       this->ap = new WifiAccessPoint();
-      config->setSSID("");
       return;
     }
+
     LV_LOG_INFO("STA connected");
 
     if (WiFiClass::status() == WL_CONNECTED) // 如果连接成功
     {
-      config->SaveConfig();
-
       LV_LOG_INFO("WIFI connect Success");
       LV_LOG_INFO("SSID:%s", WiFi.SSID().c_str());
       LV_LOG_INFO(", PSW:%s\r\n", WiFi.psk().c_str());
@@ -75,9 +75,6 @@ public:
       LV_LOG_INFO(WiFi.localIP().toString().c_str());
       LV_LOG_INFO(" ,GateIP:");
       LV_LOG_INFO(WiFi.gatewayIP().toString().c_str());
-
-      LV_LOG_INFO("KlipperIP:");
-      LV_LOG_INFO(config->getKlipperIp().c_str());
 
       LV_LOG_INFO("WIFI status is:");
       LV_LOG_INFO(String(WiFi.status()).c_str());
@@ -92,8 +89,7 @@ public:
 
     if (WiFiClass::status() != WL_CONNECTED &&
         WiFiClass::getMode() != WIFI_AP &&
-        WiFiClass::getMode() != WIFI_AP_STA)
-    {
+        WiFiClass::getMode() != WIFI_AP_STA) {
       LV_LOG_INFO("WiFi Mode:");
       LV_LOG_INFO(String(WiFi.getMode()).c_str());
       connectToWiFi();

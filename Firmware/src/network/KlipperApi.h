@@ -1,5 +1,5 @@
 #pragma once
-#include "WifiConfig.h"
+#include "../config/KlipperConfig.h"
 #include "lvgl.h"
 #include "requests/KlipperApiRequest.h"
 #include "requests/Request1.h"
@@ -14,7 +14,7 @@ class KlipperApi {
 private:
   uint32_t httprequest_nowtime = 0;
   uint32_t httprequest_nexttime = 0;
-  WifiConfig *wifiEepromConfig;
+  KlipperConfig *config;
   uint8_t start_http_request_flg = 0; // 0 开始启动http请求
 
   String text_print_file_name = "No Printfile"; // 打印文件名
@@ -25,9 +25,7 @@ private:
   Request4 req4;
 
 public:
-  KlipperApi(WifiConfig *config) {
-    wifiEepromConfig = config;
-  }
+  KlipperApi(KlipperConfig *config) { this->config = config; }
 
   String getExtruderActualTemp() { return {req1.text_ext_actual_temp}; }
   String getExtruderTargetTemp() { return {req1.text_ext_target_temp}; }
@@ -45,12 +43,13 @@ public:
   bool isPrinting() const { return req1.print_status == 1; }
 
   bool isKlipperNotAvailable() {
-    int failCount = req1.getFailCount() + req2.getFailCount() + req3.getFailCount() + req4.getFailCount();
-    return failCount > 3; 
+    int failCount = req1.getFailCount() + req2.getFailCount() +
+                    req3.getFailCount() + req4.getFailCount();
+    return failCount > 3;
   }
 
-  void refreshData() { 
-    String klipper_ip = wifiEepromConfig->getKlipperIp();
+  void refreshData() {
+    String klipper_ip = config->getHost();
     req1.Execute(klipper_ip);
     req2.Execute(klipper_ip);
     req3.Execute(klipper_ip);

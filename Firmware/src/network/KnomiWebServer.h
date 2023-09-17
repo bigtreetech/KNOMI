@@ -1,15 +1,15 @@
 #pragma once
 #include "../Version.h"
-#include "WifiConfig.h"
+#include "../config/Config.h"
+#include "../generated/knomiWebpage.h"
+#include "Arduino.h"
+#include "ESPAsyncWebServer.h"
+#include "Update.h"
+#include "WiFi.h"
+#include "WiFiClient.h"
 #include "WifiManager.h"
 #include "lvgl.h"
 #include <ESPmDNS.h>
-#include "Arduino.h"
-#include "WiFi.h"
-#include "WiFiClient.h"
-#include "ESPAsyncWebServer.h"
-#include "Update.h"
-#include "../generated/knomiWebpage.h"
 
 class KnomiWebServer {
 private:
@@ -17,7 +17,7 @@ private:
   bool started = false;
   AsyncWebServer *server = nullptr;
   AsyncWebSocket *socket = nullptr;
-  WifiConfig *wificonfig = nullptr;
+  Config *config = nullptr;
   WifiManager *wifimanager = nullptr;
 
   bool updateInProgress = false;
@@ -25,7 +25,7 @@ private:
   ulong updateDone = 0;
 
 public:
-  KnomiWebServer(WifiConfig *config, WifiManager* manager);
+  KnomiWebServer(Config *config, WifiManager *manager);
   ~KnomiWebServer() {
     this->server->end();
     delete this->server;
@@ -37,8 +37,7 @@ public:
   ulong getUpdateDone() { return updateDone; }
   ulong getUpdateTotal() { return updateTotal; }
 
-  void tick()
-  {
+  void tick() {
     if (!this->started) {
       this->started = true;
       this->server->begin();
