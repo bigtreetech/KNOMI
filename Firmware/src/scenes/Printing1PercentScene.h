@@ -3,7 +3,6 @@
 
 LV_FONT_DECLARE(font_48);
 
-
 class Printing1PercentScene : public AbstractScene {
 private:
   lv_obj_t *label_print_progress;
@@ -48,8 +47,7 @@ public:
 
     lv_obj_add_style(label_print_progress, &style_label_print_progress,
                      LV_PART_MAIN); // 将样式添加到文字对象中
-    lv_label_set_text(label_print_progress,
-                      String(deps.klipperApi->getProgressData()).c_str());
+    lv_label_set_text(label_print_progress, String(deps.klipperApi->getProgressData()).c_str());
     lv_obj_align(label_print_progress, LV_ALIGN_CENTER, 0, 0); // 居中显示
   }
 

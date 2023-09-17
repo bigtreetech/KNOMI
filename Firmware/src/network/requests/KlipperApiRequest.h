@@ -1,6 +1,6 @@
 #pragma once
-#include "AsyncHTTPRequest_Generic.hpp"
 #include "ArduinoJson.h"
+#include "AsyncHTTPRequest_Generic.hpp"
 
 class KlipperApiRequest {
 private:
@@ -16,9 +16,9 @@ public:
   int getFailCount() { return failCount; }
 
   KlipperApiRequest() {
-    request.onReadyStateChange([&](void *optParm, AsyncHTTPRequest* req, int readyState) {
-             ((KlipperApiRequest *)optParm)->requestCB(req, readyState);
-           }, this);
+    request.onReadyStateChange([&](void *optParm, AsyncHTTPRequest *req,
+                                   int readyState) { ((KlipperApiRequest *)optParm)->requestCB(req, readyState); },
+                               this);
   }
 
   void requestCB(AsyncHTTPRequest *asyncHttpRequest, int readyState) {
@@ -36,10 +36,9 @@ public:
     }
   }
 
-  void Execute(String& klipper_ip) {
+  void Execute(String &klipper_ip) {
     LV_LOG_INFO("Executing request, state is %d", request.readyState());
-    if (request.readyState() == readyStateUnsent ||
-        request.readyState() == readyStateDone) {
+    if (request.readyState() == readyStateUnsent || request.readyState() == readyStateDone) {
       if (request.open("GET", getUrl(klipper_ip).c_str())) {
         request.send();
       }

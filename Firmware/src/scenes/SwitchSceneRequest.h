@@ -29,11 +29,12 @@ public:
   SceneId id;
   int timerOverride;
 
-  explicit SwitchSceneRequest(SceneDeps deps, SceneId id, int timerOverride = -1): deps(deps) {
+  explicit SwitchSceneRequest(SceneDeps deps, SceneId id, int timerOverride = -1) : deps(deps) {
     this->deps = deps;
     this->id = id;
     this->timerOverride = timerOverride;
   }
 
-  AbstractScene *Provide();;
+  AbstractScene *Provide();
+  ;
 };

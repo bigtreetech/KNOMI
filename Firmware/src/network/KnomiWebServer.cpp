@@ -10,13 +10,11 @@
 KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   auto *pServer = new AsyncWebServer(webPort);
   auto *pSocket = new AsyncWebSocket("/ws");
-  pSocket->onEvent([&](AsyncWebSocket *_unused, AsyncWebSocketClient *client,
-                       AwsEventType type, void *arg, uint8_t *data,
-                       size_t len) {
+  pSocket->onEvent([&](AsyncWebSocket *_unused, AsyncWebSocketClient *client, AwsEventType type, void *arg,
+                       uint8_t *data, size_t len) {
     switch (type) {
     case WS_EVT_CONNECT:
-      LV_LOG_INFO("WebSocket client #%u connected from %s\n", client->id(),
-                  client->remoteIP().toString().c_str());
+      LV_LOG_INFO("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
       break;
     case WS_EVT_DISCONNECT:
       LV_LOG_INFO("WebSocket client #%u disconnected\n", client->id());
@@ -45,8 +43,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   wifimanager = manager;
 
   pServer->on("/", HTTP_GET, [&](AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *pResponse =
-        request->beginResponse_P(200, "text/html", KNOMI_HTML, KNOMI_HTML_SIZE);
+    AsyncWebServerResponse *pResponse = request->beginResponse_P(200, "text/html", KNOMI_HTML, KNOMI_HTML_SIZE);
     pResponse->addHeader("Content-Encoding", "gzip");
     request->send(pResponse);
   });
@@ -57,8 +54,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   });
 
   pServer->on("/api/listFiles", HTTP_GET, [&](AsyncWebServerRequest *req) {
-    AsyncResponseStream *response =
-        req->beginResponseStream("application/json");
+    AsyncResponseStream *response = req->beginResponseStream("application/json");
     DynamicJsonDocument doc(512);
     doc["total"] = LittleFS.totalBytes();
     doc["used"] = LittleFS.usedBytes();
@@ -78,9 +74,10 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     req->send(response);
   });
 
-  pServer->on("/api/coredump", HTTP_GET, [&](AsyncWebServerRequest * req) {
+  pServer->on("/api/coredump", HTTP_GET, [&](AsyncWebServerRequest *req) {
     req->send("application/binary", 0x10000, [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
-      const esp_partition_t* partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_COREDUMP, "coredump");
+      const esp_partition_t *partition =
+          esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_COREDUMP, "coredump");
       if (partition != nullptr) {
         esp_partition_read(partition, index, buffer, maxLen);
         return maxLen;
@@ -90,8 +87,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   });
 
   pServer->on("/api/status", HTTP_GET, [&](AsyncWebServerRequest *req) {
-    AsyncResponseStream *response =
-        req->beginResponseStream("application/json");
+    AsyncResponseStream *response = req->beginResponseStream("application/json");
     DynamicJsonDocument doc(512);
     doc["hash"] = Version::getGitCommitSha1();
     doc["branch"] = Version::getGitBranch();
@@ -164,8 +160,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     delay(200);
 
     req->send(200, "application/json", "{result: \"ok\"}");
-    LV_LOG_INFO(("WiFi Connect SSID: %s, PASS: %s, HOSTNAME: %s",
-                 this->config->getNetworkConfig()->getSsid().c_str(),
+    LV_LOG_INFO(("WiFi Connect SSID: %s, PASS: %s, HOSTNAME: %s", this->config->getNetworkConfig()->getSsid().c_str(),
                  this->config->getNetworkConfig()->getPsk().c_str(),
                  this->config->getNetworkConfig()->getHostname().c_str()));
     wifimanager->connectToWiFi();
@@ -174,8 +169,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   pServer->on(
       "/update", HTTP_POST,
       [&](AsyncWebServerRequest *req) {
-        AsyncWebServerResponse *pResponse = req->beginResponse(
-            200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+        AsyncWebServerResponse *pResponse = req->beginResponse(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
         pResponse->addHeader("Connection", "close");
         pResponse->addHeader("Access-Control-Allow-Origin", "*");
         updateInProgress = false;
@@ -188,8 +182,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
         delay(100);
         ESP.restart();
       },
-      [&](AsyncWebServerRequest *request, const String &filename, size_t index,
-          uint8_t *data, size_t len, bool final) {
+      [&](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
         if (!index) {
           if (!request->hasParam("MD5", true)) {
             return request->send(400, "text/plain", "MD5 parameter missing");
@@ -221,10 +214,9 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
           }
         }
 
-        if (final) { // if the final flag is set then this is the last frame of
-                     // data
-          if (!Update.end(
-                  true)) { // true to set the size to the current progress
+        if (final) {               // if the final flag is set then this is the last frame of
+                                   // data
+          if (!Update.end(true)) { // true to set the size to the current progress
             Update.printError(Serial);
             return request->send(400, "text/plain", "Could not end OTA");
           }

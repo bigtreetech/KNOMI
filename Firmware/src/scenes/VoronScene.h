@@ -7,10 +7,7 @@ private:
   ResourceImage *ri_voron;
 
 public:
-  explicit VoronScene(SceneDeps deps) : AbstractScene(deps) {
-
-    ri_voron = KnownResourceImages::get_Voron();
-  }
+  explicit VoronScene(SceneDeps deps) : AbstractScene(deps) { ri_voron = KnownResourceImages::get_Voron(); }
   ~VoronScene() override { delete ri_voron; }
 
   SwitchSceneRequest *NextScene() override {

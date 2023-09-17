@@ -43,8 +43,7 @@ public:
   bool isPrinting() const { return req1.print_status == 1; }
 
   bool isKlipperNotAvailable() {
-    int failCount = req1.getFailCount() + req2.getFailCount() +
-                    req3.getFailCount() + req4.getFailCount();
+    int failCount = req1.getFailCount() + req2.getFailCount() + req3.getFailCount() + req4.getFailCount();
     return failCount > 3;
   }
 

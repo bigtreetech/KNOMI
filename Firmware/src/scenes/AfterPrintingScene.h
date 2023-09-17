@@ -11,7 +11,5 @@ public:
   }
   ~AfterPrintingScene() override { delete ri_after; }
 
-  SwitchSceneRequest *NextScene() override {
-    return new SwitchSceneRequest(deps, SceneId::Standby, 10);
-  };
+  SwitchSceneRequest *NextScene() override { return new SwitchSceneRequest(deps, SceneId::Standby, 10); };
 };

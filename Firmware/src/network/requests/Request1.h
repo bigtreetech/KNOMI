@@ -1,9 +1,7 @@
 #pragma once
 
 class Request1 : public KlipperApiRequest {
-  String getUrl(String klipper_ip) {
-    return "http://" + klipper_ip + "/api/printer";
-  }
+  String getUrl(String klipper_ip) { return "http://" + klipper_ip + "/api/printer"; }
 
   void processJson(DynamicJsonDocument &doc) {
     String nameStr1 = doc["temperature"]["bed"]["actual"].as<String>();
@@ -13,16 +11,10 @@ class Request1 : public KlipperApiRequest {
     String nameStr5 = doc["state"]["flags"]["printing"].as<String>();
     String nameStr6 = doc["state"]["flags"]["paused"].as<String>();
 
-    bedtemp_actual =
-        (uint16_t)((doc["temperature"]["bed"]["actual"].as<double>()) * 100);
-    bedtemp_target =
-        (uint16_t)((doc["temperature"]["bed"]["target"].as<double>()) * 100);
-    tooltemp_actual =
-        (uint16_t)((doc["temperature"]["tool0"]["actual"].as<double>()) *
-                   100);
-    tooltemp_target =
-        (uint16_t)((doc["temperature"]["tool0"]["target"].as<double>()) *
-                   100);
+    bedtemp_actual = (uint16_t)((doc["temperature"]["bed"]["actual"].as<double>()) * 100);
+    bedtemp_target = (uint16_t)((doc["temperature"]["bed"]["target"].as<double>()) * 100);
+    tooltemp_actual = (uint16_t)((doc["temperature"]["tool0"]["actual"].as<double>()) * 100);
+    tooltemp_target = (uint16_t)((doc["temperature"]["tool0"]["target"].as<double>()) * 100);
 
     text_ext_actual_temp = nameStr3 + "°C";
     text_ext_target_temp = nameStr4 + "°C";
@@ -49,7 +41,7 @@ class Request1 : public KlipperApiRequest {
   }
 
 public:
-  String text_print_status = "standby";         // 打印状态
+  String text_print_status = "standby"; // 打印状态
   uint8_t print_status;
   String text_ext_actual_temp = " °C";
   String text_ext_target_temp = " °C";

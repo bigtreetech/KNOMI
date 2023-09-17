@@ -27,8 +27,7 @@ public:
   }
 
   SwitchSceneRequest *NextScene() override {
-    if ((deps.klipperApi->getExtruderActualTempValue() >=
-         deps.klipperApi->getExtruderTargetTempValue()) &&
+    if ((deps.klipperApi->getExtruderActualTempValue() >= deps.klipperApi->getExtruderTargetTempValue()) &&
         (deps.klipperApi->getExtruderTargetTempValue() != 0)) {
       // heated fully...
 
@@ -60,8 +59,7 @@ public:
 
     lv_obj_add_style(label_ext_actual_temp, &style_label_ext_actual_temp,
                      LV_PART_MAIN); // 将样式添加到文字对象中
-    lv_label_set_text(label_ext_actual_temp,
-                      deps.klipperApi->getExtruderActualTemp().c_str());
+    lv_label_set_text(label_ext_actual_temp, deps.klipperApi->getExtruderActualTemp().c_str());
     lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
   }
 
@@ -76,8 +74,7 @@ public:
 
     lv_obj_add_style(label_ext_target_temp, &style_label_ext_target_temp,
                      LV_PART_MAIN); // 将样式添加到文字对象中
-    lv_label_set_text(label_ext_target_temp,
-                      deps.klipperApi->getExtruderTargetTemp().c_str());
+    lv_label_set_text(label_ext_target_temp, deps.klipperApi->getExtruderTargetTemp().c_str());
     lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
   }
 };

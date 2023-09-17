@@ -50,4 +50,5 @@ def on_upload(source, target, env):
         bar.close()
         print(response,response.text)
             
-env.Replace(UPLOADCMD=on_upload)
+if env.GetProjectOption("upload_protocol", "") == "custom":
+    env.Replace(UPLOADCMD=on_upload)

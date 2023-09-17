@@ -26,8 +26,7 @@ public:
     delay(500);
     WiFi.disconnect(true, true);
     esp_wifi_restore();
-    LV_LOG_INFO(
-        "Saved wifi config deleted and switched mode to AP. Resetting...");
+    LV_LOG_INFO("Saved wifi config deleted and switched mode to AP. Resetting...");
     delay(10);
     ESP.restart();
   }
@@ -88,9 +87,7 @@ public:
     if (ap != nullptr)
       ap->tick();
 
-    if (WiFiClass::status() != WL_CONNECTED &&
-        WiFiClass::getMode() != WIFI_AP &&
-        WiFiClass::getMode() != WIFI_AP_STA) {
+    if (WiFiClass::status() != WL_CONNECTED && WiFiClass::getMode() != WIFI_AP && WiFiClass::getMode() != WIFI_AP_STA) {
       LV_LOG_INFO("WiFi Mode:");
       LV_LOG_INFO(String(WiFi.getMode()).c_str());
       connectToWiFi();

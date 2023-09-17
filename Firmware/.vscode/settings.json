@@ -24,5 +24,6 @@
         "system_error": "cpp",
         "lvgl.h": "c",
         "lv_conf.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": false
 }
