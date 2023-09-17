@@ -1,5 +1,5 @@
 #pragma once
-#include "../config/KlipperConfig.h"
+#include "../config/Config.h"
 #include "lvgl.h"
 #include "requests/KlipperApiRequest.h"
 #include "requests/Request1.h"
@@ -14,7 +14,7 @@ class KlipperApi {
 private:
   uint32_t httprequest_nowtime = 0;
   uint32_t httprequest_nexttime = 0;
-  KlipperConfig *config;
+  Config *config;
   uint8_t start_http_request_flg = 0; // 0 开始启动http请求
 
   String text_print_file_name = "No Printfile"; // 打印文件名
@@ -25,7 +25,7 @@ private:
   Request4 req4;
 
 public:
-  KlipperApi(KlipperConfig *config) { this->config = config; }
+  KlipperApi(Config *config) { this->config = config; }
 
   String getExtruderActualTemp() { return {req1.text_ext_actual_temp}; }
   String getExtruderTargetTemp() { return {req1.text_ext_target_temp}; }
@@ -49,10 +49,12 @@ public:
   }
 
   void refreshData() {
-    String klipper_ip = config->getHost();
-    req1.Execute(klipper_ip);
-    req2.Execute(klipper_ip);
-    req3.Execute(klipper_ip);
-    req4.Execute(klipper_ip);
+    if (config->isInitailised()) {
+      String klipper_ip = config->getKlipperConfig()->getHost();
+      req1.Execute(klipper_ip);
+      req2.Execute(klipper_ip);
+      req3.Execute(klipper_ip);
+      req4.Execute(klipper_ip);
+    }
   }
 };
