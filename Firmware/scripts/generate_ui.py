@@ -3,6 +3,8 @@ Import("env")
 def generate_webui(*arg, **kwargs):
     # You must have nodejs/npm installed
     env.Execute(f"cd ui-ng && npm install --legacy-peer-deps")
+    env.Execute(f"cd ui-ng && npm run lint")
+    env.Execute(f"cd ui-ng && npm run format")
     env.Execute(f"cd ui-ng && npm run build-silent")
 
 
