@@ -17,7 +17,6 @@ public:
   explicit WifiManager(Config *config) {
     this->config = config;
     this->networkConfig = config->getNetworkConfig();
-    WiFiClass::hostname(this->networkConfig->getHostname().c_str());
   }
 
   ~WifiManager() { delete ap; }
@@ -39,6 +38,7 @@ public:
 
   void connectToWiFi() {
     int timeOut_s = 30;
+    WiFiClass::hostname(this->networkConfig->getHostname().c_str());
 
     if (networkConfig->getSsid().isEmpty() || !config->isInitailised()) {
       LV_LOG_INFO("Config is not initailised starting AP mode");

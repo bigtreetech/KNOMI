@@ -28,9 +28,7 @@ public:
   String getPsk() { return this->psk; }
   void setPsk(String psk) { this->psk = psk; }
   String getHostname() { return this->hostname; }
-  void setHostname(String hostname) {
-    this->hostname = hostname;
-  } // TODO: Support setting hostname via UI
+  void setHostname(String hostname) { this->hostname = hostname; }
   void save();
   void load();
 };

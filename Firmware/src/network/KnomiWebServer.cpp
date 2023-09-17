@@ -86,10 +86,17 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     doc["branch"] = Version::getGitBranch();
     doc["gitTimestamp"] = Version::getGitTimestamp();
     doc["buildTimestamp"] = Version::getBuildTimestamp();
-    doc["ssid"] = config->getNetworkConfig()->getSsid();
-    doc["pass"] = config->getNetworkConfig()->getPsk();
-    doc["hostname"] = config->getNetworkConfig()->getHostname();
-    doc["ip"] = config->getKlipperConfig()->getHost();
+
+    if (this->config->getNetworkConfig() != nullptr) {
+      doc["ssid"] = this->config->getNetworkConfig()->getSsid();
+      doc["pass"] = this->config->getNetworkConfig()->getPsk();
+      doc["hostname"] = this->config->getNetworkConfig()->getHostname();
+    }
+
+    if (this->config->getKlipperConfig() != nullptr) {
+      doc["ip"] = this->config->getKlipperConfig()->getHost();
+    }
+
     doc["ota_partition"] = String(esp_ota_get_running_partition()->label);
     serializeJson(doc, *response);
     req->send(response);
@@ -117,7 +124,15 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
       return;
     }
 
-    // TODO: Support configuring hostname
+    if (req->hasArg("hostname")) {
+      String hostname = req->arg("hostname");
+      this->config->getNetworkConfig()->setHostname(hostname);
+      LV_LOG_INFO(("got hostname:" + hostname).c_str());
+    } else {
+      LV_LOG_INFO("error, not found klipper ip");
+      req->send(500, "application/json", "{error:\"KLIPPER is not found\"}");
+      return;
+    }
 
     this->config->getNetworkConfig()->save();
 
@@ -127,7 +142,6 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     if (req->hasArg("klipper")) {
       String klipper_ip = req->arg("klipper");
       this->config->getKlipperConfig()->setHost(klipper_ip);
-      this->config->getKlipperConfig()->save();
       LV_LOG_INFO(("got KlipperIP:" + klipper_ip).c_str());
     } else {
       LV_LOG_INFO("error, not found klipper ip");
