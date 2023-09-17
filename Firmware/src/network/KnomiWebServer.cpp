@@ -7,29 +7,32 @@
 #include "LittleFS.h"
 #include "esp_ota_ops.h"
 
-KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
+KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   auto *pServer = new AsyncWebServer(webPort);
   auto *pSocket = new AsyncWebSocket("/ws");
-  pSocket->onEvent([&](AsyncWebSocket *_unused, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len){
+  pSocket->onEvent([&](AsyncWebSocket *_unused, AsyncWebSocketClient *client,
+                       AwsEventType type, void *arg, uint8_t *data,
+                       size_t len) {
     switch (type) {
     case WS_EVT_CONNECT:
-      LV_LOG_INFO("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      LV_LOG_INFO("WebSocket client #%u connected from %s\n", client->id(),
+                  client->remoteIP().toString().c_str());
       break;
     case WS_EVT_DISCONNECT:
       LV_LOG_INFO("WebSocket client #%u disconnected\n", client->id());
       break;
     case WS_EVT_DATA:
-      // Here is an example on how to handle message from JS. Probably we won't ever need that.
-      //AwsFrameInfo *info = (AwsFrameInfo*)arg;
-      //if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-        //data[len] = 0;
-        //String message = (char*)data;
-        // Check if the message is "getReadings"
-        //if (strcmp((char*)data, "getReadings") == 0) {
-        //if it is, send current sensor readings
-        //String sensorReadings = getSensorReadings();
-        //notifyClients(sensorReadings);
-        //}
+      // Here is an example on how to handle message from JS. Probably we won't
+      // ever need that.
+      // AwsFrameInfo *info = (AwsFrameInfo*)arg;
+      // if (info->final && info->index == 0 && info->len == len && info->opcode
+      // == WS_TEXT) { data[len] = 0; String message = (char*)data;
+      // Check if the message is "getReadings"
+      // if (strcmp((char*)data, "getReadings") == 0) {
+      // if it is, send current sensor readings
+      // String sensorReadings = getSensorReadings();
+      // notifyClients(sensorReadings);
+      //}
       //}
     case WS_EVT_PONG:
     case WS_EVT_ERROR:
@@ -38,7 +41,7 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
   });
   pServer->addHandler(pSocket);
 
-  wificonfig = config;
+  this->config = config;
   wifimanager = manager;
 
   pServer->on("/", HTTP_GET, [&](AsyncWebServerRequest *request) {
@@ -52,7 +55,7 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
     req->redirect("/");
     // req->send(404, "text/html", "Not found");
   });
-  
+
   pServer->on("/api/listFiles", HTTP_GET, [&](AsyncWebServerRequest *req) {
     AsyncResponseStream *response =
         req->beginResponseStream("application/json");
@@ -62,7 +65,7 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
     const JsonArray &array = doc.createNestedArray("files");
     File root = LittleFS.open("/");
     File file = root.openNextFile();
-    while(file) {
+    while (file) {
       const JsonObject &item = array.createNestedObject();
       item["name"] = String(file.name());
       item["size"] = file.size();
@@ -72,7 +75,7 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
     root.close();
 
     serializeJson(doc, *response);
-    req->send(response);       
+    req->send(response);
   });
 
   pServer->on("/api/coredump", HTTP_GET, [&](AsyncWebServerRequest * req) {
@@ -94,9 +97,17 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
     doc["branch"] = Version::getGitBranch();
     doc["gitTimestamp"] = Version::getGitTimestamp();
     doc["buildTimestamp"] = Version::getBuildTimestamp();
-    doc["ssid"] = wificonfig->getSSID();
-    doc["pass"] = wificonfig->getPassword();
-    doc["ip"] = wificonfig->getKlipperIp();
+
+    if (this->config->getNetworkConfig() != nullptr) {
+      doc["ssid"] = this->config->getNetworkConfig()->getSsid();
+      doc["pass"] = this->config->getNetworkConfig()->getPsk();
+      doc["hostname"] = this->config->getNetworkConfig()->getHostname();
+    }
+
+    if (this->config->getKlipperConfig() != nullptr) {
+      doc["ip"] = this->config->getKlipperConfig()->getHost();
+    }
+
     doc["ota_partition"] = String(esp_ota_get_running_partition()->label);
     serializeJson(doc, *response);
     req->send(response);
@@ -107,7 +118,7 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
   pServer->on("/api/configwifi", HTTP_POST, [&](AsyncWebServerRequest *req) {
     if (req->hasArg("ssid")) {
       String wifi_ssid = req->arg("ssid");
-      wificonfig->setSSID(wifi_ssid);
+      this->config->getNetworkConfig()->setSsid(wifi_ssid);
       LV_LOG_INFO(("got ssid:" + wifi_ssid).c_str());
     } else {
       LV_LOG_INFO("error, not found ssid");
@@ -116,26 +127,47 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
     }
     if (req->hasArg("pass")) {
       String wifi_pass = req->arg("pass");
-      wificonfig->setPassword(wifi_pass);
+      this->config->getNetworkConfig()->setPsk(wifi_pass);
       LV_LOG_INFO(("got password:" + wifi_pass).c_str());
     } else {
       LV_LOG_INFO("error, not found password");
       req->send(500, "application/json", "{error:\"PASS is not found\"}");
       return;
     }
+
+    if (req->hasArg("hostname")) {
+      String hostname = req->arg("hostname");
+      this->config->getNetworkConfig()->setHostname(hostname);
+      LV_LOG_INFO(("got hostname:" + hostname).c_str());
+    } else {
+      LV_LOG_INFO("error, not found klipper ip");
+      req->send(500, "application/json", "{error:\"KLIPPER is not found\"}");
+      return;
+    }
+
+    this->config->getNetworkConfig()->save();
+
+    this->config->setInitialised();
+    this->config->save();
+
     if (req->hasArg("klipper")) {
       String klipper_ip = req->arg("klipper");
-      wificonfig->setKlipperIp(klipper_ip);
+      this->config->getKlipperConfig()->setHost(klipper_ip);
       LV_LOG_INFO(("got KlipperIP:" + klipper_ip).c_str());
     } else {
       LV_LOG_INFO("error, not found klipper ip");
       req->send(500, "application/json", "{error:\"KLIPPER is not found\"}");
       return;
     }
+
+    this->config->getKlipperConfig()->save();
     delay(200);
 
     req->send(200, "application/json", "{result: \"ok\"}");
-    LV_LOG_INFO(("WiFi Connect SSID:" + wificonfig->getSSID() + "  PASS:" + wificonfig->getPassword()).c_str());
+    LV_LOG_INFO(("WiFi Connect SSID: %s, PASS: %s, HOSTNAME: %s",
+                 this->config->getNetworkConfig()->getSsid().c_str(),
+                 this->config->getNetworkConfig()->getPsk().c_str(),
+                 this->config->getNetworkConfig()->getHostname().c_str()));
     wifimanager->connectToWiFi();
   });
 
@@ -156,46 +188,49 @@ KnomiWebServer::KnomiWebServer(WifiConfig *config, WifiManager *manager) {
         delay(100);
         ESP.restart();
       },
-      [&](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
+      [&](AsyncWebServerRequest *request, const String &filename, size_t index,
+          uint8_t *data, size_t len, bool final) {
         if (!index) {
-           if(!request->hasParam("MD5", true)) {
-             return request->send(400, "text/plain", "MD5 parameter missing");
-           }
+          if (!request->hasParam("MD5", true)) {
+            return request->send(400, "text/plain", "MD5 parameter missing");
+          }
 
+          if (!Update.setMD5(request->getParam("MD5", true)->value().c_str())) {
+            return request->send(400, "text/plain", "MD5 parameter invalid");
+          }
 
-           if(!Update.setMD5(request->getParam("MD5", true)->value().c_str())) {
-             return request->send(400, "text/plain", "MD5 parameter invalid");
-           }
+          int cmd = (filename == "filesystem") ? U_SPIFFS : U_FLASH;
+          if (!Update.begin(UPDATE_SIZE_UNKNOWN,
+                            cmd)) { // Start with max available size
+            Update.printError(Serial);
+            return request->send(400, "text/plain", "OTA could not begin");
+          }
+        }
 
-           int cmd = (filename == "filesystem") ? U_SPIFFS : U_FLASH;
-           if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) { // Start with max available size
-             Update.printError(Serial);
-             return request->send(400, "text/plain", "OTA could not begin");
-           }
-         }
+        if (!updateInProgress) {
+          updateInProgress = true;
+          updateTotal = atoi(request->getParam("size", true)->value().c_str());
+          updateDone = 0;
+        }
 
-         if (!updateInProgress) {
-           updateInProgress = true;
-           updateTotal = atoi(request->getParam("size", true)->value().c_str());
-           updateDone = 0;
-         }
+        // Write chunked data to the free sketch space
+        if (len) {
+          updateDone += len;
+          if (Update.write(data, len) != len) {
+            return request->send(400, "text/plain", "OTA could not begin");
+          }
+        }
 
-         // Write chunked data to the free sketch space
-         if(len){
-           updateDone += len;
-           if (Update.write(data, len) != len) {
-             return request->send(400, "text/plain", "OTA could not begin");
-           }
-         }
-
-         if (final) { // if the final flag is set then this is the last frame of data
-           if (!Update.end(true)) { //true to set the size to the current progress
-             Update.printError(Serial);
-             return request->send(400, "text/plain", "Could not end OTA");
-           }
-         }else{
-           return;
-         }
+        if (final) { // if the final flag is set then this is the last frame of
+                     // data
+          if (!Update.end(
+                  true)) { // true to set the size to the current progress
+            Update.printError(Serial);
+            return request->send(400, "text/plain", "Could not end OTA");
+          }
+        } else {
+          return;
+        }
       });
 
   this->socket = pSocket;
