@@ -11,7 +11,5 @@ public:
   }
   ~Printing100PercentScene() override { delete ri_ok; }
 
-  SwitchSceneRequest *NextScene() override {
-    return new SwitchSceneRequest(deps, SceneId::AfterPrint);
-  }
+  SwitchSceneRequest *NextScene() override { return new SwitchSceneRequest(deps, SceneId::AfterPrint); }
 };

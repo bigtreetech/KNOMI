@@ -1,14 +1,14 @@
 #pragma once
+#include "esp_wifi.h"
+#include "lvgl.h"
 #include <DNSServer.h>
 #include <WiFi.h>
-#include "lvgl.h"
-#include "esp_wifi.h"
 
 class WifiAccessPoint {
 private:
   const char *AP_SSID = "BTT-KNOMI";
   const byte DNS_PORT = 53; // 设置DNS端口号
-  DNSServer* dnsService = nullptr;
+  DNSServer *dnsService = nullptr;
 
 public:
   WifiAccessPoint() {
@@ -24,15 +24,14 @@ public:
       my_config.ampdu_rx_enable = false;
       esp_wifi_init(&my_config);
       esp_wifi_start();
-      vTaskDelay(100 / portTICK_PERIOD_MS);  // Add a small delay
+      vTaskDelay(100 / portTICK_PERIOD_MS); // Add a small delay
 
       dnsService = new DNSServer();
       dnsService->start(DNS_PORT, "*", apIP);
       LV_LOG_INFO("ESP-32S SoftAP is right.");
       LV_LOG_INFO("Soft-AP IP address = ");
       LV_LOG_INFO(WiFi.softAPIP().toString().c_str());
-      LV_LOG_INFO(
-          (String("MAC address = ") + WiFi.softAPmacAddress().c_str()).c_str());
+      LV_LOG_INFO((String("MAC address = ") + WiFi.softAPmacAddress().c_str()).c_str());
     } else {
       LV_LOG_INFO("WiFiAP Failed");
       delay(1000);

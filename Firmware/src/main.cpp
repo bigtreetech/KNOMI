@@ -44,53 +44,33 @@ __attribute__((unused)) void setup() {
   delay(100);
 
   config = new Config();
-  LV_LOG_INFO(
-      ("Config created, free heap = " + String(esp_get_free_heap_size()))
-          .c_str());
+  LV_LOG_INFO(("Config created, free heap = " + String(esp_get_free_heap_size())).c_str());
   wifiManager = new WifiManager(config);
-  LV_LOG_INFO(
-      ("WifiManager created, free heap = " + String(esp_get_free_heap_size()))
-          .c_str());
+  LV_LOG_INFO(("WifiManager created, free heap = " + String(esp_get_free_heap_size())).c_str());
   btn = new Button(config);
-  LV_LOG_INFO(("Timer and button created, free heap = " +
-               String(esp_get_free_heap_size()))
-                  .c_str());
+  LV_LOG_INFO(("Timer and button created, free heap = " + String(esp_get_free_heap_size())).c_str());
   displayhal = new DisplayHAL();
-  LV_LOG_INFO(
-      ("DisplayHAL created, free heap = " + String(esp_get_free_heap_size()))
-          .c_str());
+  LV_LOG_INFO(("DisplayHAL created, free heap = " + String(esp_get_free_heap_size())).c_str());
   lv_port_littlefs_init();
-  LV_LOG_INFO(("LVFS-Littlefs proxy enabled, free heap = " +
-               String(esp_get_free_heap_size()))
-                  .c_str());
+  LV_LOG_INFO(("LVFS-Littlefs proxy enabled, free heap = " + String(esp_get_free_heap_size())).c_str());
   klipperApi = new KlipperApi(config);
-  LV_LOG_INFO(
-      ("KlipperAPI started, free heap = " + String(esp_get_free_heap_size()))
-          .c_str());
+  LV_LOG_INFO(("KlipperAPI started, free heap = " + String(esp_get_free_heap_size())).c_str());
   webServer = new KnomiWebServer(config, wifiManager);
-  LV_LOG_INFO(
-      ("WebServer started, free heap = " + String(esp_get_free_heap_size()))
-          .c_str());
+  LV_LOG_INFO(("WebServer started, free heap = " + String(esp_get_free_heap_size())).c_str());
   sceneManager = new SceneManager(webServer, klipperApi, wifiManager);
   lv_timer_handler_run_in_period(33); // 30fps
-  LV_LOG_INFO(
-      ("SceneManager started, free heap = " + String(esp_get_free_heap_size()))
-          .c_str());
+  LV_LOG_INFO(("SceneManager started, free heap = " + String(esp_get_free_heap_size())).c_str());
   wifiManager->connectToWiFi();
-  LV_LOG_INFO(
-      ("Connected to wifi, free heap = " + String(esp_get_free_heap_size()))
-          .c_str());
+  LV_LOG_INFO(("Connected to wifi, free heap = " + String(esp_get_free_heap_size())).c_str());
 }
 
 __attribute__((unused)) void loop() {
   lv_timer_handler_run_in_period(33); // 30fps
 
-  if (webServer->isUpdateInProgress() &&
-      sceneManager->getCurrentSceneId() != SceneId::FirmwareUpdate) {
+  if (webServer->isUpdateInProgress() && sceneManager->getCurrentSceneId() != SceneId::FirmwareUpdate) {
     sceneManager->SwitchScene(SceneId::FirmwareUpdate, 0);
   } else if (WiFi.isConnected() && !btn->isPressed()) {
-    if (klipperApi->isKlipperNotAvailable() &&
-        sceneManager->getCurrentSceneId() != SceneId::NoKlipper) {
+    if (klipperApi->isKlipperNotAvailable() && sceneManager->getCurrentSceneId() != SceneId::NoKlipper) {
       sceneManager->SwitchScene(SceneId::NoKlipper, 0);
     }
   }

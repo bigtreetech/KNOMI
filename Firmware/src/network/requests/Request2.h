@@ -1,14 +1,10 @@
 #pragma once
 
 class Request2 : public KlipperApiRequest {
-  String getUrl(String klipper_ip) {
-    return "http://" + klipper_ip + "/printer/objects/query?display_status";
-  }
+  String getUrl(String klipper_ip) { return "http://" + klipper_ip + "/printer/objects/query?display_status"; }
 
   void processJson(DynamicJsonDocument &doc) {
-    double nameStr7 =
-        (doc["result"]["status"]["display_status"]["progress"].as<double>()) *
-        100;
+    double nameStr7 = (doc["result"]["status"]["display_status"]["progress"].as<double>()) * 100;
     uint16_t datas = round(nameStr7);
 
     progress_data = datas;

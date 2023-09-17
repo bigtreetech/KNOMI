@@ -12,6 +12,4 @@ void LegacyConfig::load() {
   LV_LOG_INFO(("SSID:%s", this->getSsid().c_str()));
 }
 
-void LegacyConfig::save() {
-  LV_LOG_INFO("LegacyConfig does not support saving.");
-}
+void LegacyConfig::save() { LV_LOG_INFO("LegacyConfig does not support saving."); }
