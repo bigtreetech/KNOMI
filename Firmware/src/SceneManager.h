@@ -1,20 +1,21 @@
 #pragma once
-#include "scenes/AbstractScene.h"
-#include "scenes/SwitchSceneRequest.h"
-#include "scenes/BootupLogo.h"
-#include "network/WifiManager.h"
 #include "lvgl.h"
+#include "network/WifiManager.h"
+#include "scenes/AbstractScene.h"
+#include "scenes/BootupLogo.h"
+#include "scenes/SwitchSceneRequest.h"
 
 class SceneManager {
 private:
   uint8_t timer_contne = 0;
-  AbstractScene* currentScene = nullptr;
+  AbstractScene *currentScene = nullptr;
   SceneId currentSceneId;
-  SwitchSceneRequest* switchSceneRequest = nullptr;
+  SwitchSceneRequest *switchSceneRequest = nullptr;
   SceneDeps deps;
 
 public:
-  explicit SceneManager(KnomiWebServer* webServer, KlipperApi* klipperApi, WifiManager* manager): deps(klipperApi, manager, webServer) {
+  explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager)
+      : deps(klipperApi, manager, webServer) {
     this->currentScene = new BootupLogoScene(deps);
     this->currentSceneId = SceneId::BootupLogo;
   }
@@ -47,7 +48,6 @@ public:
         }
       }
     }
-
   }
 
   void SwitchScene(SceneId id, int timerOverride = -1) {
@@ -55,4 +55,3 @@ public:
     SwitchSceneIfRequired();
   }
 };
-

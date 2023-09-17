@@ -6,9 +6,7 @@ private:
   ResourceImage *ri_printing;
 
 public:
-  explicit PrintingScene(SceneDeps deps) : AbstractScene(deps) {
-    ri_printing = KnownResourceImages::get_Printing();
-  }
+  explicit PrintingScene(SceneDeps deps) : AbstractScene(deps) { ri_printing = KnownResourceImages::get_Printing(); }
   ~PrintingScene() override { delete ri_printing; }
 
   SwitchSceneRequest *NextScene() override {

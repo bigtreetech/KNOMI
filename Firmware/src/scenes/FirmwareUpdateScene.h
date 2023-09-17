@@ -1,9 +1,8 @@
 #pragma once
-#include "AbstractScene.h"
 #include "../network/KnomiWebServer.h"
+#include "AbstractScene.h"
 
 LV_FONT_DECLARE(font_48);
-
 
 class FirmwareUpdateScene : public AbstractScene {
 private:
@@ -28,12 +27,11 @@ public:
 
   SwitchSceneRequest *NextScene() override {
     if (webServer->getUpdateTotal() > 0) {
-      auto value = (int16_t) (100.0 * webServer->getUpdateDone() / webServer->getUpdateTotal());
+      auto value = (int16_t)(100.0 * webServer->getUpdateDone() / webServer->getUpdateTotal());
       String result = String(value) + "%";
       lv_label_set_text(label_print_progress, result.c_str());
       lv_arc_set_value(arc_print_progress, value);
-    }
-    else {
+    } else {
       String result = "...";
       lv_label_set_text(label_print_progress, result.c_str());
     }
@@ -79,5 +77,4 @@ public:
     lv_arc_set_value(arc_print_progress, 0);          // 设置初始值
     lv_obj_center(arc_print_progress);                // 居中显示
   }
-
 };
