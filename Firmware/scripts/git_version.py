@@ -45,5 +45,5 @@ default = env.GetProjectConfig().get("env", propName)
 
 print("Current Build targets $PROGPATH")
 
-if env.GetProjectOption(propName, default) == "true":
+if not BUILD_TARGETS and env.GetProjectOption(propName, default) == "true":
     generate_version();

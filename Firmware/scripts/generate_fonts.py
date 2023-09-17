@@ -23,5 +23,6 @@ env.AddCustomTarget(
 
 propName = "custom_generateFonts"
 default = env.GetProjectConfig().get("env", propName)
-if env.GetProjectOption(propName, default) == "true":
+
+if not BUILD_TARGETS and env.GetProjectOption(propName, default) == "true":
     generate_fonts();
