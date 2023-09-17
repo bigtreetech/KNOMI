@@ -63,7 +63,7 @@ __attribute__((unused)) void setup() {
   LV_LOG_INFO(("LVFS-Littlefs proxy enabled, free heap = " +
                String(esp_get_free_heap_size()))
                   .c_str());
-  klipperApi = new KlipperApi(config->getKlipperConfig());
+  klipperApi = new KlipperApi(config);
   LV_LOG_INFO(
       ("KlipperAPI started, free heap = " + String(esp_get_free_heap_size()))
           .c_str());
