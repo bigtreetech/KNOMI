@@ -40,7 +40,7 @@ public:
     int timeOut_s = 30;
     WiFiClass::hostname(this->networkConfig->getHostname().c_str());
 
-    if (networkConfig->getSsid().isEmpty() || !config->isInitailised()) {
+    if (networkConfig->getSsid().isEmpty() || !config->isInitialised()) {
       LV_LOG_INFO("Config is not initailised starting AP mode");
       ap = new WifiAccessPoint();
       return;

@@ -20,7 +20,7 @@ void Config::load() {
 
 void Config::save() {
   preferences.begin(this->getConfigNamespace().c_str(), false);
-  preferences.putBool("initialised", this->isInitailised());
+  preferences.putBool("initialised", this->isInitialised());
   preferences.end();
 }
 

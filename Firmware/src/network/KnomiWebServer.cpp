@@ -136,7 +136,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
 
     this->config->getNetworkConfig()->save();
 
-    this->config->setInitailised();
+    this->config->setInitialised();
     this->config->save();
 
     if (req->hasArg("klipper")) {

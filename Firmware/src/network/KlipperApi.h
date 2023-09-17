@@ -49,7 +49,7 @@ public:
   }
 
   void refreshData() {
-    if (config->isInitailised()) {
+    if (config->isInitialised()) {
       String klipper_ip = config->getKlipperConfig()->getHost();
       req1.Execute(klipper_ip);
       req2.Execute(klipper_ip);
