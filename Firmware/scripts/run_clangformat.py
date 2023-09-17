@@ -12,7 +12,7 @@ def linter_callback(*arg, **kwargs):
 
     print("check folders", check_folders_without_prefix);
     
-    subprocess.run("pip -q install clang-format")
+    subprocess.run("\"$PYTHONEXE\" -m pip -q install clang-format")
     files = []
     for folder in check_folders_without_prefix:
         # r=root, d=directories, f = files
