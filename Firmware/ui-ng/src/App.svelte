@@ -5,8 +5,8 @@
     import SparkMD5 from "spark-md5/spark-md5";
     import Theme from "./components/Theme.svelte";
 
-    let fileinput : HTMLInputElement;
-    let selectedFile : File;
+    let fileinput: HTMLInputElement;
+    let selectedFile: File;
 
     var ssid = "";
     var pass = "";
@@ -20,7 +20,7 @@
     var isSaving = false;
 
     var otaSuccess = false;
-    var otaError : String | boolean  = false;
+    var otaError: String | boolean = false;
     var otaProgress = false;
     var otaPercentage = 0;
     var otaKind = "";
@@ -78,7 +78,7 @@
         isSaving = false;
     }
 
-    const onFileSelected = (e : Event) => {
+    const onFileSelected = (e: Event) => {
         selectedFile = e.target.files[0];
     };
 
@@ -107,7 +107,7 @@
             const spark = new SparkMD5.ArrayBuffer();
             const fileReader = new FileReader();
             let currentChunk = 0;
-            
+
             let loadNext = () => {
                 const start = currentChunk * chunkSize;
                 const end =

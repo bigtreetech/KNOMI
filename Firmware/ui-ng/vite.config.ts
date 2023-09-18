@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { viteSingleFile } from "vite-plugin-singlefile";
-import sveltePreprocess from 'svelte-preprocess';
+import sveltePreprocess from "svelte-preprocess";
 import viteCompression from "vite-plugin-compression2";
 import svg from "vite-plugin-svgo";
 
@@ -19,19 +19,27 @@ export default defineConfig({
                 ws: true,
                 secure: false,
                 changeOrigin: true,
-                rewrite: path => path.replace(/^\/ws/, ''), 
+                rewrite: (path) => path.replace(/^\/ws/, ""),
                 configure: (proxy, _options) => {
-                    proxy.on('error', (err, _req, _res) => {
-                      console.log('proxy error', err);
+                    proxy.on("error", (err, _req, _res) => {
+                        console.log("proxy error", err);
                     });
-                    proxy.on('proxyReq', (proxyReq, req, _res) => {
-                      console.log('Sending Request to the Target:', req.method, req.url);
+                    proxy.on("proxyReq", (proxyReq, req, _res) => {
+                        console.log(
+                            "Sending Request to the Target:",
+                            req.method,
+                            req.url,
+                        );
                     });
-                    proxy.on('proxyRes', (proxyRes, req, _res) => {
-                      console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+                    proxy.on("proxyRes", (proxyRes, req, _res) => {
+                        console.log(
+                            "Received Response from the Target:",
+                            proxyRes.statusCode,
+                            req.url,
+                        );
                     });
-                  },
-            }
+                },
+            },
         },
     },
 
@@ -61,7 +69,7 @@ export default defineConfig({
     plugins: [
         svg(),
         svelte({
-            preprocess: [sveltePreprocess({ typescript: true})]
+            preprocess: [sveltePreprocess({ typescript: true })],
         }),
         viteSingleFile(),
         viteCompression({ algorithm: "gzip", deleteOriginalAssets: false }),
