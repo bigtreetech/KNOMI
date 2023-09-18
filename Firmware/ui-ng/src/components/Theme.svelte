@@ -21,7 +21,6 @@
         let statusJson = await statusResponse.json();
         hash = statusJson.hash;
 
-
         let response = await fetch("/api/listFiles");
         let json = await response.json();
         filesList = json;
@@ -29,7 +28,7 @@
     }
 
     function getFile(filename: string) {
-        return filesList!.files.filter(t=>t.name == filename)[0];
+        return filesList!.files.filter((t) => t.name == filename)[0];
     }
 
     load();
@@ -43,23 +42,46 @@
             <article>
                 <header>
                     <div>
-                        <a role="button" href="/theme" class="outline" use:active>Back</a>
+                        <a
+                            role="button"
+                            href="/theme"
+                            class="outline"
+                            use:active>Back</a
+                        >
                         <span>
-                            {getFile(meta.params.filename).name} ({prettyBytes(getFile(meta.params.filename).size)})
+                            {getFile(meta.params.filename).name} ({prettyBytes(
+                                getFile(meta.params.filename).size,
+                            )})
                         </span>
                     </div>
                 </header>
                 <div class="grid">
                     <div>
                         <h5>Current:</h5>
-                        <img src="/fs/{getFile(meta.params.filename).name}" alt="{meta.params.filename}" />
+                        <img
+                            src="/fs/{getFile(meta.params.filename).name}"
+                            alt={meta.params.filename}
+                        />
                     </div>
                     <div>
                         <h5>Original:</h5>
-                        <img src="https://github.com/DiverOfDark/KNOMI/raw/{hash}/Firmware/data/{meta.params.filename}" alt="Original {meta.params.filename}"/>
+                        <img
+                            src="https://github.com/DiverOfDark/KNOMI/raw/{hash}/Firmware/data/{meta
+                                .params.filename}"
+                            alt="Original {meta.params.filename}"
+                        />
                     </div>
                 </div>
-
+                <footer>
+                    <div class="grid">
+                        <div>
+                            <button disabled>Upload new image</button>
+                        </div>
+                        <div>
+                            <button disabled>Restore Original</button>
+                        </div>
+                    </div>
+                </footer>
             </article>
         </Route>
         <Route path="/">
@@ -72,14 +94,16 @@
                 </thead>
                 {#each filesList.files as file}
                     <tr>
-                        <td><a href="/theme/{file.name}" use:active>{file.name}</a></td>
+                        <td
+                            ><a href="/theme/{file.name}" use:active
+                                >{file.name}</a
+                            ></td
+                        >
                         <td>{prettyBytes(file.size)}</td>
                     </tr>
                 {/each}
             </table>
-            <div>
-                
-            </div>
+            <div></div>
         </Route>
 
         Free space {prettyBytes(filesList.used)} / {prettyBytes(
