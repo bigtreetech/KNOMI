@@ -10,6 +10,8 @@
 KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   auto *pServer = new AsyncWebServer(webPort);
   auto *pSocket = new AsyncWebSocket("/ws");
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+
   pSocket->onEvent([&](AsyncWebSocket *_unused, AsyncWebSocketClient *client, AwsEventType type, void *arg,
                        uint8_t *data, size_t len) {
     switch (type) {

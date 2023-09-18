@@ -3,9 +3,10 @@
     import voronLogo from "./assets/voron.svg";
     import prettyBytes from "pretty-bytes";
     import SparkMD5 from "spark-md5/spark-md5";
+    import Theme from "./components/Theme.svelte";
 
-    let fileinput;
-    let selectedFile; // : File;
+    let fileinput : HTMLInputElement;
+    let selectedFile : File;
 
     var ssid = "";
     var pass = "";
@@ -19,7 +20,7 @@
     var isSaving = false;
 
     var otaSuccess = false;
-    var otaError = false;
+    var otaError : String | boolean  = false;
     var otaProgress = false;
     var otaPercentage = 0;
     var otaKind = "";
@@ -77,7 +78,7 @@
         isSaving = false;
     }
 
-    const onFileSelected = (e) => {
+    const onFileSelected = (e : Event) => {
         selectedFile = e.target.files[0];
     };
 
@@ -106,10 +107,19 @@
             const spark = new SparkMD5.ArrayBuffer();
             const fileReader = new FileReader();
             let currentChunk = 0;
-            let loadNext;
+            
+            let loadNext = () => {
+                const start = currentChunk * chunkSize;
+                const end =
+                    start + chunkSize >= file.size
+                        ? file.size
+                        : start + chunkSize;
+
+                fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+            };
 
             fileReader.onload = (e) => {
-                spark.append(e.target.result); // Append array buffer
+                spark.append(e.target!.result); // Append array buffer
                 currentChunk += 1;
 
                 if (currentChunk < chunks) {
@@ -122,16 +132,6 @@
 
             fileReader.onerror = (e) => {
                 reject(e);
-            };
-
-            loadNext = () => {
-                const start = currentChunk * chunkSize;
-                const end =
-                    start + chunkSize >= file.size
-                        ? file.size
-                        : start + chunkSize;
-
-                fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
             };
 
             loadNext();
@@ -192,6 +192,7 @@
                 >
                 <a href="/setup" use:active disabled={otaProgress}>Setup</a>
                 <a href="/update" use:active>Update</a>
+                <a href="/theme" use:active disabled={otaProgress}>Theme</a>
             </li>
         </ul>
         <ul>
@@ -409,6 +410,9 @@
                 >
             </form>
         {/if}
+    </Route>
+    <Route path="/theme">
+        <Theme />
     </Route>
 
     <footer>

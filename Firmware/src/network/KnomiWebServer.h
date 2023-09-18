@@ -41,6 +41,8 @@ public:
     if (!this->started) {
       this->started = true;
       this->server->begin();
+    } else {
+      socket->cleanupClients();
     }
   }
 
