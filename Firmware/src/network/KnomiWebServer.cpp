@@ -57,7 +57,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
 
   pServer->on("/api/listFiles", HTTP_GET, [&](AsyncWebServerRequest *req) {
     AsyncResponseStream *response = req->beginResponseStream("application/json");
-    DynamicJsonDocument doc(512);
+    DynamicJsonDocument doc(2048);
     doc["total"] = LittleFS.totalBytes();
     doc["used"] = LittleFS.usedBytes();
     const JsonArray &array = doc.createNestedArray("files");
