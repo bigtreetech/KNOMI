@@ -411,7 +411,7 @@
             </form>
         {/if}
     </Route>
-    <Route path="/theme">
+    <Route path="/theme/*">
         <Theme />
     </Route>
 

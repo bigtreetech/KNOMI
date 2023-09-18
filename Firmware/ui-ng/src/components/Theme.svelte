@@ -1,5 +1,6 @@
 <script lang="ts">
     import prettyBytes from "pretty-bytes";
+    import { active, Route, router } from "tinro";
 
     interface ListFilesResponse {
         total: number;
@@ -13,15 +14,23 @@
     }
 
     let filesList: ListFilesResponse | null = null;
+    let hash = "master";
 
     async function load() {
+        let statusResponse = await fetch("/api/status");
+        let statusJson = await statusResponse.json();
+        hash = statusJson.hash;
+
+
         let response = await fetch("/api/listFiles");
         let json = await response.json();
         filesList = json;
-        filesList.files = filesList?.files.filter((f) => f.name);
+        filesList!.files = filesList?.files.filter((f) => f.name)!;
     }
 
-    let selectedFile: FileInfo | null = null;
+    function getFile(filename: string) {
+        return filesList!.files.filter(t=>t.name == filename)[0];
+    }
 
     load();
 </script>
@@ -30,36 +39,49 @@
     {#if !filesList}
         <div aria-busy="true">Loading...</div>
     {:else}
-        {#if selectedFile}
+        <Route path="/:filename" let:meta>
             <article>
                 <header>
                     <div>
-                        <button
-                            on:click|preventDefault={(e) =>
-                                (selectedFile = null)}>Back</button
-                        >
+                        <a role="button" href="/theme" class="outline" use:active>Back</a>
                         <span>
-                            {selectedFile.name} ({prettyBytes(
-                                selectedFile.size,
-                            )})
+                            {getFile(meta.params.filename).name} ({prettyBytes(getFile(meta.params.filename).size)})
                         </span>
                     </div>
                 </header>
-                <img src="/fs/{selectedFile.name}" alt={selectedFile.name} />
-            </article>
-        {:else}
-            <div>
-                {#each filesList.files as file}
+                <div class="grid">
                     <div>
-                        <button
-                            on:click|preventDefault={(e) =>
-                                (selectedFile = file)}
-                            >{file.name} ({prettyBytes(file.size)})</button
-                        >
+                        <h5>Current:</h5>
+                        <img src="/fs/{getFile(meta.params.filename).name}" alt="{meta.params.filename}" />
                     </div>
+                    <div>
+                        <h5>Original:</h5>
+                        <img src="https://github.com/DiverOfDark/KNOMI/raw/{hash}/Firmware/data/{meta.params.filename}" alt="Original {meta.params.filename}"/>
+                    </div>
+                </div>
+
+            </article>
+        </Route>
+        <Route path="/">
+            <table role="grid">
+                <thead>
+                    <tr>
+                        <th scope="col">Filename</th>
+                        <th scope="col">Size</th>
+                    </tr>
+                </thead>
+                {#each filesList.files as file}
+                    <tr>
+                        <td><a href="/theme/{file.name}" use:active>{file.name}</a></td>
+                        <td>{prettyBytes(file.size)}</td>
+                    </tr>
                 {/each}
+            </table>
+            <div>
+                
             </div>
-        {/if}
+        </Route>
+
         Free space {prettyBytes(filesList.used)} / {prettyBytes(
             filesList.total,
         )} <progress value={filesList.used} max={filesList.total} />
