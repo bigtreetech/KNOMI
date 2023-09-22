@@ -8,7 +8,9 @@
 
     let fileInput: HTMLInputElement;
     let uploadInProgress = false;
-    let selectedFileError = "";
+    let uploadProgress = 0;
+    let selectedFileError : String | null = null;
+    let reloadIter = Math.random();
     
     function getExtension(filename: string) {
         let pos = filename.lastIndexOf(".");
@@ -43,6 +45,38 @@
     function loadToImgAndCheckResolution(file : File) {
         // check resolution - should be no more than CONST
         // check free space
+        
+        const request = new XMLHttpRequest();
+        const formData = new FormData();
+
+        uploadInProgress = true;
+
+        request.addEventListener("load", () => {
+            // request.response will hold the response from the server
+            if (request.status === 200) {
+                selectedFileError = null;
+                reloadIter = Math.random();
+                
+            } else if (request.status !== 500) {
+                selectedFileError = `[HTTP ERROR] ${request.statusText}`;
+            } else {
+                selectedFileError = request.responseText;
+            }
+            uploadInProgress = false;
+            uploadProgress = 0;
+        });
+
+        // Upload progress
+        request.upload.addEventListener("progress", (e) => {
+            uploadProgress = Math.trunc((e.loaded / e.total) * 100);
+            debugger;
+        });
+
+        request.withCredentials = true;
+        request.open("post", "/api/uploadFile");
+        formData.append("filename", filename);
+        formData.append("file", file, filename);
+        request.send(formData);
     }
 </script>
 
@@ -63,10 +97,17 @@
     <div class="grid">
         <div>
             <h5>Current:</h5>
-            <img
-                src="/fs/{filename}"
-                alt={filename}
-            />
+            <div class="imgContainer">
+                {#if uploadInProgress}
+                <div class="imgOverlay" >
+                    <div aria-busy="{uploadInProgress}">updating</div>
+                </div>
+                {/if}
+                <img
+                    src="/fs/{filename}?{reloadIter}"
+                    alt={filename}
+                />
+            </div>
         </div>
         <div>
             <h5>Original:</h5>
@@ -89,7 +130,7 @@
                     {#if selectedFileError }
                     <div class="error">{selectedFileError}</div>
                     {/if}
-                    <button type="submit" aria-busy="{uploadInProgress}">Upload new image</button>
+                    <button type="submit" aria-busy="{uploadInProgress}" disabled="{uploadInProgress}">Upload new image</button>
                 </form>
             </div>
             <div>
@@ -105,5 +146,20 @@
         background-color: var(--del-color);
         margin-bottom: 1em;
         border-radius: var(--border-radius);
+    }
+
+    .imgContainer {
+        position: relative;
+        float:left;
+    }
+
+    .imgOverlay {
+        background-color: rgba(0,0,0, 0.8);
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 </style>
