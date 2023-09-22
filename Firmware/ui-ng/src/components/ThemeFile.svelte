@@ -46,6 +46,7 @@
         // check resolution - should be no more than CONST
         // check free space
         
+        // todo extract file upload into ts function/helper
         const request = new XMLHttpRequest();
         const formData = new FormData();
 
@@ -56,7 +57,7 @@
             if (request.status === 200) {
                 selectedFileError = null;
                 reloadIter = Math.random();
-                
+
             } else if (request.status !== 500) {
                 selectedFileError = `[HTTP ERROR] ${request.statusText}`;
             } else {
