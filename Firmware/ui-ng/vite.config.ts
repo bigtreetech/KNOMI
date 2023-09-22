@@ -65,6 +65,10 @@ export default defineConfig({
         ],
     },
 
+    optimizeDeps: {
+        exclude: ['tinro']
+    },
+
     clearScreen: false,
     plugins: [
         svg(),

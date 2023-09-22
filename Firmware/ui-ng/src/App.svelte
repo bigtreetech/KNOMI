@@ -190,9 +190,9 @@
                 <span class="logo"
                     ><!-- eslint-disable -->{@html voronLogo}<!-- eslint-enable --></span
                 >
-                <a href="/setup" use:active disabled={otaProgress}>Setup</a>
+                <a href="/setup" use:active disabled={otaProgress || null}>Setup</a>
                 <a href="/update" use:active>Update</a>
-                <a href="/theme" use:active disabled={otaProgress}>Theme</a>
+                <a href="/theme" use:active disabled={otaProgress || null}>Theme</a>
             </li>
         </ul>
         <ul>
@@ -206,25 +206,25 @@
             <form on:submit|preventDefault={saveSetup}>
                 <label class="input">
                     <span>WiFi SSID</span>
-                    <input disabled={isSaving} type="text" bind:value={ssid} />
+                    <input disabled={isSaving || null} type="text" bind:value={ssid} />
                 </label>
                 <label class="input">
                     <span>WiFi PASS</span>
-                    <input disabled={isSaving} type="text" bind:value={pass} />
+                    <input disabled={isSaving || null} type="text" bind:value={pass} />
                 </label>
                 <label class="input">
                     <span>Klipper IP</span>
-                    <input disabled={isSaving} type="text" bind:value={ip} />
+                    <input disabled={isSaving || null} type="text" bind:value={ip} />
                 </label>
                 <label class="input">
                     <span>KNOMI Hostname</span>
                     <input
-                        disabled={isSaving}
+                        disabled={isSaving || null}
                         type="text"
                         bind:value={hostname}
                     />
                 </label>
-                <button disabled={isSaving} type="submit">SAVE</button>
+                <button disabled={isSaving || null} type="submit">SAVE</button>
             </form>
         </div>
     </Route>

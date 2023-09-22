@@ -1,6 +1,7 @@
 <script lang="ts">
     import prettyBytes from "pretty-bytes";
-    import { active, Route, router } from "tinro";
+    import { active, Route } from "tinro";
+    import ThemeFile from "./ThemeFile.svelte";
 
     interface ListFilesResponse {
         total: number;
@@ -39,50 +40,7 @@
         <div aria-busy="true">Loading...</div>
     {:else}
         <Route path="/:filename" let:meta>
-            <article>
-                <header>
-                    <div>
-                        <a
-                            role="button"
-                            href="/theme"
-                            class="outline"
-                            use:active>Back</a
-                        >
-                        <span>
-                            {getFile(meta.params.filename).name} ({prettyBytes(
-                                getFile(meta.params.filename).size,
-                            )})
-                        </span>
-                    </div>
-                </header>
-                <div class="grid">
-                    <div>
-                        <h5>Current:</h5>
-                        <img
-                            src="/fs/{getFile(meta.params.filename).name}"
-                            alt={meta.params.filename}
-                        />
-                    </div>
-                    <div>
-                        <h5>Original:</h5>
-                        <img
-                            src="https://github.com/DiverOfDark/KNOMI/raw/{hash}/Firmware/data/{meta
-                                .params.filename}"
-                            alt="Original {meta.params.filename}"
-                        />
-                    </div>
-                </div>
-                <footer>
-                    <div class="grid">
-                        <div>
-                            <button disabled>Upload new image</button>
-                        </div>
-                        <div>
-                            <button disabled>Restore Original</button>
-                        </div>
-                    </div>
-                </footer>
-            </article>
+            <ThemeFile filename={getFile(meta.params.filename).name} {hash} size={getFile(meta.params.filename).size} />
         </Route>
         <Route path="/">
             <table role="grid">
