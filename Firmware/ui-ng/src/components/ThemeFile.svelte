@@ -27,26 +27,29 @@
         if (!file) return;
 
         const free_buffer = 8192;
-        
+
         if (file.size < totalSize - usedSize - free_buffer) {
-            selectedFileError = "Not enough free space for this file. Available is " + prettyBytes(totalSize - usedSize - free_buffer) + ", file is " + prettyBytes(file.size);
+            selectedFileError =
+                "Not enough free space for this file. Available is " +
+                prettyBytes(totalSize - usedSize - free_buffer) +
+                ", file is " +
+                prettyBytes(file.size);
             return;
         }
 
         if (file.size)
-
-        if (getExtension(file.name) === ".gif") {
-            checkGif(file);
-        } else if (getExtension(file.name) === ".bmp") {
-            checkBmp(file);
-        } else {
-            selectedFileError =
-                "Not supported file format! Expected '" +
-                getExtension(filename) +
-                "', but got '" +
-                getExtension(file.name) +
-                "'";
-        }
+            if (getExtension(file.name) === ".gif") {
+                checkGif(file);
+            } else if (getExtension(file.name) === ".bmp") {
+                checkBmp(file);
+            } else {
+                selectedFileError =
+                    "Not supported file format! Expected '" +
+                    getExtension(filename) +
+                    "', but got '" +
+                    getExtension(file.name) +
+                    "'";
+            }
     }
 
     function checkBmp(file: File) {
@@ -118,7 +121,7 @@
                     </div>
                 {/if}
                 {#if size == -1}
-                <h3>NOT FOUND</h3>
+                    <h3>NOT FOUND</h3>
                 {:else}
                     <img src="/fs/{filename}?{reloadIter}" alt={filename} />
                 {/if}

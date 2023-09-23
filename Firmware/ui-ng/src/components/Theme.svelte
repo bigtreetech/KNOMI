@@ -61,7 +61,11 @@
                                 >{file.name}</a
                             ></td
                         >
-                        <td>{file.size == -1 ? "MISSING" : prettyBytes(file.size)}</td>
+                        <td
+                            >{file.size == -1
+                                ? "MISSING"
+                                : prettyBytes(file.size)}</td
+                        >
                     </tr>
                 {/each}
             </table>
