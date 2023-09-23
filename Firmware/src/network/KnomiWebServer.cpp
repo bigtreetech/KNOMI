@@ -91,6 +91,8 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
       [&](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
         if (!index) {
           request->_tempFile = LittleFS.open("/" + filename, "w");
+
+          // todo check free space!
         }
 
         if (!updateInProgress) {
