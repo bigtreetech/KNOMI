@@ -6,10 +6,13 @@
 #include "ArduinoJson.h"
 #include "LittleFS.h"
 #include "esp_ota_ops.h"
+#include <set>
 
 KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   auto *pServer = new AsyncWebServer(webPort);
   auto *pSocket = new AsyncWebSocket("/ws");
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+
   pSocket->onEvent([&](AsyncWebSocket *_unused, AsyncWebSocketClient *client, AwsEventType type, void *arg,
                        uint8_t *data, size_t len) {
     switch (type) {
@@ -53,16 +56,30 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     // req->send(404, "text/html", "Not found");
   });
 
+  pServer->on("/api/restart", HTTP_GET, [&](AsyncWebServerRequest *req) {
+    AsyncWebServerResponse *pResponse = req->beginResponse(200, "text/plain", "OK");
+    pResponse->addHeader("Connection", "close");
+    req->send(pResponse);
+    delay(100);
+    yield();
+    delay(100);
+    ESP.restart();
+  });
+
   pServer->on("/api/listFiles", HTTP_GET, [&](AsyncWebServerRequest *req) {
     AsyncResponseStream *response = req->beginResponseStream("application/json");
-    DynamicJsonDocument doc(512);
+    DynamicJsonDocument doc(2048);
     doc["total"] = LittleFS.totalBytes();
     doc["used"] = LittleFS.usedBytes();
     const JsonArray &array = doc.createNestedArray("files");
+
     File root = LittleFS.open("/");
     File file = root.openNextFile();
+
+    std::set<String> added;
     while (file) {
       const JsonObject &item = array.createNestedObject();
+      added.insert(String(file.name()));
       item["name"] = String(file.name());
       item["size"] = file.size();
 
@@ -70,9 +87,75 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     }
     root.close();
 
+    for (const char *file : KnownResourceImages::enumerateFiles()) {
+      if (added.find(String(file)) == added.end()) {
+        const JsonObject &item = array.createNestedObject();
+
+        String fileName = String(file);
+        item["name"] = fileName;
+        item["size"] = -1;
+      }
+    }
+
     serializeJson(doc, *response);
     req->send(response);
   });
+
+  pServer->on("/api/uploadFile", HTTP_DELETE, [&](AsyncWebServerRequest *req) {
+    String fn = req->getParam("filename")->value();
+    bool result = LittleFS.remove("/" + fn);
+    AsyncWebServerResponse *pResponse =
+        req->beginResponse(result ? 200 : 404, "text/plain", result ? "OK" : "NOT_FOUND");
+    pResponse->addHeader("Connection", "close");
+    req->send(pResponse);
+  });
+
+  pServer->on(
+      "/api/uploadFile", HTTP_POST,
+      [&](AsyncWebServerRequest *req) {
+        AsyncWebServerResponse *pResponse = req->beginResponse(200, "text/plain", "OK");
+        pResponse->addHeader("Connection", "close");
+        updateInProgress = false;
+        updateTotal = 0;
+        updateDone = 0;
+        req->send(pResponse);
+      },
+      [&](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
+        if (!index) {
+          auto currentFile = LittleFS.open("/" + filename, "r");
+          int size = currentFile.size();
+          int available = LittleFS.totalBytes() - LittleFS.usedBytes() + currentFile.size();
+          currentFile.close();
+
+          int minimalAvailableSize = 8192;
+
+          int uploadSize = atoi(request->getParam("size", true)->value().c_str());
+
+          if (available < minimalAvailableSize + uploadSize) {
+            return request->send(400, "text/plain", "Not enough of free space");
+          }
+
+          updateTotal = uploadSize;
+          updateDone = 0;
+
+          request->_tempFile = LittleFS.open("/" + filename, "w");
+
+          updateInProgress = true;
+        }
+
+        // Write chunked data to the free sketch space
+        if (len) {
+          updateDone += len;
+          request->_tempFile.write(data, len);
+        }
+
+        if (final) { // if the final flag is set then this is the last frame of
+                     // data
+          request->_tempFile.flush();
+          request->_tempFile.close();
+        }
+        return;
+      });
 
   pServer->on("/api/coredump", HTTP_GET, [&](AsyncWebServerRequest *req) {
     req->send("application/binary", 0x10000, [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
@@ -171,7 +254,6 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
       [&](AsyncWebServerRequest *req) {
         AsyncWebServerResponse *pResponse = req->beginResponse(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
         pResponse->addHeader("Connection", "close");
-        pResponse->addHeader("Access-Control-Allow-Origin", "*");
         updateInProgress = false;
         updateTotal = 0;
         updateDone = 0;

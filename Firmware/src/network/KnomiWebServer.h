@@ -1,6 +1,7 @@
 #pragma once
 #include "../Version.h"
 #include "../config/Config.h"
+#include "../generated/images.h"
 #include "../generated/knomiWebpage.h"
 #include "Arduino.h"
 #include "ESPAsyncWebServer.h"
@@ -41,6 +42,8 @@ public:
     if (!this->started) {
       this->started = true;
       this->server->begin();
+    } else {
+      socket->cleanupClients();
     }
   }
 

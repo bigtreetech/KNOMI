@@ -25,7 +25,7 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: cd Firmware && pio run -e esp32dev && cp .pio/build/esp32dev/firmware.bin ../firmware.bin
+        run: cd Firmware && pio run -e esp32dev && cp .pio/build/esp32dev/firmware.bin ../firmware.bin && cp .pio/build/esp32dev/firmware.elf ../firmware.elf
 
       - name: Build LightFS
         run: cd Firmware && pio run -e esp32dev -t buildfs && cp .pio/build/esp32dev/littlefs.bin ../littlefs.bin
@@ -36,6 +36,7 @@ jobs:
           name: firmware
           path: |
             firmware.bin
+            firmware.elf
             littlefs.bin
 
   release:
@@ -56,4 +57,5 @@ jobs:
       with:
         files: | 
           ${{steps.download.outputs.download-path}}/firmware.bin
+          ${{steps.download.outputs.download-path}}/firmware.elf
           ${{steps.download.outputs.download-path}}/littlefs.bin
