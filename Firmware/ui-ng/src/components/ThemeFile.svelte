@@ -78,8 +78,8 @@
         request.withCredentials = true;
         request.open("post", "/api/uploadFile");
         formData.append("filename", filename);
-        formData.append("file", file, filename);
         formData.append("size", file.size.toString());
+        formData.append("file", file, filename);
         request.send(formData);
     }
 </script>
