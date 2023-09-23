@@ -61,20 +61,57 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     doc["total"] = LittleFS.totalBytes();
     doc["used"] = LittleFS.usedBytes();
     const JsonArray &array = doc.createNestedArray("files");
-    File root = LittleFS.open("/");
-    File file = root.openNextFile();
-    while (file) {
+    for (const char *file : KnownResourceImages::enumerateFiles()) {
       const JsonObject &item = array.createNestedObject();
-      item["name"] = String(file.name());
-      item["size"] = file.size();
-
-      file = root.openNextFile();
+      String fileName = String(file);
+      item["name"] = fileName;
+      if (LittleFS.exists("/" + fileName)) {
+        auto fileObject = LittleFS.open("/" + fileName, "r");
+        item["size"] = fileObject.size();
+        fileObject.close();
+      } else {
+        item["size"] = 0;
+      }
     }
-    root.close();
 
     serializeJson(doc, *response);
     req->send(response);
   });
+
+  pServer->on(
+      "/api/uploadFile", HTTP_POST,
+      [&](AsyncWebServerRequest *req) {
+        AsyncWebServerResponse *pResponse = req->beginResponse(200, "text/plain", "OK");
+        pResponse->addHeader("Connection", "close");
+        updateInProgress = false;
+        updateTotal = 0;
+        updateDone = 0;
+        req->send(pResponse);
+      },
+      [&](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
+        if (!index) {
+          request->_tempFile = LittleFS.open("/" + filename, "w");
+        }
+
+        if (!updateInProgress) {
+          updateInProgress = true;
+          updateTotal = atoi(request->getParam("size", true)->value().c_str());
+          updateDone = 0;
+        }
+
+        // Write chunked data to the free sketch space
+        if (len) {
+          updateDone += len;
+          request->_tempFile.write(data, len);
+        }
+
+        if (final) { // if the final flag is set then this is the last frame of
+                     // data
+          request->_tempFile.flush();
+          request->_tempFile.close();
+        }
+        return;
+      });
 
   pServer->on("/api/coredump", HTTP_GET, [&](AsyncWebServerRequest *req) {
     req->send("application/binary", 0x10000, [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
@@ -173,7 +210,6 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
       [&](AsyncWebServerRequest *req) {
         AsyncWebServerResponse *pResponse = req->beginResponse(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
         pResponse->addHeader("Connection", "close");
-        pResponse->addHeader("Access-Control-Allow-Origin", "*");
         updateInProgress = false;
         updateTotal = 0;
         updateDone = 0;
