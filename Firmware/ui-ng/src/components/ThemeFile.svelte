@@ -1,6 +1,9 @@
 <script lang="ts">
     import prettyBytes from "pretty-bytes";
     import { active } from "tinro";
+    import { createEventDispatcher } from "svelte";
+
+    const dispatch = createEventDispatcher();
 
     export let hash = "";
     export let filename = "";
@@ -61,6 +64,7 @@
             if (request.status === 200) {
                 selectedFileError = null;
                 reloadIter = Math.random();
+                dispatch("uploaded");
             } else if (request.status !== 500) {
                 selectedFileError = `[HTTP ERROR] ${request.statusText}`;
             } else {
@@ -134,8 +138,9 @@
                     >
                 </form>
             </div>
-            <div>
-                <button disabled>Restore Original</button>
+            <div data-tooltip="Not implemented yet.">
+                <!-- Had to be done on KNOMI because of CORS issue -->
+                <button type="submit" disabled="true">Restore Original</button>
             </div>
         </div>
     </footer>
@@ -162,5 +167,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    [data-tooltip] {
+        border-bottom: 0;
     }
 </style>

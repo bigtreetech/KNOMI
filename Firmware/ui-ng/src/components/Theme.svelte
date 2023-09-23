@@ -28,7 +28,7 @@
         filesList!.files = filesList?.files.filter((f) => f.name)!;
     }
 
-    function getFile(filename: string) {
+    function getFile(filesList: ListFilesResponse, filename: string) {
         return filesList!.files.filter((t) => t.name == filename)[0];
     }
 
@@ -41,9 +41,10 @@
     {:else}
         <Route path="/:filename" let:meta>
             <ThemeFile
-                filename={getFile(meta.params.filename).name}
+                filename={getFile(filesList, meta.params.filename).name}
                 {hash}
-                size={getFile(meta.params.filename).size}
+                size={getFile(filesList, meta.params.filename).size}
+                on:uploaded={load}
             />
         </Route>
         <Route path="/">
