@@ -9,24 +9,28 @@
     let fileInput: HTMLInputElement;
     let uploadInProgress = false;
     let uploadProgress = 0;
-    let selectedFileError : String | null = null;
+    let selectedFileError: String | null = null;
     let reloadIter = Math.random();
-    
+
     function getExtension(filename: string) {
         let pos = filename.lastIndexOf(".");
         return filename.slice(pos);
     }
 
     function uploadFile(file: File) {
-        if (!file)
-            return;
+        if (!file) return;
 
         if (getExtension(file.name) === ".gif") {
             checkGif(file);
         } else if (getExtension(file.name) === ".bmp") {
             checkBmp(file);
         } else {
-            selectedFileError = "Not supported file format! Expected '" + getExtension(filename) + "', but got '" + getExtension(file.name) + "'";
+            selectedFileError =
+                "Not supported file format! Expected '" +
+                getExtension(filename) +
+                "', but got '" +
+                getExtension(file.name) +
+                "'";
         }
     }
 
@@ -42,10 +46,10 @@
         loadToImgAndCheckResolution(file);
     }
 
-    function loadToImgAndCheckResolution(file : File) {
+    function loadToImgAndCheckResolution(file: File) {
         // check resolution - should be no more than CONST
         // check free space
-        
+
         // todo extract file upload into ts function/helper
         const request = new XMLHttpRequest();
         const formData = new FormData();
@@ -57,7 +61,6 @@
             if (request.status === 200) {
                 selectedFileError = null;
                 reloadIter = Math.random();
-
             } else if (request.status !== 500) {
                 selectedFileError = `[HTTP ERROR] ${request.statusText}`;
             } else {
@@ -70,13 +73,13 @@
         // Upload progress
         request.upload.addEventListener("progress", (e) => {
             uploadProgress = Math.trunc((e.loaded / e.total) * 100);
-            debugger;
         });
 
         request.withCredentials = true;
         request.open("post", "/api/uploadFile");
         formData.append("filename", filename);
         formData.append("file", file, filename);
+        formData.append("size", file.size.toString());
         request.send(formData);
     }
 </script>
@@ -84,12 +87,7 @@
 <article>
     <header>
         <div>
-            <a
-                role="button"
-                href="/theme"
-                class="outline"
-                use:active>Back</a
-            >
+            <a role="button" href="/theme" class="outline" use:active>Back</a>
             <span>
                 {filename} ({prettyBytes(size)})
             </span>
@@ -100,14 +98,11 @@
             <h5>Current:</h5>
             <div class="imgContainer">
                 {#if uploadInProgress}
-                <div class="imgOverlay" >
-                    <div aria-busy="{uploadInProgress}">updating</div>
-                </div>
+                    <div class="imgOverlay">
+                        <div aria-busy={uploadInProgress}>updating</div>
+                    </div>
                 {/if}
-                <img
-                    src="/fs/{filename}?{reloadIter}"
-                    alt={filename}
-                />
+                <img src="/fs/{filename}?{reloadIter}" alt={filename} />
             </div>
         </div>
         <div>
@@ -122,16 +117,21 @@
         <div class="grid">
             <div>
                 <form on:submit|preventDefault={() => fileInput.click()}>
-                    <input type="file" 
-                        style="display: none" 
-                        bind:this={fileInput} 
-                        on:change={(e) => uploadFile(e.target.files[0]) }
+                    <input
+                        type="file"
+                        style="display: none"
+                        bind:this={fileInput}
+                        on:change={(e) => uploadFile(e.target.files[0])}
                         accept={getExtension(filename)}
-                        />
-                    {#if selectedFileError }
-                    <div class="error">{selectedFileError}</div>
+                    />
+                    {#if selectedFileError}
+                        <div class="error">{selectedFileError}</div>
                     {/if}
-                    <button type="submit" aria-busy="{uploadInProgress}" disabled="{uploadInProgress}">Upload new image</button>
+                    <button
+                        type="submit"
+                        aria-busy={uploadInProgress}
+                        disabled={uploadInProgress}>Upload new image</button
+                    >
                 </form>
             </div>
             <div>
@@ -151,11 +151,11 @@
 
     .imgContainer {
         position: relative;
-        float:left;
+        float: left;
     }
 
     .imgOverlay {
-        background-color: rgba(0,0,0, 0.8);
+        background-color: rgba(0, 0, 0, 0.8);
         position: absolute;
         height: 100%;
         width: 100%;

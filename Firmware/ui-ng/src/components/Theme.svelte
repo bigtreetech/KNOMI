@@ -40,7 +40,11 @@
         <div aria-busy="true">Loading...</div>
     {:else}
         <Route path="/:filename" let:meta>
-            <ThemeFile filename={getFile(meta.params.filename).name} {hash} size={getFile(meta.params.filename).size} />
+            <ThemeFile
+                filename={getFile(meta.params.filename).name}
+                {hash}
+                size={getFile(meta.params.filename).size}
+            />
         </Route>
         <Route path="/">
             <table role="grid">

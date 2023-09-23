@@ -66,7 +66,7 @@ export default defineConfig({
     },
 
     optimizeDeps: {
-        exclude: ['tinro']
+        exclude: ["tinro"],
     },
 
     clearScreen: false,
