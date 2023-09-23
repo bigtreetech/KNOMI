@@ -9,6 +9,9 @@
     export let filename = "";
     export let size = 0;
 
+    export let usedSize = 0;
+    export let totalSize = 0;
+
     let fileInput: HTMLInputElement;
     let uploadInProgress = false;
     let uploadProgress = 0;
@@ -22,6 +25,15 @@
 
     function uploadFile(file: File) {
         if (!file) return;
+
+        const free_buffer = 8192;
+        
+        if (file.size < totalSize - usedSize - free_buffer) {
+            selectedFileError = "Not enough free space for this file. Available is " + prettyBytes(totalSize - usedSize - free_buffer) + ", file is " + prettyBytes(file.size);
+            return;
+        }
+
+        if (file.size)
 
         if (getExtension(file.name) === ".gif") {
             checkGif(file);
@@ -51,7 +63,6 @@
 
     function loadToImgAndCheckResolution(file: File) {
         // check resolution - should be no more than CONST
-        // check free space
 
         // todo extract file upload into ts function/helper
         const request = new XMLHttpRequest();
@@ -93,24 +104,28 @@
         <div>
             <a role="button" href="/theme" class="outline" use:active>Back</a>
             <span>
-                {filename} ({prettyBytes(size)})
+                {filename} ({size == -1 ? "MISSING" : prettyBytes(size)})
             </span>
         </div>
     </header>
     <div class="grid">
         <div>
-            <h5>Current:</h5>
+            <h5>Current</h5>
             <div class="imgContainer">
                 {#if uploadInProgress}
                     <div class="imgOverlay">
                         <div aria-busy={uploadInProgress}>updating</div>
                     </div>
                 {/if}
-                <img src="/fs/{filename}?{reloadIter}" alt={filename} />
+                {#if size == -1}
+                <h3>NOT FOUND</h3>
+                {:else}
+                    <img src="/fs/{filename}?{reloadIter}" alt={filename} />
+                {/if}
             </div>
         </div>
         <div>
-            <h5>Original:</h5>
+            <h5>Original</h5>
             <img
                 src="https://github.com/DiverOfDark/KNOMI/raw/{hash}/Firmware/data/{filename}"
                 alt="Original {filename}"

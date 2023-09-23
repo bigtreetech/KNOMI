@@ -15,17 +15,14 @@
     }
 
     let filesList: ListFilesResponse | null = null;
-    let hash = "master";
+    export let hash = "master";
 
     async function load() {
-        let statusResponse = await fetch("/api/status");
-        let statusJson = await statusResponse.json();
-        hash = statusJson.hash;
-
         let response = await fetch("/api/listFiles");
         let json = await response.json();
         filesList = json;
         filesList!.files = filesList?.files.filter((f) => f.name)!;
+        filesList!.files.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     function getFile(filesList: ListFilesResponse, filename: string) {
@@ -44,6 +41,8 @@
                 filename={getFile(filesList, meta.params.filename).name}
                 {hash}
                 size={getFile(filesList, meta.params.filename).size}
+                usedSize={filesList.used}
+                totalSize={filesList.total}
                 on:uploaded={load}
             />
         </Route>
@@ -62,14 +61,14 @@
                                 >{file.name}</a
                             ></td
                         >
-                        <td>{prettyBytes(file.size)}</td>
+                        <td>{file.size == -1 ? "MISSING" : prettyBytes(file.size)}</td>
                     </tr>
                 {/each}
             </table>
             <div></div>
         </Route>
 
-        Free space {prettyBytes(filesList.used)} / {prettyBytes(
+        Used space {prettyBytes(filesList.used)} / {prettyBytes(
             filesList.total,
         )} <progress value={filesList.used} max={filesList.total} />
     {/if}

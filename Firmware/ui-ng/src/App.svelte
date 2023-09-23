@@ -428,7 +428,7 @@
         {/if}
     </Route>
     <Route path="/theme/*">
-        <Theme />
+        <Theme {hash} />
     </Route>
 
     <footer>
