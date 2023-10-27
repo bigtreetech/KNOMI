@@ -41,7 +41,7 @@ public:
   void init_label_print_progress() {
     label_print_progress = lv_label_create(lv_scr_act());
 
-    lv_obj_add_style(label_print_progress, &Styles::getRedText48(), LV_PART_MAIN);
+    lv_obj_add_style(label_print_progress, Styles::getRedText48(), LV_PART_MAIN);
     lv_label_set_text(label_print_progress, String("").c_str());
     lv_obj_align(label_print_progress, LV_ALIGN_CENTER, 0, 0);
   }
