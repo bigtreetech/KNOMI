@@ -169,6 +169,13 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     });
   });
 
+  pServer->on("/api/dumpHeap", HTTP_GET, [&](AsyncWebServerRequest *req) {
+    heap_caps_dump_all();
+    AsyncWebServerResponse *pResponse = req->beginResponse(200);
+    pResponse->addHeader("Connection", "close");
+    req->send(pResponse);
+  });
+
   pServer->on("/api/status", HTTP_GET, [&](AsyncWebServerRequest *req) {
     AsyncResponseStream *response = req->beginResponseStream("application/json");
     DynamicJsonDocument doc(512);
@@ -188,6 +195,17 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     }
 
     doc["ota_partition"] = String(esp_ota_get_running_partition()->label);
+    multi_heap_info_t info;
+    heap_caps_get_info(&info, MALLOC_CAP_DEFAULT);
+    auto heap = doc.createNestedObject("heap");
+    heap["allocated_blocks"] = info.allocated_blocks;
+    heap["free_blocks"] = info.free_blocks;
+    heap["largest_free_block"] = info.largest_free_block;
+    heap["minimum_free_bytes"] = info.minimum_free_bytes;
+    heap["total_allocated_bytes"] = info.total_allocated_bytes;
+    heap["total_blocks"] = info.total_blocks;
+    heap["total_free_bytes"] = info.total_free_bytes;
+
     serializeJson(doc, *response);
     req->send(response);
   });
