@@ -1,5 +1,6 @@
 #pragma once
 #include "AbstractScene.h"
+#include "Styles.h"
 
 LV_FONT_DECLARE(font_32)
 
@@ -9,8 +10,6 @@ private:
 
   lv_obj_t *label_ext_actual_temp;
   lv_obj_t *label_ext_target_temp;
-  lv_style_t style_label_ext_actual_temp;
-  lv_style_t style_label_ext_target_temp;
 
 public:
   explicit ExtruderHeatingScene(SceneDeps deps) : AbstractScene(deps) {
@@ -49,32 +48,18 @@ public:
   }
 
   void init_label_extruder_actual_temp() {
-    label_ext_actual_temp = lv_label_create(lv_scr_act()); // 创建文字对象
+    label_ext_actual_temp = lv_label_create(lv_scr_act());
 
-    lv_style_init(&style_label_ext_actual_temp);
-    lv_style_set_text_font(&style_label_ext_actual_temp,
-                           &font_32); // 设置字体样机及大小
-    lv_style_set_text_color(&style_label_ext_actual_temp,
-                            lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-    lv_obj_add_style(label_ext_actual_temp, &style_label_ext_actual_temp,
-                     LV_PART_MAIN); // 将样式添加到文字对象中
+    lv_obj_add_style(label_ext_actual_temp, &Styles::getRedText32(), LV_PART_MAIN);
     lv_label_set_text(label_ext_actual_temp, deps.klipperApi->getExtruderActualTemp().c_str());
-    lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75); // 居中显示
+    lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75);
   }
 
   void init_label_extruder_target_temp() {
-    label_ext_target_temp = lv_label_create(lv_scr_act()); // 创建文字对象
+    label_ext_target_temp = lv_label_create(lv_scr_act());
 
-    lv_style_init(&style_label_ext_target_temp);
-    lv_style_set_text_font(&style_label_ext_target_temp,
-                           &font_32); // 设置字体样机及大小
-    lv_style_set_text_color(&style_label_ext_target_temp,
-                            lv_color_hex(0xFF0000)); // 设置样式文本字颜色
-
-    lv_obj_add_style(label_ext_target_temp, &style_label_ext_target_temp,
-                     LV_PART_MAIN); // 将样式添加到文字对象中
+    lv_obj_add_style(label_ext_target_temp, &Styles::getRedText32(), LV_PART_MAIN);
     lv_label_set_text(label_ext_target_temp, deps.klipperApi->getExtruderTargetTemp().c_str());
-    lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75); // 居中显示
+    lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75);
   }
 };
