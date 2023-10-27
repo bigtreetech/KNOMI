@@ -97,7 +97,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
       }
     }
 
-    serializeJson(doc, *response);
+    serializeJsonPretty(doc, *response);
     req->send(response);
   });
 
@@ -206,7 +206,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     heap["total_blocks"] = info.total_blocks;
     heap["total_free_bytes"] = info.total_free_bytes;
 
-    serializeJson(doc, *response);
+    serializeJsonPretty(doc, *response);
     req->send(response);
   });
 

@@ -29,9 +29,10 @@ uint32_t klipper_nexttime = 0;
 
 #if LV_USE_LOG
 void logToSerial(const char *logLine) {
-  Serial.print(logLine);
+  String detailedLog = String(logLine) + ", free heap = " + esp_get_free_heap_size();
+  Serial.print(detailedLog);
   if (webServer != nullptr) {
-    webServer->websocketLog(logLine);
+    webServer->websocketLog(detailedLog.c_str());
   }
 }
 #endif
@@ -44,24 +45,24 @@ __attribute__((unused)) void setup() {
   delay(100);
 
   config = new Config();
-  LV_LOG_INFO(("Config created, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("Config created");
   wifiManager = new WifiManager(config);
-  LV_LOG_INFO(("WifiManager created, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("WifiManager created");
   btn = new Button(config);
-  LV_LOG_INFO(("Timer and button created, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("Timer and button created");
   displayhal = new DisplayHAL();
-  LV_LOG_INFO(("DisplayHAL created, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("DisplayHAL created");
   lv_port_littlefs_init();
-  LV_LOG_INFO(("LVFS-Littlefs proxy enabled, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("LVFS-Littlefs proxy enabled");
   klipperApi = new KlipperApi(config);
-  LV_LOG_INFO(("KlipperAPI started, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("KlipperAPI started");
   webServer = new KnomiWebServer(config, wifiManager);
-  LV_LOG_INFO(("WebServer started, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("WebServer started");
   sceneManager = new SceneManager(webServer, klipperApi, wifiManager);
   lv_timer_handler_run_in_period(33); // 30fps
-  LV_LOG_INFO(("SceneManager started, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("SceneManager started");
   wifiManager->connectToWiFi();
-  LV_LOG_INFO(("Connected to wifi, free heap = " + String(esp_get_free_heap_size())).c_str());
+  LV_LOG_INFO("Connected to wifi");
 }
 
 __attribute__((unused)) void loop() {

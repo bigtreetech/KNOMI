@@ -31,8 +31,8 @@ function addLineBreaks(buffer) {
 
 const FILE = `#pragma once
 
-const uint32_t KNOMI_HTML_SIZE = ${BUNDLE_PAGE.length};
-const uint8_t KNOMI_HTML[] PROGMEM = { 
+static const uint32_t KNOMI_HTML_SIZE = ${BUNDLE_PAGE.length};
+static LV_ATTRIBUTE_LARGE_CONST const uint8_t KNOMI_HTML[] = { 
 ${addLineBreaks(BUNDLE_PAGE)} 
 };
 `;

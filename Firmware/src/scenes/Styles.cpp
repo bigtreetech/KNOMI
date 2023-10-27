@@ -1,4 +1,3 @@
-#pragma once
 #include "Styles.h"
 
 lv_style_t Styles::redText32;

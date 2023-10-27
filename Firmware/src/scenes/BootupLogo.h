@@ -17,7 +17,7 @@ public:
 
     lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
 
-    LV_LOG_INFO(("Loading boot logo, free heap = " + String(esp_get_free_heap_size())).c_str());
+    LV_LOG_INFO("Loading boot logo");
     ri_logo = KnownResourceImages::get_BTT_LOGO();
     LV_LOG_INFO("Boot logo loaded");
 

@@ -6,12 +6,14 @@
 class ResourceImage {
 private:
   lv_obj_t *img;
+  String filename;
 
 public:
   ResourceImage(String filename, lv_coord_t x, lv_coord_t y) {
     lv_obj_t *screen = lv_scr_act();
+    this->filename = filename;
     filename = "A:/" + filename;
-    LV_LOG_INFO(("Creating resource image " + filename + " as gif").c_str());
+    LV_LOG_INFO(("Creating resource image " + filename).c_str());
     if (filename.endsWith(".gif")) {
       img = lv_gif_create(screen);
       lv_gif_set_src(img, filename.begin());
@@ -22,7 +24,12 @@ public:
       lv_img_set_src(img, filename.begin());
     }
     lv_obj_align(img, LV_ALIGN_CENTER, x, y);
+    LV_LOG_INFO(("Created resource image " + filename).c_str());
   }
 
-  ~ResourceImage() { lv_obj_del(img); }
+  ~ResourceImage() { 
+    LV_LOG_INFO(("Deleting resource image " + this->filename).c_str());
+    lv_obj_del(img); 
+    LV_LOG_INFO(("Deleted resource image " + this->filename).c_str());
+  }
 };
