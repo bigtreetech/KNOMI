@@ -1,8 +1,6 @@
 #pragma once
 #include "AbstractScene.h"
 
-LV_FONT_DECLARE(font_20);
-
 class NoKlipperScene : public AbstractScene {
 private:
   ResourceImage *ri_disconnect;
