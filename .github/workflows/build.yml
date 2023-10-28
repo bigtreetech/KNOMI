@@ -15,7 +15,7 @@ jobs:
         with:
           path: |
             ~/.npm
-            ~/.platformio/.cache
+            ~/.platformio
             ~/.cache/pip
             ${{ github.workspace }}/Firmware/ui-ng/node_modules
             ${{ github.workspace }}/Firmware/.pio
