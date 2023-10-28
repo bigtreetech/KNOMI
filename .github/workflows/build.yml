@@ -75,20 +75,17 @@ jobs:
 
   build-flasher:
     needs: build-firmware
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-gnu
-          - aarch64-apple-darwin
+        os: [macos-latest, windows-latest, ubuntu-latest]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
         
-      - name: Install required packages
-        run: sudo apt install -y libudev-dev pkg-config
+#      - name: Install required packages
+#        run: sudo apt install -y libudev-dev pkg-config
 
       - name: Cache Crates
         uses: actions/cache@v3
@@ -102,7 +99,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.target }}
           override: true
 
       - name: Download Firmware Files
@@ -116,7 +112,7 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --release --target=${{ matrix.target }} --manifest-path Firmware/rs-flasher/Cargo.toml
+          args: --release --manifest-path Firmware/rs-flasher/Cargo.toml
 
       - name: Debug dir
         run: | 
