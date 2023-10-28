@@ -26,6 +26,7 @@ jobs:
         with:
           path: |
             ~/.platformio
+            ~/.cache/pip
             ${{ github.workspace }}/Firmware/.pio
           key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
 
@@ -33,7 +34,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          cache: 'pip'
 
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
@@ -73,7 +73,7 @@ jobs:
             firmware.elf
             littlefs.bin
 
-  package-installer:
+  build-flasher:
     needs: build-firmware
     runs-on: ubuntu-latest
     strategy:
@@ -120,7 +120,7 @@ jobs:
 
   release:
     needs: 
-      - package-installer
+      - build-flasher
     if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: 
