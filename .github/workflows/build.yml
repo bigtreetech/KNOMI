@@ -15,12 +15,15 @@ jobs:
         with:
           path: |
             ~/.npm
-            ~/.platformio
-            ~/.cache/pip
             ${{ github.workspace }}/Firmware/ui-ng/node_modules
-            ${{ github.workspace }}/Firmware/.pio
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
-          key: ${{ runner.os }}-pio
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.platformio
+          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
@@ -82,7 +85,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: firmware
-          path: .pio/builds/esp32dev
+          path: Firmware/.pio/build/esp32dev
 
       - name: Run Python Script
         run: |
