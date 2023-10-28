@@ -3,7 +3,7 @@
 class Request1 : public KlipperApiRequest {
   String getUrl(String klipper_ip) { return "http://" + klipper_ip + "/api/printer"; }
 
-  void processJson(DynamicJsonDocument &doc) {
+  void processJson(JsonDocument &doc) {
     String nameStr1 = doc["temperature"]["bed"]["actual"].as<String>();
     String nameStr2 = doc["temperature"]["bed"]["target"].as<String>();
     String nameStr3 = doc["temperature"]["tool0"]["actual"].as<String>();

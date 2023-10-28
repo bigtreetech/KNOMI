@@ -6,7 +6,7 @@ class Request4 : public KlipperApiRequest {
     return "http://" + klipper_ip + "/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE";
   }
 
-  void processJson(DynamicJsonDocument &doc) {
+  void processJson(JsonDocument &doc) {
     String nameStr9 = doc["result"]["status"]["gcode_macro BED_MESH_CALIBRATE"]["probing"].as<String>();
     LV_LOG_INFO(nameStr9.c_str());
 

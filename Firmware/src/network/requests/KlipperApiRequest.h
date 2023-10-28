@@ -10,7 +10,7 @@ protected:
   int failCount = 0;
 
   virtual String getUrl(String klipper_ip) = 0;
-  virtual void processJson(DynamicJsonDocument &doc) = 0;
+  virtual void processJson(JsonDocument &doc) = 0;
 
 public:
   int getFailCount() { return failCount; }
@@ -25,8 +25,8 @@ public:
     if (readyState == readyStateDone) {
       if (asyncHttpRequest->responseHTTPcode() == 200) {
         String payload = asyncHttpRequest->responseText();
-        DynamicJsonDocument doc(payload.length() * 2);
-        deserializeJson(doc, payload);
+        StaticJsonDocument<200> doc;
+        deserializeJson(doc, payload.c_str());
         failCount = 0;
         processJson(doc);
       } else {
