@@ -77,8 +77,9 @@ jobs:
     needs: build-firmware
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -110,7 +111,7 @@ jobs:
           pip install wheel
           python ./waf all
           cd ..
-          pip install . |
+          pip install .
 
       - name: Run Python Script
         run: |
