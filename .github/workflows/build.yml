@@ -22,6 +22,7 @@ jobs:
         with:
           path: |
             ~/.platformio
+            ${{ github.workspace }}/Firmware/.pio
           key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
 
       - uses: actions/setup-python@v4
