@@ -6,26 +6,31 @@ permissions:
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  build:
+  build-firmware:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v3
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        
+      - name: Cache NPM
+        uses: actions/cache@v3
         with:
           path: |
             ~/.npm
             ${{ github.workspace }}/Firmware/ui-ng/node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
-      - uses: actions/cache@v3
+      - name: Cache PIO
+        uses: actions/cache@v3
         with:
           path: |
             ~/.platformio
             ${{ github.workspace }}/Firmware/.pio
           key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
 
-      - uses: actions/setup-python@v4
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
           cache: 'pip'
@@ -69,15 +74,24 @@ jobs:
             littlefs.bin
 
   package-installer:
-    needs: build
+    needs: build-firmware
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout sources
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - name: Checkout PyInstaller
+        uses: actions/checkout@v4
+        with:
+          repository: 'pyinstaller/pyinstaller'
+          ref: 'develop'
+          path: 'pyinstaller'
+
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
           cache: 'pip'
@@ -88,13 +102,23 @@ jobs:
           name: firmware
           path: Firmware/.pio/build/esp32dev
 
+      - name: Setup PyInstaller
+        run: |
+          cd ${{ github.workspace }}
+          cd pyinstaller 
+          cd bootloader
+          python ./waf all
+          cd ..
+          python setup.py install
+          pip install . |
+
       - name: Run Python Script
         run: |
           cd ${{ github.workspace }}
           cd Firmware
           cd flasher
-          pip install -r requirements.txt
-          python main.py  	
+          pip install -r requirements.txt --target .
+          python main.py
 
       - name: Archive Flasher
         uses: actions/upload-artifact@v3
@@ -105,8 +129,7 @@ jobs:
 
   release:
     needs: 
-      - build
-      - package-installer
+      - package-firmware
     if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: 
