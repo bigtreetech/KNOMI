@@ -2,10 +2,9 @@ Import("env")
 import csv
 import os
 
-APP_BIN = "$BUILD_DIR/${PROGNAME}.bin"
-FS_BIN = "$BUILD_DIR/littlefs.bin"
-MERGED_BIN = "$BUILD_DIR/${PROGNAME}_full.bin"
-BAT_FILE = "$BUILD_DIR/flash_full.bat"
+APP_BIN = os.path.join(env.subst("$BUILD_DIR") , "firmware.bin")
+FS_BIN = os.path.join(env.subst("$BUILD_DIR") , "littlefs.bin")
+MERGED_BIN = os.path.join(env.subst("$BUILD_DIR") , "firmware_full.bin")
 BOARD_CONFIG = env.BoardConfig()
 
 # Define function to parse partitions from CSV
@@ -28,8 +27,17 @@ def merge_firmware(*arg, **kwargs):
     # the final application binary
     flash_images = env.Flatten(env.get("FLASH_EXTRA_IMAGES", [])) + [offsets["app0"], APP_BIN] + [offsets["app1"], APP_BIN] + [offsets["spiffs"], FS_BIN]
 
+    def check_file_and_list_directory(path):
+        if not os.path.isfile(path):
+            print(f"The file '{path}' does not exist.")
+            print(f"Directory contents of '{os.path.dirname(path)}':")
+            for item in os.listdir(os.path.dirname(path)):
+                print(item)
+
     print("Source images: ")
     for i in range(0, len(flash_images), 2):
+        flash_images[i+1] = env.subst(flash_images[i+1])
+        check_file_and_list_directory(flash_images[i+1])
         print(f"  {flash_images[i]} -> {flash_images[i+1]}")
 
     print("Target image: ")
