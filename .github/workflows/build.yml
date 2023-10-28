@@ -14,23 +14,38 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: 
-            ~/.npm
-            ~/.cache/pip
-            ~/.platformio/.cache
+            ${{ github.workspace }}/.npm
+            ${{ github.workspace }}/.platformio/.cache
+            ${{ github.workspace }}/Firmware/ui-ng/node_modules
+
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          cache: 'pip'
+
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO Project
+      - name: Build Firmware Core
         run: | 
             cd Firmware 
-            pio run --disable-auto-clean -e esp32dev
-            pio run --disable-auto-clean -e esp32dev -t buildfs 
-            pio run --disable-auto-clean -e esp32dev -t merge_firmware 
+            pio run --disable-auto-clean -e esp32dev -v
 
+      - name: Build Firmware LittleFS
+        run: | 
+            cd Firmware 
+            pio run --disable-auto-clean -e esp32dev -t buildfs -v
+
+      - name: Build Full Firmware
+        run: | 
+            cd Firmware 
+            pio run --disable-auto-clean -e esp32dev -t merge_firmware -v
+
+
+      - name: Prepare artifacts for archive 
+        run: | 
+            cd Firmware 
             cp .pio/build/esp32dev/buildinfo.json ../buildinfo.json
             cp .pio/build/esp32dev/firmware_full.bin ../firmware_full.bin
             cp .pio/build/esp32dev/firmware.bin ../firmware.bin 
@@ -58,6 +73,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          cache: 'pip'
 
       - uses: actions/checkout@v4
 
