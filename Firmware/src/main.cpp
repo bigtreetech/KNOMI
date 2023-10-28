@@ -93,7 +93,7 @@ __attribute__((unused)) void loop() {
     keyscan_nexttime = nowtime + 400;
   }
 
-  if (nowtime > klipper_nexttime) {
+  if (nowtime > klipper_nexttime && WiFi.isConnected()) {
     klipperApi->refreshData();
     klipper_nexttime = nowtime + 2000;
   }

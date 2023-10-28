@@ -160,12 +160,27 @@ jobs:
       with:
         name: flasher
 
+    - name: Build Changelog
+      id: build_changelog
+      uses: mikepenz/release-changelog-builder-action@{latest-release}
+
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
+        body: | 
+          Files published:
+           - rs-flasher - Tool to update firmware on your KNOMI without installing any dependencies
+           - firmware_full.bin - Full image to be flashed by esptool 
+           - firmware.bin - OTA update
+           - firmware.elf - debug symbols
+           - littlefs.bin - partition with resources
+
+          ${{steps.build_changelog.outputs.changelog}}
         files: | 
           ${{steps.download1.outputs.download-path}}/firmware_full.bin
           ${{steps.download1.outputs.download-path}}/firmware.bin
           ${{steps.download1.outputs.download-path}}/firmware.elf
           ${{steps.download1.outputs.download-path}}/littlefs.bin
-          ${{steps.download2.outputs.download-path}}/flash_firmware.Windows.exe
+          ${{steps.download2.outputs.download-path}}/rs-flasher.exe
+          ${{steps.download2.outputs.download-path}}/rs-flasher.linux-amd64
+          ${{steps.download2.outputs.download-path}}/rs-flasher.macOS

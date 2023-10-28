@@ -1,7 +1,7 @@
 use chrono::DateTime;
 use espflash;
 use espflash::cli::config::Config;
-use espflash::cli::{connect, print_board_info, ConnectArgs, EspflashProgress};
+use espflash::cli::{connect, ConnectArgs, EspflashProgress};
 use espflash::logging::initialize_logger;
 use log::LevelFilter;
 use miette::Result;
@@ -47,7 +47,7 @@ Do you want to continue? (yes/no): "#,
     let mut user_input = String::new();
     io::stdin().read_line(&mut user_input).unwrap();
 
-    let user_input = user_input.trim().to_lowercase();
+    user_input = user_input.trim().to_lowercase();
 
     // Check if the user wants to continue
     if user_input == "yes" {
@@ -61,8 +61,6 @@ Do you want to continue? (yes/no): "#,
             port: None,
         };
         let mut flasher = connect(&conn, &config)?;
-        print_board_info(&mut flasher)?;
-
         let bytes = include_bytes!("../resources/firmware_full.bin");
 
         flasher.write_bin_to_flash(
@@ -70,6 +68,10 @@ Do you want to continue? (yes/no): "#,
             &bytes.as_slice(),
             Some(&mut EspflashProgress::default()),
         )?;
+
+        println!("Firmware flashing completed. Please unplug your KNOMI and plug it back.");
+        println!("Press Enter to exit");
+        io::stdin().read_line(&mut user_input).unwrap();
     } else {
         println!("Firmware flashing canceled.");
         std::process::exit(1); // Exit the program with an error code
