@@ -25,17 +25,33 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: cd Firmware && pio run -e esp32dev && cp .pio/build/esp32dev/firmware.bin ../firmware.bin && cp .pio/build/esp32dev/firmware.elf ../firmware.elf
+        run: | 
+            cd Firmware 
+            pio run -e esp32dev
+            cp .pio/build/esp32dev/buildinfo.json ../buildinfo.json
+            cp .pio/build/esp32dev/firmware.bin ../firmware.bin 
+            cp .pio/build/esp32dev/firmware.elf ../firmware.elf
 
       - name: Build LightFS
-        run: cd Firmware && pio run -e esp32dev -t buildfs && cp .pio/build/esp32dev/littlefs.bin ../littlefs.bin
+        run: | 
+            cd Firmware 
+            pio run -e esp32dev -t buildfs 
+            cp .pio/build/esp32dev/littlefs.bin ../littlefs.bin
+
+      - name: Build Full firmware
+        run: | 
+            cd Firmware 
+            pio run -e esp32dev -t merge_firmware 
+            cp .pio/build/esp32dev/firmware_full.bin ../firmware_full.bin
           
       - name: Archive Firmware Files
         uses: actions/upload-artifact@v3
         with: 
           name: firmware
           path: |
+            buildinfo.json
             firmware.bin
+            firmware_full.bin
             firmware.elf
             littlefs.bin
 
