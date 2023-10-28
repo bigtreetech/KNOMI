@@ -10,7 +10,7 @@ public:
     this->config = config;
     WiFi.mode(WIFI_STA);
     WiFi.setAutoConnect(true);
-    LV_LOG_INFO("Connecting to WIFI " + config->getSsid() + " / " + config->getPsk());
+    LV_LOG_INFO((String("Connecting to WIFI ") + config->getSsid() + " / " + config->getPsk()).c_str());
     WiFi.begin(config->getSsid(), config->getPsk());
   }
 
