@@ -129,7 +129,7 @@ jobs:
 
   release:
     needs: 
-      - package-firmware
+      - package-installer
     if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: 
