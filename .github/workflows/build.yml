@@ -76,9 +76,9 @@ jobs:
   package-installer:
     needs: build-firmware
     runs-on: ubuntu-latest
-    fail-fast: false
     strategy:
       matrix:
+        fail-fast: false
         target:
           - x86_64-pc-windows-msvc
           - x86_64-unknown-linux-gnu
