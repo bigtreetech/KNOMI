@@ -77,8 +77,8 @@ jobs:
     needs: build-firmware
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         target:
           - x86_64-pc-windows-msvc
           - x86_64-unknown-linux-gnu
