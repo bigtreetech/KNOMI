@@ -141,11 +141,19 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: firmware
+    - name: Download Flasher Files
+      id: download
+      uses: actions/download-artifact@v3
+      with:
+        name: flasher
+
 
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: | 
+          ${{steps.download.outputs.download-path}}/firmware_full.bin
           ${{steps.download.outputs.download-path}}/firmware.bin
           ${{steps.download.outputs.download-path}}/firmware.elf
           ${{steps.download.outputs.download-path}}/littlefs.bin
+          ${{steps.download.outputs.download-path}}/flash_firmware.Windows.exe
