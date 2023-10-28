@@ -124,14 +124,14 @@ jobs:
       - name: Copy result
         if: matrix.os == 'macos-latest'
         run: | 
-            dir Firmware/rs-flasher/target/release
-            copy Firmware/rs-flasher/target/release/rs-flasher rs-flasher.macOS
+            ls Firmware/rs-flasher/target/release
+            cp Firmware/rs-flasher/target/release/rs-flasher rs-flasher.macOS
 
       - name: Copy result
         if: matrix.os == 'ubuntu-latest'
         run: | 
-            dir Firmware/rs-flasher/target/release
-            copy Firmware/rs-flasher/target/release/rs-flasher rs-flasher.linux-amd64
+            ls Firmware/rs-flasher/target/release
+            cp Firmware/rs-flasher/target/release/rs-flasher rs-flasher.linux-amd64
 
       - name: Archive Flasher
         uses: actions/upload-artifact@v3
