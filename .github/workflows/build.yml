@@ -13,10 +13,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/cache@v3
         with:
-          path: 
-            ${{ github.workspace }}/.npm
-            ${{ github.workspace }}/.platformio/.cache
+          path: |
+            ~/.npm
+            ~/.platformio/.cache
+            ~/.cache/pip
             ${{ github.workspace }}/Firmware/ui-ng/node_modules
+            ${{ github.workspace }}/Firmware/.pio
 
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v4
@@ -41,7 +43,6 @@ jobs:
         run: | 
             cd Firmware 
             pio run --disable-auto-clean -e esp32dev -t merge_firmware -v
-
 
       - name: Prepare artifacts for archive 
         run: | 
