@@ -29,7 +29,9 @@ uint32_t klipper_nexttime = 0;
 
 #if LV_USE_LOG
 void logToSerial(const char *logLine) {
-  String detailedLog = String(logLine) + ", free heap = " + esp_get_free_heap_size();
+  String detailedLog = String(logLine);
+  detailedLog.remove(detailedLog.length() - 1);
+  detailedLog += String("(free heap = ") + esp_get_free_heap_size() + ")\n";
   Serial.print(detailedLog);
   if (webServer != nullptr) {
     webServer->websocketLog(detailedLog.c_str());
