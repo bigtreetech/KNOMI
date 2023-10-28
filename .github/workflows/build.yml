@@ -110,7 +110,6 @@ jobs:
           pip install wheel
           python ./waf all
           cd ..
-          python setup.py install
           pip install . |
 
       - name: Run Python Script
