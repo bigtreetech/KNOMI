@@ -75,58 +75,48 @@ jobs:
 
   package-installer:
     needs: build-firmware
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    fail-fast: false
     strategy:
-      fail-fast: false
       matrix:
-        os: [windows-latest]
+        target:
+          - x86_64-pc-windows-msvc
+          - x86_64-unknown-linux-gnu
+          - aarch64-apple-darwin
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
-      - name: Checkout PyInstaller
-        uses: actions/checkout@v4
+      - name: Install Rust toolchain ${{ matrix.target }}
+        uses: actions-rs/toolchain@v1
         with:
-          repository: 'pyinstaller/pyinstaller'
-          ref: 'develop'
-          path: 'pyinstaller'
-
-      - name: Setup Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip'
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
 
       - name: Download Firmware Files
         uses: actions/download-artifact@v3
         with:
           name: firmware
-          path: Firmware/.pio/build/esp32dev
+          path: Firmware/rs-flasher/resources
 
-      - name: Setup PyInstaller
-        run: |
-          cd ${{ github.workspace }}
-          cd pyinstaller 
-          cd bootloader
-          pip install wheel
-          python ./waf all
-          cd ..
-          pip install .
+      - name: Build Flasher
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=${{ matrix.target }} --manifest-path Firmware/rs-flasher/Cargo.toml
 
-      - name: Run Python Script
-        run: |
-          cd ${{ github.workspace }}
-          cd Firmware
-          cd flasher
-          pip install -r requirements.txt --target .
-          python main.py
+      - name: Debug dir
+        run: | 
+            cd Firmware/rs-flasher/target
+            dir
 
       - name: Archive Flasher
         uses: actions/upload-artifact@v3
         with: 
           name: flasher
           path: |
-            Firmware/.build/dist/*
+            Firmware/rs-flasher/target/rs-flasher.exe
 
   release:
     needs: 
