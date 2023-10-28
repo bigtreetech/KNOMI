@@ -83,7 +83,9 @@ jobs:
             Firmware/.build/dist/*
 
   release:
-    needs: build, package-installer
+    needs: 
+      - build
+      - package-installer
     if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: 
