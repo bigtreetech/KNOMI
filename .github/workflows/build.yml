@@ -137,16 +137,13 @@ jobs:
       name: github-releases
     steps:
     - name: Download Firmware Files
-      id: download
       uses: actions/download-artifact@v3
       with:
         name: firmware
     - name: Download Flasher Files
-      id: download
       uses: actions/download-artifact@v3
       with:
         name: flasher
-
 
     - name: Release
       uses: softprops/action-gh-release@v1
