@@ -86,7 +86,7 @@ jobs:
         
       - name: Install required packages
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt install -y libudev-dev pkg-config
+        run: sudo apt install -y libudev libudev-dev pkg-config
 
       - name: Cache Crates
         uses: actions/cache@v3
@@ -115,24 +115,32 @@ jobs:
           command: build
           args: --release --manifest-path Firmware/rs-flasher/Cargo.toml
 
-      - name: Debug dir
+      - name: Copy result
         if: matrix.os == 'windows-latest'
         run: | 
-            cd Firmware/rs-flasher/target
-            dir
+            dir Firmware/rs-flasher/target/release
+            copy Firmware/rs-flasher/target/release/rs-flasher.exe rs-flasher.exe
 
-      - name: Debug dir
-        if: matrix.os != 'windows-latest'
+      - name: Copy result
+        if: matrix.os == 'macos-latest'
         run: | 
-            cd Firmware/rs-flasher/target
-            ls
+            dir Firmware/rs-flasher/target/release
+            copy Firmware/rs-flasher/target/release/rs-flasher rs-flasher.macOS
+
+      - name: Copy result
+        if: matrix.os == 'ubuntu-latest'
+        run: | 
+            dir Firmware/rs-flasher/target/release
+            copy Firmware/rs-flasher/target/release/rs-flasher rs-flasher.linux-amd64
 
       - name: Archive Flasher
         uses: actions/upload-artifact@v3
         with: 
           name: flasher
           path: |
-            Firmware/rs-flasher/target/rs-flasher.exe
+            rs-flasher.exe
+            rs-flasher.macOS
+            rs-flasher.linux-amd64
 
   release:
     needs: 
