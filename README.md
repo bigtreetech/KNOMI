@@ -1,7 +1,7 @@
 # KNOMI
 Online manual & customize UI tutorials：[here](https://bigtreetech.github.io/docs/KNOMI.html#)
 
-# Differences from original KNOMI Firmware:
+# Differences from original KNOMI Firmware
 
 ## Pros:
 
@@ -14,6 +14,7 @@ Online manual & customize UI tutorials：[here](https://bigtreetech.github.io/do
 ## Cons:
 
  - Startup logo loads slowly. First screen config (with Access Point instructions) is also slow to load.
+ - First setup on iOS is not that nice. Enter "http://KNOMI/" to open initial setup in Safari. On Android / Windows regular captivity portal should open.
  - Unofficial fork - support is on best-effort basis
 
 ## Development notes:
