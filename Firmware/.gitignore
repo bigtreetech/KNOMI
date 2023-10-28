@@ -4,5 +4,6 @@
 .vscode/launch.json
 .vscode/ipch
 .idea
+.build
 src/generated
 lv_img_converter/__pycache__

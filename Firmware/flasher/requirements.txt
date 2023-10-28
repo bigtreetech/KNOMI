@@ -1,0 +1,2 @@
+pyinstaller~=6.1.0
+esptool~=4.6.2
