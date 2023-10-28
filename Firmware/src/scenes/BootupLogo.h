@@ -24,10 +24,12 @@ public:
     LV_LOG_INFO("Creating styles");
     lv_style_init(&style_spinner_open);
     lv_style_set_arc_color(&style_spinner_open, lv_color_hex(0xFF0000));
+    lv_style_set_arc_rounded(&style_spinner_open, true);
     lv_style_set_arc_width(&style_spinner_open, 16);
 
     lv_style_init(&style_bc_spinner_open);
     lv_style_set_arc_color(&style_bc_spinner_open, lv_color_hex(0x000000));
+    lv_style_set_arc_rounded(&style_bc_spinner_open, true);
     lv_style_set_arc_width(&style_bc_spinner_open, 16);
     LV_LOG_INFO("Style loaded");
 

@@ -36,6 +36,10 @@ public:
   }
 
   void Timer() {
+    if (currentScene != nullptr) {
+      currentScene->RefreshData();
+    }
+
     if (timer_contne > 0)
       timer_contne--;
 

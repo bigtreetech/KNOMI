@@ -56,6 +56,7 @@ public:
 
     lv_style_init(&style_arc_print_progress);
     lv_style_set_arc_width(&style_arc_print_progress, 24); // 设置样式的圆弧粗细
+    lv_style_set_arc_rounded(&style_arc_print_progress, true);
     lv_style_set_arc_color(&style_arc_print_progress,
                            lv_color_hex(0x000000)); // 设置背景圆环颜色
 

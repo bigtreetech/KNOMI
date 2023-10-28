@@ -15,4 +15,6 @@ protected:
 public:
   virtual SwitchSceneRequest *NextScene() = 0;
   virtual ~AbstractScene(){};
+
+  virtual void RefreshData() {}
 };

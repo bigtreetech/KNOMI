@@ -148,12 +148,12 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
           updateDone += len;
           request->_tempFile.write(data, len);
         }
-
         if (final) { // if the final flag is set then this is the last frame of
                      // data
           request->_tempFile.flush();
           request->_tempFile.close();
         }
+        lv_task_handler();
         return;
       });
 
@@ -170,7 +170,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
   });
 
   pServer->on("/api/dumpHeap", HTTP_GET, [&](AsyncWebServerRequest *req) {
-    heap_caps_dump_all();
+    heap_caps_print_heap_info((MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
     AsyncWebServerResponse *pResponse = req->beginResponse(200);
     pResponse->addHeader("Connection", "close");
     req->send(pResponse);
@@ -313,6 +313,8 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
             return request->send(400, "text/plain", "OTA could not begin");
           }
         }
+
+        lv_task_handler();
 
         if (final) {               // if the final flag is set then this is the last frame of
                                    // data

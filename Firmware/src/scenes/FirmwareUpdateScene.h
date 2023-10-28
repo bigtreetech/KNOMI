@@ -24,7 +24,7 @@ public:
     lv_obj_del(arc_print_progress);
   }
 
-  SwitchSceneRequest *NextScene() override {
+  void RefreshData() override {
     if (webServer->getUpdateTotal() > 0) {
       auto value = (int16_t)(100.0 * webServer->getUpdateDone() / webServer->getUpdateTotal());
       String result = String(value) + "%";
@@ -34,9 +34,9 @@ public:
       String result = "...";
       lv_label_set_text(label_print_progress, result.c_str());
     }
-
-    return nullptr;
   }
+
+  SwitchSceneRequest *NextScene() override { return nullptr; }
 
   void init_label_print_progress() {
     label_print_progress = lv_label_create(lv_scr_act());
@@ -51,6 +51,7 @@ public:
 
     lv_style_init(&style_arc_print_progress);
     lv_style_set_arc_width(&style_arc_print_progress, 24); // 设置样式的圆弧粗细
+    lv_style_set_arc_rounded(&style_arc_print_progress, true);
     lv_style_set_arc_color(&style_arc_print_progress,
                            lv_color_hex(0x000000)); // 设置背景圆环颜色
 
