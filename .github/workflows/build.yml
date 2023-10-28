@@ -27,9 +27,9 @@ jobs:
       - name: Build PlatformIO Project
         run: | 
             cd Firmware 
-            pio run -e esp32dev
-            pio run -e esp32dev -t buildfs 
-            pio run -e esp32dev -t merge_firmware 
+            pio run --disable-auto-clean -e esp32dev
+            pio run --disable-auto-clean -e esp32dev -t buildfs 
+            pio run --disable-auto-clean -e esp32dev -t merge_firmware 
 
             cp .pio/build/esp32dev/buildinfo.json ../buildinfo.json
             cp .pio/build/esp32dev/firmware_full.bin ../firmware_full.bin
