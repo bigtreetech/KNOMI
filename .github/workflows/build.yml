@@ -137,10 +137,12 @@ jobs:
       name: github-releases
     steps:
     - name: Download Firmware Files
+      id: download1
       uses: actions/download-artifact@v3
       with:
         name: firmware
     - name: Download Flasher Files
+      id: download2
       uses: actions/download-artifact@v3
       with:
         name: flasher
@@ -149,8 +151,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: | 
-          ${{steps.download.outputs.download-path}}/firmware_full.bin
-          ${{steps.download.outputs.download-path}}/firmware.bin
-          ${{steps.download.outputs.download-path}}/firmware.elf
-          ${{steps.download.outputs.download-path}}/littlefs.bin
-          ${{steps.download.outputs.download-path}}/flash_firmware.Windows.exe
+          ${{steps.download1.outputs.download-path}}/firmware_full.bin
+          ${{steps.download1.outputs.download-path}}/firmware.bin
+          ${{steps.download1.outputs.download-path}}/firmware.elf
+          ${{steps.download1.outputs.download-path}}/littlefs.bin
+          ${{steps.download2.outputs.download-path}}/flash_firmware.Windows.exe
