@@ -84,8 +84,9 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
         
-#      - name: Install required packages
-#        run: sudo apt install -y libudev-dev pkg-config
+      - name: Install required packages
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt install -y libudev-dev pkg-config
 
       - name: Cache Crates
         uses: actions/cache@v3
@@ -115,9 +116,16 @@ jobs:
           args: --release --manifest-path Firmware/rs-flasher/Cargo.toml
 
       - name: Debug dir
+        if: matrix.os == 'windows-latest'
         run: | 
             cd Firmware/rs-flasher/target
             dir
+
+      - name: Debug dir
+        if: matrix.os != 'windows-latest'
+        run: | 
+            cd Firmware/rs-flasher/target
+            ls
 
       - name: Archive Flasher
         uses: actions/upload-artifact@v3
