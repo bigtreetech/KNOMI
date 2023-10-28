@@ -35,11 +35,13 @@ public:
     }
   }
 
-  void Timer() {
+  void RefreshScene() {
     if (currentScene != nullptr) {
       currentScene->RefreshData();
     }
+  }
 
+  void Timer() {
     if (timer_contne > 0)
       timer_contne--;
 

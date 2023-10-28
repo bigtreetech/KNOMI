@@ -24,12 +24,15 @@ public:
       lv_img_set_src(img, filename.begin());
     }
     lv_obj_align(img, LV_ALIGN_CENTER, x, y);
+    if (!filename.endsWith(".gif")) {
+      lv_task_handler();
+    }
     LV_LOG_INFO(("Created resource image " + filename).c_str());
   }
 
-  ~ResourceImage() { 
+  ~ResourceImage() {
     LV_LOG_INFO(("Deleting resource image " + this->filename).c_str());
-    lv_obj_del(img); 
+    lv_obj_del(img);
     LV_LOG_INFO(("Deleted resource image " + this->filename).c_str());
   }
 };

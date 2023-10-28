@@ -23,6 +23,7 @@ KlipperApi *klipperApi = nullptr;
 SceneManager *sceneManager = nullptr;
 __attribute__((unused)) DisplayHAL *displayhal = nullptr;
 
+uint32_t scenerefresh_nexttime = 0;
 uint32_t keyscan_nexttime = 0;
 uint32_t netcheck_nexttime = 0;
 uint32_t klipper_nexttime = 0;
@@ -81,6 +82,12 @@ __attribute__((unused)) void loop() {
   sceneManager->SwitchSceneIfRequired();
 
   uint32_t nowtime = millis();
+
+  if (nowtime > scenerefresh_nexttime) {
+    sceneManager->RefreshScene();
+    scenerefresh_nexttime = nowtime + 50;
+  }
+
   if (nowtime > keyscan_nexttime) {
     sceneManager->Timer();
     keyscan_nexttime = nowtime + 400;
