@@ -48,8 +48,42 @@ jobs:
             firmware.elf
             littlefs.bin
 
-  release:
+  package-installer:
     needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - uses: actions/checkout@v4
+
+      - name: Download Firmware Files
+        uses: actions/download-artifact@v3
+        with:
+          name: firmware
+          path: .pio/builds/esp32dev
+
+      - name: Run Python Script
+        run: |
+          cd ${{ github.workspace }}
+          cd Firmware
+          cd flasher
+          pip install -r requirements.txt
+          python main.py  	
+
+      - name: Archive Flasher
+        uses: actions/upload-artifact@v3
+        with: 
+          name: flasher
+          path: |
+            Firmware/.build/dist/*
+
+  release:
+    needs: build, package-installer
     if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: 
