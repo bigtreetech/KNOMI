@@ -111,7 +111,6 @@ jobs:
       - name: Build Flasher
         uses: actions-rs/cargo@v1
         with:
-          use-cross: true
           command: build
           args: --release --manifest-path Firmware/rs-flasher/Cargo.toml
 
