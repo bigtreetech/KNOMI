@@ -41,17 +41,17 @@ jobs:
       - name: Build Firmware Core
         run: | 
             cd Firmware 
-            pio run --disable-auto-clean -e esp32dev -v
+            pio run --disable-auto-clean -e esp32dev
 
       - name: Build Firmware LittleFS
         run: | 
             cd Firmware 
-            pio run --disable-auto-clean -e esp32dev -t buildfs -v
+            pio run --disable-auto-clean -e esp32dev -t buildfs
 
       - name: Build Full Firmware
         run: | 
             cd Firmware 
-            pio run --disable-auto-clean -e esp32dev -t merge_firmware -v
+            pio run --disable-auto-clean -e esp32dev -t merge_firmware
 
       - name: Prepare artifacts for archive 
         run: | 
