@@ -1,17 +1,20 @@
 #pragma once
+#include "../config/UIConfig.h"
 #include "AbstractScene.h"
 
 LV_FONT_DECLARE(font_32)
 LV_FONT_DECLARE(font_48)
 
 class Styles final {
+  UIConfig *config = nullptr;
   static lv_style_t accentText32;
   static lv_style_t accentText48;
   static bool accentText32initialized;
   static bool accentText48initialized;
 
 public:
-  uint32_t getAccentColor() { return 0xFF0000; }
+  Styles(UIConfig *config) { this->config = config; }
+  uint32_t getAccentColor() { return config->getAccentColor(); }
 
   lv_style_t *getAccentText32() {
     if (!accentText32initialized) {
