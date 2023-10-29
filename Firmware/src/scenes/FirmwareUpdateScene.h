@@ -41,7 +41,7 @@ public:
   void init_label_print_progress() {
     label_print_progress = lv_label_create(lv_scr_act());
 
-    lv_obj_add_style(label_print_progress, Styles::getRedText48(), LV_PART_MAIN);
+    lv_obj_add_style(label_print_progress, deps.styles->getAccentText48(), LV_PART_MAIN);
     lv_label_set_text(label_print_progress, String("").c_str());
     lv_obj_align(label_print_progress, LV_ALIGN_CENTER, 0, 0);
   }
@@ -62,7 +62,7 @@ public:
 
     lv_obj_remove_style(arc_print_progress, NULL, LV_PART_KNOB); // 移除样式
     lv_obj_clear_flag(arc_print_progress, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(0xFF0000),
+    lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(deps.styles->getAccentColor()),
                                LV_PART_INDICATOR);    // 进度条颜色
     lv_obj_set_size(arc_print_progress, 240, 240);    // 设置尺寸
     lv_arc_set_rotation(arc_print_progress, 270);     // 设置零度位置

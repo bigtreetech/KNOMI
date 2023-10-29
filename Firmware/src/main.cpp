@@ -6,6 +6,7 @@
 #include "network/KlipperApi.h"
 #include "network/KnomiWebServer.h"
 #include "network/WifiManager.h"
+#include "scenes/Styles.h"
 #include <Arduino.h>
 #include <AsyncHTTPRequest_Generic.h>
 #include <EEPROM.h>
@@ -22,6 +23,7 @@ KnomiWebServer *webServer = nullptr;
 KlipperApi *klipperApi = nullptr;
 SceneManager *sceneManager = nullptr;
 __attribute__((unused)) DisplayHAL *displayhal = nullptr;
+Styles *styles = nullptr;
 
 uint32_t scenerefresh_nexttime = 0;
 uint32_t keyscan_nexttime = 0;
@@ -60,8 +62,9 @@ __attribute__((unused)) void setup() {
   klipperApi = new KlipperApi(config);
   LV_LOG_INFO("KlipperAPI started");
   webServer = new KnomiWebServer(config, wifiManager);
+  styles = new Styles(config->getUiConfig());
   LV_LOG_INFO("WebServer started");
-  sceneManager = new SceneManager(webServer, klipperApi, wifiManager);
+  sceneManager = new SceneManager(webServer, klipperApi, wifiManager, styles);
   lv_timer_handler_run_in_period(33); // 30fps
   LV_LOG_INFO("SceneManager started");
   wifiManager->connectToWiFi();
