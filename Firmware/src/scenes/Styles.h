@@ -5,29 +5,31 @@ LV_FONT_DECLARE(font_32)
 LV_FONT_DECLARE(font_48)
 
 class Styles final {
-  static lv_style_t redText32;
-  static lv_style_t redText48;
-  static bool redText32initialized;
-  static bool redText48initialized;
+  static lv_style_t accentText32;
+  static lv_style_t accentText48;
+  static bool accentText32initialized;
+  static bool accentText48initialized;
 
 public:
-  static lv_style_t *getRedText32() {
-    if (!redText32initialized) {
-      lv_style_init(&redText32);
-      lv_style_set_text_font(&redText32, &font_32);
-      lv_style_set_text_color(&redText32, lv_color_hex(0xFF0000));
-      redText32initialized = true;
+  uint32_t getAccentColor() { return 0xFF0000; }
+
+  lv_style_t *getAccentText32() {
+    if (!accentText32initialized) {
+      lv_style_init(&accentText32);
+      lv_style_set_text_font(&accentText32, &font_32);
+      lv_style_set_text_color(&accentText32, lv_color_hex(getAccentColor()));
+      accentText32initialized = true;
     }
-    return &redText32;
+    return &accentText32;
   }
 
-  static lv_style_t *getRedText48() {
-    if (!redText48initialized) {
-      lv_style_init(&redText48);
-      lv_style_set_text_font(&redText48, &font_48);
-      lv_style_set_text_color(&redText48, lv_color_hex(0xFF0000));
-      redText48initialized = true;
+  lv_style_t *getAccentText48() {
+    if (!accentText48initialized) {
+      lv_style_init(&accentText48);
+      lv_style_set_text_font(&accentText48, &font_48);
+      lv_style_set_text_color(&accentText48, lv_color_hex(getAccentColor()));
+      accentText48initialized = true;
     }
-    return &redText48;
+    return &accentText48;
   }
 };

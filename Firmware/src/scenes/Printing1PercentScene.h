@@ -43,7 +43,7 @@ public:
     lv_style_set_text_font(&style_label_print_progress,
                            &font_48); // 设置字体样机及大小
     lv_style_set_text_color(&style_label_print_progress,
-                            lv_color_hex(0xFF0000)); // 设置样式文本字颜色
+                            lv_color_hex(deps.styles->getAccentColor())); // 设置样式文本字颜色
 
     lv_obj_add_style(label_print_progress, &style_label_print_progress,
                      LV_PART_MAIN); // 将样式添加到文字对象中
@@ -67,7 +67,7 @@ public:
 
     lv_obj_remove_style(arc_print_progress, NULL, LV_PART_KNOB); // 移除样式
     lv_obj_clear_flag(arc_print_progress, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(0xFF0000),
+    lv_obj_set_style_arc_color(arc_print_progress, lv_color_hex(deps.styles->getAccentColor()),
                                LV_PART_INDICATOR);    // 进度条颜色
     lv_obj_set_size(arc_print_progress, 240, 240);    // 设置尺寸
     lv_arc_set_rotation(arc_print_progress, 270);     // 设置零度位置

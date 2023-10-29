@@ -2,8 +2,8 @@
 #include "esp_wifi.h"
 #include "lvgl.h"
 #include <DNSServer.h>
-#include <WiFi.h>
 #include <ESPmDNS.h>
+#include <WiFi.h>
 
 class WifiAccessPoint {
 private:

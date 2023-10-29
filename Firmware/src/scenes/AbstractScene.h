@@ -2,7 +2,7 @@
 #include "../generated/images.h"
 #include "../network/KlipperApi.h"
 #include "../network/WifiManager.h"
-#include "SceneDeps.h"
+#include "Styles.h"
 #include "SwitchSceneRequest.h"
 #include "lvgl.h"
 
