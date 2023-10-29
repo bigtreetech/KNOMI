@@ -14,8 +14,8 @@ private:
   SceneDeps deps;
 
 public:
-  explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager)
-      : deps(klipperApi, manager, webServer) {
+  explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager, Styles *styles)
+      : deps(klipperApi, manager, webServer, styles) {
     this->currentScene = new BootupLogoScene(deps);
     this->currentSceneId = SceneId::BootupLogo;
   }
