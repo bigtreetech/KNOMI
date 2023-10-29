@@ -28,7 +28,7 @@
 
         const free_buffer = 8192;
 
-        if (file.size < totalSize - usedSize - free_buffer) {
+        if (file.size > totalSize - usedSize - free_buffer + size) {
             selectedFileError =
                 "Not enough free space for this file. Available is " +
                 prettyBytes(totalSize - usedSize - free_buffer) +

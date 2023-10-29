@@ -31,12 +31,17 @@ public:
       lv_label_set_text(label_print_progress, result.c_str());
       lv_arc_set_value(arc_print_progress, value);
     } else {
-      String result = "...";
+      String result = "done";
       lv_label_set_text(label_print_progress, result.c_str());
     }
   }
 
-  SwitchSceneRequest *NextScene() override { return nullptr; }
+  SwitchSceneRequest *NextScene() override {
+    if (!webServer->isUpdateInProgress()) {
+      return new SwitchSceneRequest(deps, SceneId::Standby, 0);
+    }
+    return nullptr;
+  }
 
   void init_label_print_progress() {
     label_print_progress = lv_label_create(lv_scr_act());
