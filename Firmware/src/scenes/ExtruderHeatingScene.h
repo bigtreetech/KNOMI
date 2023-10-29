@@ -1,6 +1,5 @@
 #pragma once
 #include "AbstractScene.h"
-#include "Styles.h"
 
 LV_FONT_DECLARE(font_32)
 
@@ -50,7 +49,7 @@ public:
   void init_label_extruder_actual_temp() {
     label_ext_actual_temp = lv_label_create(lv_scr_act());
 
-    lv_obj_add_style(label_ext_actual_temp, Styles::getRedText32(), LV_PART_MAIN);
+    lv_obj_add_style(label_ext_actual_temp, deps.styles->getAccentText32(), LV_PART_MAIN);
     lv_label_set_text(label_ext_actual_temp, deps.klipperApi->getExtruderActualTemp().c_str());
     lv_obj_align(label_ext_actual_temp, LV_ALIGN_CENTER, 0, 75);
   }
@@ -58,7 +57,7 @@ public:
   void init_label_extruder_target_temp() {
     label_ext_target_temp = lv_label_create(lv_scr_act());
 
-    lv_obj_add_style(label_ext_target_temp, Styles::getRedText32(), LV_PART_MAIN);
+    lv_obj_add_style(label_ext_target_temp, deps.styles->getAccentText32(), LV_PART_MAIN);
     lv_label_set_text(label_ext_target_temp, deps.klipperApi->getExtruderTargetTemp().c_str());
     lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75);
   }
