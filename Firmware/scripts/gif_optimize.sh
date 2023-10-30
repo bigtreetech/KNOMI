@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This script will take an animated GIF and delete every other frame
 # Accepts two parameters: input file and output file
 # Usage: ./<scriptfilename> input.gif output.gif
