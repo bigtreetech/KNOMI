@@ -1,10 +1,10 @@
 #pragma once
+#include "../DisplayHAL.h"
 #include "../generated/images.h"
 #include "../network/KlipperApi.h"
 #include "../network/WifiManager.h"
-#include "Styles.h"
 #include "SwitchSceneRequest.h"
-#include "lvgl.h"
+#include "log.h"
 
 class AbstractScene {
 protected:
@@ -16,5 +16,5 @@ public:
   virtual SwitchSceneRequest *NextScene() = 0;
   virtual ~AbstractScene(){};
 
-  virtual void RefreshData() {}
+  virtual void Tick() {}
 };

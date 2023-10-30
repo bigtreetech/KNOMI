@@ -2,37 +2,31 @@
 #include "../network/KnomiWebServer.h"
 #include "AbstractScene.h"
 
-LV_FONT_DECLARE(font_48);
-
 class FirmwareUpdateScene : public AbstractScene {
 private:
   KnomiWebServer *webServer;
 
-  lv_obj_t *label_print_progress;
-  lv_obj_t *arc_print_progress;
-
-  lv_style_t style_arc_print_progress;
-
 public:
   explicit FirmwareUpdateScene(SceneDeps deps) : AbstractScene(deps) {
     this->webServer = deps.webServer;
-    init_label_print_progress();
-    init_arc_print_progress();
+    // TODO init_label_print_progress();
+    // TODO init_arc_print_progress();
   }
   ~FirmwareUpdateScene() override {
+    /* TODO
     lv_obj_del(label_print_progress);
-    lv_obj_del(arc_print_progress);
+    lv_obj_del(arc_print_progress); */
   }
 
-  void RefreshData() override {
+  void Tick() override {
     if (webServer->getUpdateTotal() > 0) {
       auto value = (int16_t)(100.0 * webServer->getUpdateDone() / webServer->getUpdateTotal());
       String result = String(value) + "%";
-      lv_label_set_text(label_print_progress, result.c_str());
-      lv_arc_set_value(arc_print_progress, value);
+      // TODO lv_label_set_text(label_print_progress, result.c_str());
+      // TODO lv_arc_set_value(arc_print_progress, value);
     } else {
       String result = "done";
-      lv_label_set_text(label_print_progress, result.c_str());
+      // TODO lv_label_set_text(label_print_progress, result.c_str());
     }
   }
 
@@ -43,6 +37,7 @@ public:
     return nullptr;
   }
 
+  /* TODO
   void init_label_print_progress() {
     label_print_progress = lv_label_create(lv_scr_act());
 
@@ -74,5 +69,5 @@ public:
     lv_arc_set_bg_angles(arc_print_progress, 0, 360); // 设置角度
     lv_arc_set_value(arc_print_progress, 0);          // 设置初始值
     lv_obj_center(arc_print_progress);                // 居中显示
-  }
+  }*/
 };

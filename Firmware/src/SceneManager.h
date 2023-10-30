@@ -1,5 +1,5 @@
 #pragma once
-#include "lvgl.h"
+#include "log.h"
 #include "network/WifiManager.h"
 #include "scenes/AbstractScene.h"
 #include "scenes/BootupLogo.h"
@@ -14,8 +14,9 @@ private:
   SceneDeps deps;
 
 public:
-  explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager, Styles *styles)
-      : deps(klipperApi, manager, webServer, styles) {
+  explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager, UIConfig *config,
+                        DisplayHAL *displayHAL)
+      : deps(klipperApi, manager, webServer, config, displayHAL) {
     this->currentScene = new BootupLogoScene(deps);
     this->currentSceneId = SceneId::BootupLogo;
   }
@@ -37,7 +38,7 @@ public:
 
   void RefreshScene() {
     if (currentScene != nullptr) {
-      currentScene->RefreshData();
+      currentScene->Tick();
     }
   }
 

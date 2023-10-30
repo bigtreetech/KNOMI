@@ -23,7 +23,7 @@ def generate_images(*arg, **kwargs):
 
     #include "ResourceImage.h"
     #include <vector>
-    #include <lvgl.h>
+    #include "log.h"
     #include <Arduino.h>
 
     class KnownResourceImages {{
@@ -60,12 +60,12 @@ def generate_images(*arg, **kwargs):
         filename = parts[0]
         extension = parts[1]
         cWrapper += rf"""
-    ResourceImage* KnownResourceImages::get_{filename}(lv_coord_t x, lv_coord_t y) {{
+    ResourceImage* KnownResourceImages::get_{filename}(int x, int y) {{
         return new ResourceImage(FILE_{filename}, x, y);
     }}
     """
         hWrapper += rf"""
-        static ResourceImage* get_{filename}(lv_coord_t x = 0, lv_coord_t y = 0);
+        static ResourceImage* get_{filename}(int x = 0, int y = 0);
     """
         
     hWrapper += """};"""

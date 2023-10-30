@@ -153,7 +153,6 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
           request->_tempFile.flush();
           request->_tempFile.close();
         }
-        lv_task_handler();
         return;
       });
 
@@ -313,8 +312,6 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
             return request->send(400, "text/plain", "OTA could not begin");
           }
         }
-
-        lv_task_handler();
 
         if (final) {               // if the final flag is set then this is the last frame of
                                    // data

@@ -6,21 +6,20 @@
 class BootupLogoScene : public AbstractScene {
 private:
   WifiManager *wifiManager;
-  ResourceImage *ri_logo = nullptr;
-  lv_style_t style_spinner_open;
-  lv_style_t style_bc_spinner_open;
-  lv_obj_t *open_anim_arc;
+  ResourceImage *ri_logo = nullptr; /* TODO
+   lv_style_t style_spinner_open;
+   lv_style_t style_bc_spinner_open;
+   lv_obj_t *open_anim_arc;*/
 
 public:
   explicit BootupLogoScene(SceneDeps deps) : AbstractScene(deps) {
     this->wifiManager = deps.mgr;
-
-    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
-
+    deps.displayHAL->setBackgroundColor(0x000000);
     LV_LOG_INFO("Loading boot logo");
     ri_logo = KnownResourceImages::get_BTT_LOGO();
     LV_LOG_INFO("Boot logo loaded");
 
+    /* TODO
     LV_LOG_INFO("Creating styles");
     lv_style_init(&style_spinner_open);
     lv_style_set_arc_color(&style_spinner_open, lv_color_hex(deps.styles->getAccentColor()));
@@ -42,10 +41,11 @@ public:
     lv_obj_set_size(open_anim_arc, 240, 240);
     lv_obj_align(open_anim_arc, LV_ALIGN_CENTER, 0, 0);
     LV_LOG_INFO("Spinner setup");
+     */
   }
 
   ~BootupLogoScene() override {
-    lv_obj_del(open_anim_arc);
+    // TODO lv_obj_del(open_anim_arc);
     delete ri_logo;
   }
 

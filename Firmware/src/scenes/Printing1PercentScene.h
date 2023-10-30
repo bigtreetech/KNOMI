@@ -1,24 +1,15 @@
 #pragma once
 #include "AbstractScene.h"
 
-LV_FONT_DECLARE(font_48);
-
 class Printing1PercentScene : public AbstractScene {
-private:
-  lv_obj_t *label_print_progress;
-  lv_obj_t *arc_print_progress;
-
-  lv_style_t style_label_print_progress;
-  lv_style_t style_arc_print_progress;
-
 public:
   explicit Printing1PercentScene(SceneDeps deps) : AbstractScene(deps) {
-    init_label_print_progress();
-    init_arc_print_progress();
+    // TODO init_label_print_progress();
+    // TODO init_arc_print_progress();
   }
   ~Printing1PercentScene() override {
-    lv_obj_del(label_print_progress);
-    lv_obj_del(arc_print_progress);
+    // TODO lv_obj_del(label_print_progress);
+    // TODO lv_obj_del(arc_print_progress);
   }
 
   SwitchSceneRequest *NextScene() override {
@@ -30,11 +21,11 @@ public:
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     String result = String(deps.klipperApi->getProgressData()) + "%";
-    lv_label_set_text(label_print_progress, result.c_str());
-    lv_arc_set_value(arc_print_progress, deps.klipperApi->getProgressData());
+    // lv_label_set_text(label_print_progress, result.c_str());
+    // lv_arc_set_value(arc_print_progress, deps.klipperApi->getProgressData());
     return nullptr;
   }
-
+  /* TODO
   void init_label_print_progress() {
 
     label_print_progress = lv_label_create(lv_scr_act()); // 创建文字对象
@@ -74,5 +65,5 @@ public:
     lv_arc_set_bg_angles(arc_print_progress, 0, 360); // 设置角度
     lv_arc_set_value(arc_print_progress, 0);          // 设置初始值
     lv_obj_center(arc_print_progress);                // 居中显示
-  }
+  }*/
 };

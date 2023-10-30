@@ -1,6 +1,6 @@
 #pragma once
 #include "../config/Config.h"
-#include "lvgl.h"
+#include "log.h"
 #include "requests/KlipperApiRequest.h"
 #include "requests/Request1.h"
 #include "requests/Request2.h"
@@ -12,10 +12,7 @@
 
 class KlipperApi {
 private:
-  uint32_t httprequest_nowtime = 0;
-  uint32_t httprequest_nexttime = 0;
   Config *config;
-  uint8_t start_http_request_flg = 0; // 0 开始启动http请求
 
   String text_print_file_name = "No Printfile"; // 打印文件名
 

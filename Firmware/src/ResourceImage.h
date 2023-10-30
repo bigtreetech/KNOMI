@@ -1,17 +1,17 @@
 #pragma once
 #include <Arduino.h>
-#include <lvgl.h>
+#include <log.h>
 #include <string>
 
 class ResourceImage {
 private:
-  lv_obj_t *img;
   String filename;
 
 public:
-  ResourceImage(String filename, lv_coord_t x, lv_coord_t y) {
-    lv_obj_t *screen = lv_scr_act();
+  ResourceImage(String filename, int x, int y) {
     this->filename = filename;
+    /* todo: AnimatedGIF
+    lv_obj_t *screen = lv_scr_act();
     filename = "A:/" + filename;
     LV_LOG_INFO(("Creating resource image " + filename).c_str());
     if (filename.endsWith(".gif")) {
@@ -27,12 +27,14 @@ public:
     if (!filename.endsWith(".gif")) {
       lv_task_handler();
     }
-    LV_LOG_INFO(("Created resource image " + filename).c_str());
+    LV_LOG_INFO(("Created resource image " + filename).c_str());*/
   }
 
   ~ResourceImage() {
+    /* todo: clean gif
     LV_LOG_INFO(("Deleting resource image " + this->filename).c_str());
     lv_obj_del(img);
     LV_LOG_INFO(("Deleted resource image " + this->filename).c_str());
+     */
   }
 };
