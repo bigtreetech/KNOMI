@@ -19,6 +19,8 @@ def generate_version(*arg, **kwargs):
 
     result = subprocess.run(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8').replace("\n", "").replace("\r", "")
     branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8').replace("\n", "").replace("\r", "")
+    if branch == "HEAD":
+        branch = subprocess.run(['git', 'name-rev', '--name-only', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8').replace("\n", "").replace("\r", "").replace("tags/", "")
     commitTime = subprocess.run(['git', 'show', '-s', '--format=%ci', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8').replace("\n", "").replace("\r", "")
     timeformat = "%Y-%m-%dT%H:%M:%S.%f%z";
     
