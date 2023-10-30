@@ -74,7 +74,7 @@
         <Route path="/">
             <form on:submit|preventDefault={saveThemeConfig}>
                 <label class="input">
-                    <span>UI Base Color</span>
+                    <span>UI Accent Color</span>
                     <input
                         disabled={isSaving}
                         type="color"
