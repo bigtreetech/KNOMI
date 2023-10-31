@@ -61,7 +61,8 @@ public:
         float sy = +cosf(start * deg2rad);
         sx = sx * (r + ir) / 2.0 + x;
         sy = sy * (r + ir) / 2.0 + y;
-        hal->tft->drawSpot(sx, sy, (r - ir) / 2.0, fgColor, bgColor);
+        hal->tft->drawSpot(sx, sy, (r - ir) / 2.0, fgColor,
+                           fgColor); // intenionally both colors are fg colors to mix with arc
         startDrawed = true;
       }
 
@@ -70,7 +71,7 @@ public:
 
       ex = ex * (r + ir) / 2.0 + x;
       ey = ey * (r + ir) / 2.0 + y;
-      hal->tft->drawSpot(ex, ey, (r - ir) / 2.0, fgColor, bgColor);
+      hal->tft->drawSpot(ex, ey, (r - ir) / 2.0, fgColor, fgColor);
     }
 
     hal->tft->drawArc(x, y, r, ir, start, end, fgColor, bgColor, true);
