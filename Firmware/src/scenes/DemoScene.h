@@ -11,16 +11,15 @@ private:
 public:
   explicit DemoScene(SceneDeps deps) : AbstractScene(deps) {
     this->arc = new Arc(deps.styles);
-    this->text = new TextLabel(deps.styles, 24, 0, 0);
+    this->text = new TextLabel(deps.styles, 32, 0, 0);
   }
+
   ~DemoScene() override {}
 
-  SwitchSceneRequest *NextScene() override {
-    progress = (progress + 1) % 100;
-    return nullptr;
-  };
+  SwitchSceneRequest *NextScene() override { return nullptr; };
 
   void Tick() override {
+    progress = (progress + 1) % 100;
     arc->setProgress(progress);
     String result = progress + String("%");
     text->setText(result);

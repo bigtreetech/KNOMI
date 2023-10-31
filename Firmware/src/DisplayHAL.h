@@ -143,14 +143,14 @@ public:
     byte r = color >> 16 & 0xFF;
     byte g = color >> 8 & 0xFF;
     byte b = color >> 0 & 0xFF;
-    return ((b & 0xF8) << 8 | (g & 0xFC) << 3 | (r >> 3));
+    return ((r & 0xF8) << 8 | (g & 0xFC) << 3 | (b >> 3));
   }
 
   static uint8_t toSpiFontSize(int size) {
     if (size == 32)
-      return 2;
+      return 4;
     if (size == 48)
-      return 3;
+      return 6;
     return 1;
   }
 };

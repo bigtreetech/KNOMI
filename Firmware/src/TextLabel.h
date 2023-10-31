@@ -25,7 +25,7 @@ public:
     uint32_t color = config->getAccentColor();
     hal->tft->startWrite();
 
-    hal->tft->setTextColor(DisplayHAL::toSpiColor(color));
+    hal->tft->setTextColor(DisplayHAL::toSpiColor(color), DisplayHAL::toSpiColor(0x000000), true);
     hal->tft->setTextSize(DisplayHAL::toSpiFontSize(size));
     hal->tft->setTextDatum(MC_DATUM);
 
@@ -34,8 +34,8 @@ public:
 
     hal->tft->setTextPadding(max(0, text_max_width - currentTextWidth));
 
-    int centerX = 240 + xOffset;
-    int centerY = 240 + yOffset;
+    int centerX = hal->tft->width() / 2 + xOffset;
+    int centerY = hal->tft->height() / 2 + yOffset;
 
     hal->tft->drawString(this->text, centerX, centerY);
     hal->tft->endWrite();

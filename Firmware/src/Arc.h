@@ -21,12 +21,15 @@ public:
     uint32_t fgColor = hal->toSpiColor(color);
     uint32_t bgColor = hal->toSpiColor(0x000000);
 
-    int start = 0;
-    int end = (360 * progress) / 100;
+    int start = 180;
+    int end = ((360 * progress) / 100 + 180) % 360;
     int r = hal->tft->width() / 2;
     hal->tft->startWrite();
-    hal->tft->drawSmoothArc(hal->tft->width() / 2, hal->tft->height() / 2, r, r - thickness, start, end, fgColor,
-                            bgColor, true);
+
+    hal->tft->drawArc(hal->tft->width() / 2, hal->tft->height() / 2, r, r - thickness, end, start, bgColor, bgColor,
+                      true);
+    hal->tft->drawArc(hal->tft->width() / 2, hal->tft->height() / 2, r, r - thickness, start, end, fgColor, bgColor,
+                      true);
     hal->tft->endWrite();
   }
 };
