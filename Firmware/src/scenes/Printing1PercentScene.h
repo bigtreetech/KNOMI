@@ -3,8 +3,8 @@
 
 class Printing1PercentScene : public AbstractScene {
 public:
-  TextLabel* text;
-  Arc* arc;
+  TextLabel *text;
+  Arc *arc;
 
   explicit Printing1PercentScene(SceneDeps deps) : AbstractScene(deps) {
     text = new TextLabel(deps.styles, 48, 0, 0);

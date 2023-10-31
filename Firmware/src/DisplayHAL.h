@@ -10,9 +10,10 @@
 #define CENTER_Y 120
 
 class DisplayHAL {
+public:
+  // TODO encapsulate
   TFT_eSPI *tft;
 
-public:
   DisplayHAL() {
     tft = new TFT_eSPI(240, 240);
     tft->init();

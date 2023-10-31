@@ -34,8 +34,7 @@ public:
     return nullptr;
   }
 
-  void Tick() override
-  {
+  void Tick() override {
     ri_logo->tick(deps.displayHAL);
     arc->tick(deps.displayHAL);
   }

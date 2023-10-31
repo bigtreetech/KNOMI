@@ -4,8 +4,8 @@
 class BedHeatingScene : public AbstractScene {
 private:
   ResourceImage *ri_bed;
-  TextLabel* actualTemp;
-  TextLabel* targetTemp;
+  TextLabel *actualTemp;
+  TextLabel *targetTemp;
 
 public:
   explicit BedHeatingScene(SceneDeps deps) : AbstractScene(deps) {

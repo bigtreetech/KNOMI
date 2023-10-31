@@ -24,10 +24,10 @@ private:
 public:
   KlipperApi(Config *config) { this->config = config; }
 
-  String getExtruderActualTemp() { return {req1.text_ext_actual_temp}; }
-  String getExtruderTargetTemp() { return {req1.text_ext_target_temp}; }
-  String getBedActualTemp() { return {req1.text_bed_actual_temp}; }
-  String getBedTargetTemp() { return {req1.text_bed_target_temp}; }
+  String &getExtruderActualTemp() { return {req1.text_ext_actual_temp}; }
+  String &getExtruderTargetTemp() { return {req1.text_ext_target_temp}; }
+  String &getBedActualTemp() { return {req1.text_bed_actual_temp}; }
+  String &getBedTargetTemp() { return {req1.text_bed_target_temp}; }
   int getProgressData() const { return req2.progress_data; }
 
   int getExtruderActualTempValue() const { return req1.tooltemp_actual; }

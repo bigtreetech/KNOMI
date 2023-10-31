@@ -5,8 +5,8 @@
 class FirmwareUpdateScene : public AbstractScene {
 private:
   KnomiWebServer *webServer;
-  Arc* arc;
-  TextLabel* text;
+  Arc *arc;
+  TextLabel *text;
 
 public:
   explicit FirmwareUpdateScene(SceneDeps deps) : AbstractScene(deps) {
@@ -26,7 +26,8 @@ public:
       text->setText(result);
       arc->setProgress(value);
     } else {
-      text->setText("done");
+      String result = "done";
+      text->setText(result);
     }
     text->tick(deps.displayHAL);
     arc->tick(deps.displayHAL);
