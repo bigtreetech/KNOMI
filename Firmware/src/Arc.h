@@ -4,7 +4,7 @@
 
 class Arc {
   UIConfig *config;
-  int progress = -1; // undefinite
+  int progress = 0;
   int thickness = 16;
 
 public:
@@ -23,9 +23,6 @@ public:
 
     int start = 0;
     int end = (360 * progress) / 100;
-    if (progress == -1) {
-      end = 180; // todo animate
-    }
     int r = hal->tft->width() / 2;
     hal->tft->startWrite();
     hal->tft->drawSmoothArc(hal->tft->width() / 2, hal->tft->height() / 2, r, r - thickness, start, end, fgColor,

@@ -4,6 +4,7 @@
 #include "BedHeatingScene.h"
 #include "BeforePrintingScene.h"
 #include "BootupLogo.h"
+#include "DemoScene.h"
 #include "ExtruderHeatingScene.h"
 #include "FirmwareUpdateScene.h"
 #include "HomingScene.h"
@@ -47,6 +48,8 @@ AbstractScene *SwitchSceneRequest::Provide() {
     return new StandbyScene(deps);
   case SceneId::FirmwareUpdate:
     return new FirmwareUpdateScene(deps);
+  case SceneId::Demo:
+    return new DemoScene(deps);
   }
   LV_LOG_WARN((String("Unhandled scene %s") + id).c_str());
   return new StandbyScene(deps);

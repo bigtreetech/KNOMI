@@ -26,7 +26,7 @@ public:
     hal->tft->startWrite();
 
     hal->tft->setTextColor(DisplayHAL::toSpiColor(color));
-    hal->tft->setTextSize(size);
+    hal->tft->setTextSize(DisplayHAL::toSpiFontSize(size));
     hal->tft->setTextDatum(MC_DATUM);
 
     int16_t currentTextWidth = hal->tft->textWidth(this->text.c_str());

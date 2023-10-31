@@ -140,9 +140,17 @@ public:
   }
 
   static uint32_t toSpiColor(uint32_t color) {
-    byte r = color >> 24 & 0xFF;
-    byte g = color >> 16 & 0xFF;
-    byte b = color >> 8 & 0xFF;
-    return ((r & 0xF8) << 8 | (g & 0xFC) << 3 | (b >> 3));
+    byte r = color >> 16 & 0xFF;
+    byte g = color >> 8 & 0xFF;
+    byte b = color >> 0 & 0xFF;
+    return ((b & 0xF8) << 8 | (g & 0xFC) << 3 | (r >> 3));
+  }
+
+  static uint8_t toSpiFontSize(int size) {
+    if (size == 32)
+      return 2;
+    if (size == 48)
+      return 3;
+    return 1;
   }
 };

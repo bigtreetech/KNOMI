@@ -16,26 +16,19 @@ public:
     LV_LOG_INFO("Loading boot logo");
     ri_logo = KnownResourceImages::get_BTT_LOGO();
     LV_LOG_INFO("Boot logo loaded");
-
-    arc = new Arc(deps.styles);
   }
 
-  ~BootupLogoScene() override {
-    delete arc;
-    delete ri_logo;
-  }
+  ~BootupLogoScene() override { delete ri_logo; }
 
   SwitchSceneRequest *NextScene() override {
     if (wifiManager->isInConfigMode()) {
       return new SwitchSceneRequest(deps, SceneId::APConfig, 0);
     } else if (wifiManager->isConnected()) {
+      return new SwitchSceneRequest(deps, SceneId::Demo);
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
   }
 
-  void Tick() override {
-    ri_logo->tick(deps.displayHAL);
-    arc->tick(deps.displayHAL);
-  }
+  void Tick() override { ri_logo->tick(deps.displayHAL); }
 };
