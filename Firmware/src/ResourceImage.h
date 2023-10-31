@@ -41,6 +41,7 @@ public:
 
   void tick(DisplayHAL *displayHal) {
     this->currentHal = displayHal;
+    // TODO switch sync to false and track time and frames by ourselves
     gif->playFrame(true, nullptr, this);
   }
 
