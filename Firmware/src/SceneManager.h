@@ -23,7 +23,7 @@ public:
 
   SceneId getCurrentSceneId() { return currentSceneId; }
 
-  void SwitchSceneIfRequired() {
+  void switchSceneIfRequired() {
     if (switchSceneRequest != nullptr) {
       LV_LOG_INFO("Deleting current scene");
       delete currentScene;
@@ -36,7 +36,7 @@ public:
     }
   }
 
-  void RefreshScene() {
+  void refreshScene() {
     if (currentScene != nullptr) {
       currentScene->Tick();
     }
@@ -59,6 +59,6 @@ public:
 
   void SwitchScene(SceneId id, int timerOverride = -1) {
     switchSceneRequest = new SwitchSceneRequest(deps, id, timerOverride);
-    SwitchSceneIfRequired();
+    switchSceneIfRequired();
   }
 };

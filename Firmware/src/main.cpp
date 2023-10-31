@@ -18,7 +18,7 @@ Button *btn = nullptr;
 KnomiWebServer *webServer = nullptr;
 KlipperApi *klipperApi = nullptr;
 SceneManager *sceneManager = nullptr;
-__attribute__((unused)) DisplayHAL *displayhal = nullptr;
+DisplayHAL *displayHAL = nullptr;
 
 uint32_t scenerefresh_nexttime = 0;
 uint32_t keyscan_nexttime = 0;
@@ -58,13 +58,14 @@ __attribute__((unused)) void setup() {
   LV_LOG_INFO("WifiManager created");
   btn = new Button(config);
   LV_LOG_INFO("Timer and button created");
-  displayhal = new DisplayHAL();
+  displayHAL = new DisplayHAL();
   LV_LOG_INFO("DisplayHAL created");
   klipperApi = new KlipperApi(config);
   LV_LOG_INFO("KlipperAPI started");
   webServer = new KnomiWebServer(config, wifiManager);
   LV_LOG_INFO("WebServer started");
-  sceneManager = new SceneManager(webServer, klipperApi, wifiManager, config->getUiConfig(), displayhal);
+  sceneManager = new SceneManager(webServer, klipperApi, wifiManager, config->getUiConfig(), displayHAL);
+  sceneManager->refreshScene();
   LV_LOG_INFO("SceneManager started");
   wifiManager->connectToWiFi();
   LV_LOG_INFO("Connected to wifi");
@@ -79,12 +80,12 @@ __attribute__((unused)) void loop() {
     }
   }
 
-  sceneManager->SwitchSceneIfRequired();
+  sceneManager->switchSceneIfRequired();
 
   uint32_t nowtime = millis();
 
   if (nowtime > scenerefresh_nexttime) {
-    sceneManager->RefreshScene();
+    sceneManager->refreshScene();
     scenerefresh_nexttime = nowtime + 50;
   }
 

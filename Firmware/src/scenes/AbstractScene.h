@@ -1,5 +1,7 @@
 #pragma once
 #include "../DisplayHAL.h"
+#include "../TextLabel.h"
+#include "../Arc.h"
 #include "../generated/images.h"
 #include "../network/KlipperApi.h"
 #include "../network/WifiManager.h"
