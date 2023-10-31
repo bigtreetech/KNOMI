@@ -56,4 +56,6 @@ public:
       lv_label_set_text(label_ext_target_temp, deps.klipperApi->getExtruderTargetTemp().c_str());
       lv_obj_align(label_ext_target_temp, LV_ALIGN_CENTER, 0, -75);
     }*/
+
+  void Tick() override { ri_ext->tick(deps.displayHAL); }
 };

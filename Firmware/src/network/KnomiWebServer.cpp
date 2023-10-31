@@ -73,8 +73,8 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     doc["used"] = LittleFS.usedBytes();
     const JsonArray &array = doc.createNestedArray("files");
 
-    File root = LittleFS.open("/");
-    File file = root.openNextFile();
+    fs::File root = LittleFS.open("/");
+    fs::File file = root.openNextFile();
 
     std::set<String> added;
     while (file) {

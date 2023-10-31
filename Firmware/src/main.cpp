@@ -49,6 +49,9 @@ __attribute__((unused)) void setup() {
   Serial.begin(115200); // 波特率
   delay(100);
 
+  LV_LOG_INFO("Setup");
+  LittleFS.begin();
+  LV_LOG_INFO("LittleFS started");
   config = new Config();
   LV_LOG_INFO("Config created");
   wifiManager = new WifiManager(config);

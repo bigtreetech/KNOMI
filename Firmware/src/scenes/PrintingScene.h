@@ -21,4 +21,6 @@ public:
     }
     return nullptr;
   }
+
+  void Tick() override { ri_printing->tick(deps.displayHAL); }
 };

@@ -16,7 +16,7 @@ public:
     this->wifiManager = deps.mgr;
     deps.displayHAL->setBackgroundColor(0x000000);
     LV_LOG_INFO("Loading boot logo");
-    ri_logo = KnownResourceImages::get_BTT_LOGO();
+    // ri_logo = KnownResourceImages::get_BTT_LOGO();
     LV_LOG_INFO("Boot logo loaded");
 
     /* TODO
@@ -46,7 +46,7 @@ public:
 
   ~BootupLogoScene() override {
     // TODO lv_obj_del(open_anim_arc);
-    delete ri_logo;
+    // delete ri_logo;
   }
 
   SwitchSceneRequest *NextScene() override {
@@ -56,5 +56,9 @@ public:
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
+  }
+
+  void Tick() override {
+    // ri_logo->tick(deps.displayHAL);
   }
 };

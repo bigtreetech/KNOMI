@@ -17,4 +17,6 @@ public:
     }
     return nullptr;
   }
+
+  void Tick() override { ri_disconnect->tick(deps.displayHAL); }
 };

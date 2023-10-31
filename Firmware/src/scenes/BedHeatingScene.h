@@ -40,4 +40,6 @@ public:
     lv_label_set_text(label_bed_target_temp, deps.klipperApi->getBedTargetTemp().c_str()); */
     return nullptr;
   }
+
+  void Tick() override { ri_bed->tick(deps.displayHAL); }
 };

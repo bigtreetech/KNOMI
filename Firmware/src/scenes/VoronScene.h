@@ -20,4 +20,6 @@ public:
     else
       return new SwitchSceneRequest(deps, SceneId::Standby);
   };
+
+  void Tick() override { ri_voron->tick(deps.displayHAL); }
 };

@@ -1,40 +1,92 @@
 #pragma once
+#include "AnimatedGIF.h"
+#include "DisplayHAL.h"
+#include "LittleFS.h"
 #include <Arduino.h>
 #include <log.h>
 #include <string>
 
+struct LittleFile {
+  fs::File file;
+};
+
 class ResourceImage {
 private:
   String filename;
+  AnimatedGIF *gif;
+  int x;
+  int y;
+  int width;
+  int height;
+
+  // we don't own this
+  DisplayHAL *currentHal;
 
 public:
-  ResourceImage(String filename, int x, int y) {
-    this->filename = filename;
-    /* todo: AnimatedGIF
-    lv_obj_t *screen = lv_scr_act();
-    filename = "A:/" + filename;
-    LV_LOG_INFO(("Creating resource image " + filename).c_str());
-    if (filename.endsWith(".gif")) {
-      img = lv_gif_create(screen);
-      lv_gif_set_src(img, filename.begin());
-    } else {
-      // TODO in case of BMP manually decode image and store it in ram - this
-      // may increase speed a lot.
-      img = lv_img_create(screen);
-      lv_img_set_src(img, filename.begin());
-    }
-    lv_obj_align(img, LV_ALIGN_CENTER, x, y);
-    if (!filename.endsWith(".gif")) {
-      lv_task_handler();
-    }
-    LV_LOG_INFO(("Created resource image " + filename).c_str());*/
+  ResourceImage(const String &filename, int x, int y) {
+    this->filename = "/" + filename;
+    this->x = x;
+    this->y = y;
+
+    const char *szFilename = this->filename.c_str();
+    gif = new AnimatedGIF();
+    gif->begin(BIG_ENDIAN_PIXELS);
+    gif->open(szFilename, gifOpen, gifClose, gifRead, gifSeek, gifDraw);
+    this->width = gif->getCanvasWidth();
+    this->height = gif->getCanvasHeight();
+    LV_LOG_INFO(("Created resource image " + this->filename).c_str());
+  }
+
+  void tick(GIFDRAW *pDraw) { currentHal->GIFDraw(pDraw, x, y, width, height); }
+
+  void tick(DisplayHAL *displayHal) {
+    this->currentHal = displayHal;
+    gif->playFrame(true, nullptr, this);
   }
 
   ~ResourceImage() {
-    /* todo: clean gif
     LV_LOG_INFO(("Deleting resource image " + this->filename).c_str());
-    lv_obj_del(img);
+    gif->close();
+    delete gif;
     LV_LOG_INFO(("Deleted resource image " + this->filename).c_str());
-     */
+  }
+
+  static void *gifOpen(const char *szFilename, int32_t *pFileSize) {
+    auto lf = new LittleFile();
+    lf->file = LittleFS.open(szFilename, "r");
+    *pFileSize = lf->file.size();
+    LV_LOG_INFO("Open file %i: %s -> %i", lf, lf->file.name(), *pFileSize);
+    return (void *)lf;
+  }
+
+  static void gifClose(void *pHanldle) {
+    auto lf = (LittleFile *)pHanldle;
+    LV_LOG_INFO("Close file %i: %s", lf, lf->file.name());
+    lf->file.close();
+    delete lf;
+  }
+
+  static int32_t gifRead(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen) {
+    auto lf = (LittleFile *)pFile->fHandle;
+    int32_t iBytesRead = iLen;
+    if ((pFile->iSize - pFile->iPos) < iLen)
+      iBytesRead = pFile->iSize - pFile->iPos - 1; // <-- ugly work-around
+    if (iBytesRead <= 0)
+      return 0;
+    iBytesRead = (int32_t)lf->file.read(pBuf, iBytesRead);
+    pFile->iPos = lf->file.position();
+    return iBytesRead;
+  }
+
+  static int32_t gifSeek(GIFFILE *pFile, int32_t iPosition) {
+    auto lf = (LittleFile *)pFile->fHandle;
+    lf->file.seek(iPosition);
+    pFile->iPos = lf->file.position();
+    return pFile->iPos;
+  }
+
+  static void gifDraw(GIFDRAW *pDraw) {
+    auto img = (ResourceImage *)pDraw->pUser;
+    img->tick(pDraw);
   }
 };
