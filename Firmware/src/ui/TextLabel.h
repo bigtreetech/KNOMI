@@ -3,7 +3,6 @@
 #include "config/UIConfig.h"
 
 #include "fonts/Montserrat_Regular20pt7b.h"
-#include "fonts/Montserrat_Regular24pt7b.h"
 #include "fonts/Montserrat_Regular32pt7b.h"
 
 enum fontSize { small, large };
