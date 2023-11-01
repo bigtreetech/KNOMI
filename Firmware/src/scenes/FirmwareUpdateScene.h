@@ -11,7 +11,7 @@ private:
 public:
   explicit FirmwareUpdateScene(SceneDeps deps) : AbstractScene(deps) {
     this->webServer = deps.webServer;
-    text = new TextLabel(deps.styles, 48, 0, 0);
+    text = new TextLabel(deps.styles, fontSize::large, 0, 0);
     arc = new Arc(deps.styles);
   }
   ~FirmwareUpdateScene() override {

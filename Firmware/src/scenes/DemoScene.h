@@ -11,7 +11,7 @@ private:
 public:
   explicit DemoScene(SceneDeps deps) : AbstractScene(deps) {
     this->arc = new Arc(deps.styles);
-    this->text = new TextLabel(deps.styles, 32, 0, 0);
+    this->text = new TextLabel(deps.styles, fontSize::small, 0, 0);
   }
 
   ~DemoScene() override {}

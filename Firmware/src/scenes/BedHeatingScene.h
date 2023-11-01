@@ -10,8 +10,8 @@ private:
 public:
   explicit BedHeatingScene(SceneDeps deps) : AbstractScene(deps) {
     ri_bed = KnownResourceImages::get_bed_temp();
-    actualTemp = new TextLabel(deps.styles, 32, 0, 75);
-    targetTemp = new TextLabel(deps.styles, 32, 0, -75);
+    actualTemp = new TextLabel(deps.styles, fontSize::small, 0, 75);
+    targetTemp = new TextLabel(deps.styles, fontSize::small, 0, -75);
   }
 
   ~BedHeatingScene() override {

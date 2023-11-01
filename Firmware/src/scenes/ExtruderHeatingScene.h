@@ -10,8 +10,8 @@ private:
 public:
   explicit ExtruderHeatingScene(SceneDeps deps) : AbstractScene(deps) {
     ri_ext = KnownResourceImages::get_ext_temp();
-    actualTemp = new TextLabel(deps.styles, 32, 0, 75);
-    targetTemp = new TextLabel(deps.styles, 32, 0, -75);
+    actualTemp = new TextLabel(deps.styles, fontSize::small, 0, 75);
+    targetTemp = new TextLabel(deps.styles, fontSize::small, 0, -75);
   }
 
   ~ExtruderHeatingScene() override {
