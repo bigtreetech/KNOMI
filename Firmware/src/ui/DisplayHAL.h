@@ -145,12 +145,4 @@ public:
     byte b = color >> 0 & 0xFF;
     return ((r & 0xF8) << 8 | (g & 0xFC) << 3 | (b >> 3));
   }
-
-  static uint8_t toSpiFontSize(int size) {
-    if (size == 32)
-      return 4;
-    if (size == 48)
-      return 6;
-    return 1;
-  }
 };
