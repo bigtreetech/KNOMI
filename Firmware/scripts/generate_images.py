@@ -21,7 +21,7 @@ def generate_images(*arg, **kwargs):
     hWrapper = rf"""
     #pragma once
 
-    #include "ResourceImage.h"
+    #include "ui/ResourceImage.h"
     #include <vector>
     #include "log.h"
     #include <Arduino.h>

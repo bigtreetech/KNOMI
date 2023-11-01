@@ -1,11 +1,11 @@
-#include "DisplayHAL.h"
-#include "SceneManager.h"
 #include "button/Button.h"
 #include "config/Config.h"
 #include "log.h"
 #include "network/KlipperApi.h"
 #include "network/KnomiWebServer.h"
 #include "network/WifiManager.h"
+#include "ui/DisplayHAL.h"
+#include "ui/SceneManager.h"
 #include <Arduino.h>
 #include <AsyncHTTPRequest_Generic.h>
 #include <WiFi.h>
@@ -33,8 +33,8 @@ void logToSerial(const char *logLevel, const char *file, int line, const char *f
   char msg[256];
   ulong t = millis();
   vsnprintf(msg, sizeof(msg), format, args);
-  snprintf(buf, sizeof(buf), "[%s] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s line #%d)(free heap = %u)\n", logLevel,
-           t / 1000, t % 1000, t - lastLogTime, func, msg, file, line, esp_get_free_heap_size());
+  snprintf(buf, sizeof(buf), "[%s] [%u%] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s line #%d)\n", logLevel,
+           esp_get_free_heap_size(), t / 1000, t % 1000, t - lastLogTime, func, msg, file, line);
   lastLogTime = t;
 
   Serial.print(buf);

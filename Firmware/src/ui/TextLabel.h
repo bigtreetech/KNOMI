@@ -27,6 +27,9 @@ public:
   }
 
   void setText(String &textValue) {
+    if (this->text.equals(textValue))
+      return;
+
     this->text = textValue;
     this->shouldDraw = true;
   }

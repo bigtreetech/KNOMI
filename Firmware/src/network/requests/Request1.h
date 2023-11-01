@@ -43,10 +43,10 @@ class Request1 : public KlipperApiRequest {
 public:
   String text_print_status = "standby"; // 打印状态
   uint8_t print_status;
-  String text_ext_actual_temp = " °C";
-  String text_ext_target_temp = " °C";
-  String text_bed_actual_temp = " °C";
-  String text_bed_target_temp = " °C";
+  String text_ext_actual_temp = " C"; // TODO return degree (°) sign
+  String text_ext_target_temp = " C";
+  String text_bed_actual_temp = " C";
+  String text_bed_target_temp = " C";
   uint16_t bedtemp_actual = 0;
   uint16_t bedtemp_target = 0;
   uint16_t tooltemp_actual = 0;

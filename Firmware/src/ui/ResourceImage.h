@@ -2,8 +2,8 @@
 #include "AnimatedGIF.h"
 #include "DisplayHAL.h"
 #include "LittleFS.h"
+#include "log.h"
 #include <Arduino.h>
-#include <log.h>
 #include <string>
 
 struct LittleFile {
