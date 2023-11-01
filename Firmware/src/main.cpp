@@ -33,7 +33,7 @@ void logToSerial(const char *logLevel, const char *file, int line, const char *f
   char msg[256];
   ulong t = millis();
   vsnprintf(msg, sizeof(msg), format, args);
-  snprintf(buf, sizeof(buf), "[%s] [%u%] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s line #%d)\n", logLevel,
+  snprintf(buf, sizeof(buf), "[%s] \t[%u] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s line #%d)\n", logLevel,
            esp_get_free_heap_size(), t / 1000, t % 1000, t - lastLogTime, func, msg, file, line);
   lastLogTime = t;
 
