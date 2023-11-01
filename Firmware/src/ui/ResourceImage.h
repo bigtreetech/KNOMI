@@ -56,13 +56,11 @@ public:
     auto lf = new LittleFile();
     lf->file = LittleFS.open(szFilename, "r");
     *pFileSize = lf->file.size();
-    LV_LOG_INFO("Open file %i: %s -> %i", lf, lf->file.name(), *pFileSize);
     return (void *)lf;
   }
 
   static void gifClose(void *pHanldle) {
     auto lf = (LittleFile *)pHanldle;
-    LV_LOG_INFO("Close file %i: %s", lf, lf->file.name());
     lf->file.close();
     delete lf;
   }
