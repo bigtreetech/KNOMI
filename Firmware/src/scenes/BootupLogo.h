@@ -24,7 +24,7 @@ public:
     if (wifiManager->isInConfigMode()) {
       return new SwitchSceneRequest(deps, SceneId::APConfig, 0);
     } else if (wifiManager->isConnected()) {
-      return new SwitchSceneRequest(deps, SceneId::Demo);
+      // return new SwitchSceneRequest(deps, SceneId::Demo);
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
