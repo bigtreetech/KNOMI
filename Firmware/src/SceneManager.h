@@ -48,6 +48,7 @@ public:
 
     if (timer_contne == 0) {
       if (currentScene != nullptr) {
+        // todo reimplement this timer_contne to scene actually being able to track it's lifetime in millis + merge tick and nextscene();
         timer_contne = 5;
         switchSceneRequest = currentScene->NextScene();
         if (switchSceneRequest != nullptr && switchSceneRequest->timerOverride >= 0) {

@@ -2,13 +2,11 @@
 #include "DisplayHAL.h"
 #include "config/UIConfig.h"
 
+#include "fonts/Montserrat_Regular20pt7b.h"
 #include "fonts/Montserrat_Regular24pt7b.h"
 #include "fonts/Montserrat_Regular32pt7b.h"
 
-enum fontSize {
-  small,
-  large
-};
+enum fontSize { small, large };
 
 class TextLabel {
   UIConfig *config;
@@ -43,7 +41,7 @@ public:
     hal->tft->startWrite();
 
     if (size == fontSize::small) {
-      hal->tft->setFreeFont(&Montserrat_Regular24pt7b);
+      hal->tft->setFreeFont(&Montserrat_Regular20pt7b);
     }
     if (size == fontSize::large) {
       hal->tft->setFreeFont(&Montserrat_Regular32pt7b);

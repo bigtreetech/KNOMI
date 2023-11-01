@@ -36,13 +36,13 @@ public:
       }
     }
 
-    actualTemp->setText(deps.klipperApi->getExtruderActualTemp());
-    targetTemp->setText(deps.klipperApi->getExtruderTargetTemp());
-
     return nullptr;
   }
 
   void Tick() override {
+    actualTemp->setText(deps.klipperApi->getExtruderActualTemp());
+    targetTemp->setText(deps.klipperApi->getExtruderTargetTemp());
+
     ri_ext->tick(deps.displayHAL);
     actualTemp->tick(deps.displayHAL);
     targetTemp->tick(deps.displayHAL);

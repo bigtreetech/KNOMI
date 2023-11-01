@@ -26,12 +26,13 @@ public:
         deps.klipperApi->getBedTargetTemp() == 0) {
       return new SwitchSceneRequest(deps, SceneId::ExtruderHeating);
     }
-    actualTemp->setText(deps.klipperApi->getBedActualTemp());
-    targetTemp->setText(deps.klipperApi->getBedTargetTemp());
     return nullptr;
   }
 
   void Tick() override {
+    actualTemp->setText(deps.klipperApi->getBedActualTemp());
+    targetTemp->setText(deps.klipperApi->getBedTargetTemp());
+
     ri_bed->tick(deps.displayHAL);
     actualTemp->tick(deps.displayHAL);
     targetTemp->tick(deps.displayHAL);

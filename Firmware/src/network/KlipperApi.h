@@ -38,6 +38,9 @@ public:
   bool isHoming() const { return req3.homing_status == 1; }
   bool isLeveling() const { return req4.levelling_status == 1; }
   bool isPrinting() const { return req1.print_status == 1; }
+  bool isHeating() const {
+    return req1.bedtemp_actual < req1.bedtemp_target || req1.tooltemp_actual < req1.tooltemp_target;
+  }
 
   bool isKlipperNotAvailable() {
     int failCount = req1.getFailCount() + req2.getFailCount() + req3.getFailCount() + req4.getFailCount();
