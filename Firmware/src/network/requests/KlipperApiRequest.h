@@ -25,9 +25,15 @@ public:
     if (readyState == readyStateDone) {
       if (asyncHttpRequest->responseHTTPcode() == 200) {
         String payload = asyncHttpRequest->responseText();
-        StaticJsonDocument<200> doc;
+        StaticJsonDocument<2048> doc;
         deserializeJson(doc, payload.c_str());
         failCount = 0;
+        unsigned int bufLen = payload.length() * 2;
+        auto buf = new char[bufLen];
+        serializeJson(doc, buf, bufLen);
+        LV_LOG_INFO("Parsed response:");
+        LV_LOG_INFO(buf);
+        delete[] buf;
         processJson(doc);
       } else {
         LV_LOG_INFO("Error on HTTP asyncHttpRequest");
