@@ -18,6 +18,7 @@ private:
   int y;
   int width;
   int height;
+  ulong nextFrame = 0;
 
   // we don't own this
   DisplayHAL *currentHal;
@@ -41,8 +42,13 @@ public:
 
   void tick(DisplayHAL *displayHal) {
     this->currentHal = displayHal;
-    // TODO switch sync to false and track time and frames by ourselves
-    gif->playFrame(true, nullptr, this);
+    ulong now = millis();
+
+    if (nextFrame < now) {
+      int delay = 0;
+      gif->playFrame(false, &delay, this);
+      nextFrame = now + delay;
+    }
   }
 
   ~ResourceImage() {

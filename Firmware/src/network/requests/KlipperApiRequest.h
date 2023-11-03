@@ -19,43 +19,42 @@ private:
 protected:
   int failCount = 0;
 
-  virtual String getUrl(String klipper_ip) = 0;
+  virtual const char* getUrl() = 0;
   virtual void processJson(JsonDocument &doc) = 0;
 
 public:
-  int getFailCount() { return failCount; }
+  int getFailCount() const { return failCount; }
 
-  KlipperApiRequest() {}
+  KlipperApiRequest() {
+
+  }
 
   void Execute(String &klipper_ip) {
-    if (inProgress)
+    if (inProgress) {
       return;
+    }
 
     inProgress = true;
     response = "";
 
+    const char *path = getUrl();
+    LV_LOG_INFO("Http request to %s %s", klipper_ip.c_str(), path);
+
     esp_http_client_config_t config = {
-        .url = getUrl(klipper_ip).c_str(),
+        .host = klipper_ip.c_str(),
+        .path = path,
         .disable_auto_redirect = true,
         .event_handler = _http_event_handler,
-        .user_data = this, // Pass address of local buffer to get response
-        .is_async = true,
+        .user_data = this
     };
     esp_http_client_handle_t client = esp_http_client_init(&config);
-    esp_err_t err;
-    while (1) {
-      err = esp_http_client_perform(client);
-      if (err != ESP_ERR_HTTP_EAGAIN) {
-        break;
-      }
-    }
+    esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-      LV_LOG_INFO("HTTP GET Status = %d, content_length = %", esp_http_client_get_status_code(client),
-                  esp_http_client_get_content_length(client));
+      LV_LOG_INFO("HTTP GET Status = %d, content_length = %i", esp_http_client_get_status_code(client), esp_http_client_get_content_length(client));
     } else {
       LV_LOG_INFO("HTTP GET request failed: %s", esp_err_to_name(err));
     }
-
+    inProgress = false;
     esp_http_client_cleanup(client);
   }
 
@@ -67,18 +66,22 @@ public:
   esp_err_t httpEventHandler(esp_http_client_event_t *evt) {
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
-      LV_LOG_INFO("HTTP_EVENT_ERROR");
+      LV_LOG_WARN("HTTP_EVENT_ERROR");
       break;
     case HTTP_EVENT_ON_CONNECTED:
+      // Incoming order: 1
       LV_LOG_INFO("HTTP_EVENT_ON_CONNECTED");
       break;
     case HTTP_EVENT_HEADER_SENT:
+      // Incoming order: 2
       LV_LOG_INFO("HTTP_EVENT_HEADER_SENT");
       break;
     case HTTP_EVENT_ON_HEADER:
+      // Incoming order: 3. Good place to save headers.
       LV_LOG_INFO("HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
       break;
     case HTTP_EVENT_ON_DATA:
+      // Incoming order: 4. Aggregate data
       LV_LOG_INFO("HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
       char *buffer;
       buffer = new char[evt->data_len + 1];
@@ -88,6 +91,7 @@ public:
       delete[] buffer;
       break;
     case HTTP_EVENT_ON_FINISH:
+      // Incoming order: 5. Request fully buffered locally. process
       LV_LOG_INFO("HTTP_EVENT_ON_FINISH");
       if (esp_http_client_get_status_code(evt->client) == 200) {
         StaticJsonDocument<2048> doc;
@@ -107,7 +111,7 @@ public:
 
       response = "";
       break;
-    case HTTP_EVENT_DISCONNECTED:
+    case HTTP_EVENT_DISCONNECTED: {
       LV_LOG_INFO("HTTP_EVENT_DISCONNECTED");
       int mbedtls_err = 0;
       esp_err_t err = esp_tls_get_and_clear_last_error((esp_tls_error_handle_t)evt->data, &mbedtls_err, NULL);
@@ -115,8 +119,12 @@ public:
         LV_LOG_INFO("Last esp error code: 0x%x", err);
         LV_LOG_INFO("Last mbedtls failure: 0x%x", mbedtls_err);
       }
+    } break;
+    default:
+      LV_LOG_INFO("Unhandled eventId %i", evt->event_id);
       break;
     }
+    yield();
     return ESP_OK;
   }
 };

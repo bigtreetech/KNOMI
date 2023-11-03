@@ -4,6 +4,9 @@
 #include "scenes/AbstractScene.h"
 #include "scenes/BootupLogo.h"
 #include "scenes/SwitchSceneRequest.h"
+#include "esp_timer.h"
+#include "esp_task_wdt.h"
+#include "soc/rtc_wdt.h"
 
 class SceneManager {
 private:
@@ -12,6 +15,11 @@ private:
   SceneId currentSceneId;
   SwitchSceneRequest *switchSceneRequest = nullptr;
   SceneDeps deps;
+  esp_timer_handle_t periodic_timer;
+
+  static void refreshSceneCallback(void* arg) {
+    ((SceneManager*)arg)->refreshScene();
+  }
 
 public:
   explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager, UIConfig *config,
@@ -19,6 +27,20 @@ public:
       : deps(klipperApi, manager, webServer, config, displayHAL) {
     this->currentScene = new BootupLogoScene(deps);
     this->currentSceneId = SceneId::BootupLogo;
+
+    const esp_timer_create_args_t periodic_timer_args = {
+        .callback = &refreshSceneCallback,
+        .arg = this,
+        .name = "screen",
+        .skip_unhandled_events = true
+    };
+    esp_timer_create(&periodic_timer_args, &periodic_timer);
+    esp_timer_start_periodic(periodic_timer, 33000); // 33 ms for screen update
+  }
+
+  ~SceneManager() {
+    esp_timer_stop(periodic_timer);
+    esp_timer_delete(periodic_timer);
   }
 
   SceneId getCurrentSceneId() { return currentSceneId; }

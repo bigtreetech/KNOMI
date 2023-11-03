@@ -19,7 +19,6 @@ KlipperApi *klipperApi = nullptr;
 SceneManager *sceneManager = nullptr;
 DisplayHAL *displayHAL = nullptr;
 
-uint32_t scenerefresh_nexttime = 0;
 uint32_t keyscan_nexttime = 0;
 uint32_t netcheck_nexttime = 0;
 uint32_t klipper_nexttime = 0;
@@ -32,7 +31,7 @@ void logToSerial(const char *logLevel, const char *file, int line, const char *f
   char msg[1024];
   ulong t = millis();
   vsnprintf(msg, sizeof(msg), format, args);
-  snprintf(buf, sizeof(buf), "[%s] \t[%u] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s line #%d)\n", logLevel,
+  snprintf(buf, sizeof(buf), "[%s] \t[%u] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s:%d)\n", logLevel,
            esp_get_free_heap_size(), t / 1000, t % 1000, t - lastLogTime, func, msg, file, line);
   lastLogTime = t;
 
@@ -64,7 +63,6 @@ __attribute__((unused)) void setup() {
   webServer = new KnomiWebServer(config, wifiManager);
   LV_LOG_INFO("WebServer started");
   sceneManager = new SceneManager(webServer, klipperApi, wifiManager, config->getUiConfig(), displayHAL);
-  sceneManager->refreshScene();
   LV_LOG_INFO("SceneManager started");
   wifiManager->connectToWiFi();
   LV_LOG_INFO("Connected to wifi");
@@ -82,11 +80,6 @@ __attribute__((unused)) void loop() {
   sceneManager->switchSceneIfRequired();
 
   uint32_t nowtime = millis();
-
-  if (nowtime > scenerefresh_nexttime) {
-    sceneManager->refreshScene();
-    scenerefresh_nexttime = nowtime + 50;
-  }
 
   if (nowtime > keyscan_nexttime) {
     sceneManager->Timer();

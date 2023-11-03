@@ -1,9 +1,10 @@
 #pragma once
+#include "KlipperApiRequest.h"
 
-class Request3 : public KlipperApiRequest {
-  String getUrl(String klipper_ip) { return "http://" + klipper_ip + "/printer/objects/query?gcode_macro%20G28"; }
+class HomingRequest : public KlipperApiRequest {
+  const char* getUrl() override { return "/printer/objects/query?gcode_macro%20G28"; }
 
-  void processJson(JsonDocument &doc) {
+  void processJson(JsonDocument &doc) override {
 
     String nameStr8 = doc["result"]["status"]["gcode_macro G28"]["homing"].as<String>();
     LV_LOG_INFO(nameStr8.c_str());

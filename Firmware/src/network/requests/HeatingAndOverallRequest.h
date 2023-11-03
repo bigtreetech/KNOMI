@@ -1,9 +1,10 @@
 #pragma once
+#include "KlipperApiRequest.h"
 
-class Request1 : public KlipperApiRequest {
-  String getUrl(String klipper_ip) { return "http://" + klipper_ip + "/api/printer"; }
+class HeatingAndOverallRequest : public KlipperApiRequest {
+  const char* getUrl() override { return "/api/printer"; }
 
-  void processJson(JsonDocument &doc) {
+  void processJson(JsonDocument &doc) override {
     String nameStr1 = doc["temperature"]["bed"]["actual"].as<String>();
     String nameStr2 = doc["temperature"]["bed"]["target"].as<String>();
     String nameStr3 = doc["temperature"]["tool0"]["actual"].as<String>();

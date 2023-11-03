@@ -1,9 +1,10 @@
 #pragma once
+#include "KlipperApiRequest.h"
 
-class Request2 : public KlipperApiRequest {
-  String getUrl(String klipper_ip) { return "http://" + klipper_ip + "/printer/objects/query?display_status"; }
+class PrintingRequest : public KlipperApiRequest {
+  const char* getUrl() override { return "/printer/objects/query?display_status"; }
 
-  void processJson(JsonDocument &doc) {
+  void processJson(JsonDocument &doc) override {
     double nameStr7 = (doc["result"]["status"]["display_status"]["progress"].as<double>()) * 100;
     uint16_t datas = round(nameStr7);
 
