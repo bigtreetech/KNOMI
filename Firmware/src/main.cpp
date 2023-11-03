@@ -28,8 +28,8 @@ ulong lastLogTime;
 void logToSerial(const char *logLevel, const char *file, int line, const char *func, const char *format, ...) {
   va_list args;
   va_start(args, format);
-  char buf[512];
-  char msg[256];
+  char buf[2048];
+  char msg[1024];
   ulong t = millis();
   vsnprintf(msg, sizeof(msg), format, args);
   snprintf(buf, sizeof(buf), "[%s] \t[%u] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s line #%d)\n", logLevel,

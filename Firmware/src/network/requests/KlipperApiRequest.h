@@ -90,9 +90,15 @@ public:
     case HTTP_EVENT_ON_FINISH:
       LV_LOG_INFO("HTTP_EVENT_ON_FINISH");
       if (esp_http_client_get_status_code(evt->client) == 200) {
-        StaticJsonDocument<200> doc;
+        StaticJsonDocument<2048> doc;
         deserializeJson(doc, response.c_str());
         failCount = 0;
+        unsigned int bufLen = response.length() * 2;
+        auto buf = new char[bufLen];
+        serializeJson(doc, buf, bufLen);
+        LV_LOG_INFO("Parsed response:");
+        LV_LOG_INFO(buf);
+        delete[] buf;
         processJson(doc);
       } else {
         LV_LOG_INFO("Error on HTTP asyncHttpRequest");
