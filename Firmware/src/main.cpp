@@ -7,7 +7,6 @@
 #include "ui/DisplayHAL.h"
 #include "ui/SceneManager.h"
 #include <Arduino.h>
-#include <AsyncHTTPRequest_Generic.h>
 #include <WiFi.h>
 
 using namespace std;

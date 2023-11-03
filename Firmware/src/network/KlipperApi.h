@@ -7,7 +7,6 @@
 #include "requests/Request3.h"
 #include "requests/Request4.h"
 #include <ArduinoJson.h>
-#include <AsyncHTTPRequest_Generic.hpp>
 #include <queue>
 
 class KlipperApi {
