@@ -75,7 +75,10 @@
             expiry: now.getTime() + ttl,
         };
 
-        localStorage.setItem(key, JSON.stringify(item));
+        let payload = JSON.stringify(item);
+        console.log("Setting key=" + key + " value=" + payload);
+
+        localStorage.setItem(key, payload);
     }
 
     async function checkForUpdates() {
@@ -109,13 +112,14 @@
 
             console.log(currentRelease);
             if (semver.valid(currentRelease) && semver.valid(latestRelease)) {
+                setLocalStorageWithExpiry(
+                    "availableUpdate",
+                    res.name,
+                    60 * 1000 * 60,
+                );
+
                 if (semver.gt(latestRelease, currentRelease)) {
                     availableUpdate = res.name;
-                    setLocalStorageWithExpiry(
-                        "availableUpdate",
-                        res.name,
-                        3600,
-                    );
                 } else {
                     console.log("Already upto date");
                 }
@@ -528,7 +532,7 @@
                 {#if availableUpdate != ""}
                     Update to <a
                         href="https://github.com/DiverOfDark/KNOMI/releases/tag/{availableUpdate}"
-                        >{availableUpdate}</a
+                        target="_blank">{availableUpdate}</a
                     > available.
                 {/if}
             </small>
