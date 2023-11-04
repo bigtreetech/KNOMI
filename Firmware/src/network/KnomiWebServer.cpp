@@ -185,11 +185,26 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
       }
     }
 
+    String newBackgroundColor;
+    if (req->hasArg("backgroundColor")) {
+      newBackgroundColor = req->arg("backgroundColor");
+
+      if (newBackgroundColor.startsWith("#")) {
+        newBackgroundColor = newBackgroundColor.substring(1);
+      }
+    }
+
     if (this->config != nullptr && this->config->getUiConfig() != nullptr) {
       if (newAccentColor != nullptr) {
         LV_LOG_INFO((String("Updating accentColor to: ") + newAccentColor).c_str());
         this->config->getUiConfig()->setAccentColor(strtol(newAccentColor.c_str(), NULL, 16));
       }
+
+      if (newBackgroundColor != nullptr) {
+        LV_LOG_INFO((String("Updating backgroundColor to: ") + newBackgroundColor).c_str());
+        this->config->getUiConfig()->setBackgroundColor(strtol(newBackgroundColor.c_str(), NULL, 16));
+      }
+
       this->config->getUiConfig()->save();
       req->send(200, "application/json", "{result: \"ok\"}");
 
@@ -220,6 +235,7 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
 
     if (this->config->getUiConfig() != nullptr) {
       doc["accentColor"] = String("#") + String(this->config->getUiConfig()->getAccentColor(), HEX);
+      doc["backgroundColor"] = String("#") + String(this->config->getUiConfig()->getBackgroundColor(), HEX);
     }
 
     doc["ota_partition"] = String(esp_ota_get_running_partition()->label);

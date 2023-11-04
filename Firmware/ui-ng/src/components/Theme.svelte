@@ -17,12 +17,14 @@
     let filesList: ListFilesResponse | null = null;
     var isSaving = false;
     var accentColor = "";
+    var backgroundColor = "";
     export let hash = "master";
 
     async function load() {
         let themeConfig = await fetch("/api/status");
         let themeJson = await themeConfig.json();
         accentColor = themeJson.accentColor;
+        backgroundColor = themeJson.backgroundColor;
 
         let response = await fetch("/api/listFiles");
         let json = await response.json();
@@ -39,6 +41,7 @@
         isSaving = true;
         const data = new URLSearchParams();
         data.append("accentColor", accentColor);
+        data.append("backgroundColor", backgroundColor);
 
         const res = await fetch("/api/themeConfig", {
             method: "POST",
@@ -73,6 +76,14 @@
         </Route>
         <Route path="/">
             <form on:submit|preventDefault={saveThemeConfig}>
+                <label class="input">
+                    <span>UI Background Color</span>
+                    <input
+                        disabled={isSaving}
+                        type="color"
+                        bind:value={backgroundColor}
+                    />
+                </label>
                 <label class="input">
                     <span>UI Accent Color</span>
                     <input

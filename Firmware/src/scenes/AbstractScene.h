@@ -12,7 +12,9 @@ class AbstractScene {
 protected:
   SceneDeps deps;
 
-  explicit AbstractScene(SceneDeps deps) : deps(deps) { deps.displayHAL->setBackgroundColor(0x000000); }
+  explicit AbstractScene(SceneDeps deps) : deps(deps) {
+    deps.displayHAL->setBackgroundColor(deps.styles->getBackgroundColor());
+  }
 
 public:
   virtual SwitchSceneRequest *NextScene() = 0;
