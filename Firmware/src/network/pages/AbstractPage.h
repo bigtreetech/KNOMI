@@ -4,14 +4,17 @@
 class KnomiWebServer;
 
 class AbstractPage {
+private:
+  httpd_uri_t handlerInfo;
+
 protected:
-  KnomiWebServer *webServer;
+  KnomiWebServer *webServer = nullptr;
 
 public:
   AbstractPage(KnomiWebServer *knomiWebServer, httpd_handle_t server, http_method method, const char *path) {
     this->webServer = knomiWebServer;
 
-    static const httpd_uri_t hello = {
+    handlerInfo = {
         .uri = path,
         .method = method,
         .handler = handlerStatic,
@@ -19,7 +22,7 @@ public:
     };
 
     LV_LOG_INFO("Registering %s %s", http_method_str(method), path);
-    httpd_register_uri_handler(server, &hello);
+    httpd_register_uri_handler(server, &handlerInfo);
   }
 
   static esp_err_t handlerStatic(httpd_req_t *request) { return ((AbstractPage *)request->user_ctx)->handler(request); }
