@@ -1,6 +1,6 @@
 #pragma once
 #include "../config/Config.h"
-#include "lvgl.h"
+#include "log.h"
 #include "requests/KlipperApiRequest.h"
 #include "requests/Request1.h"
 #include "requests/Request2.h"
@@ -12,10 +12,7 @@
 
 class KlipperApi {
 private:
-  uint32_t httprequest_nowtime = 0;
-  uint32_t httprequest_nexttime = 0;
   Config *config;
-  uint8_t start_http_request_flg = 0; // 0 开始启动http请求
 
   String text_print_file_name = "No Printfile"; // 打印文件名
 
@@ -27,10 +24,10 @@ private:
 public:
   KlipperApi(Config *config) { this->config = config; }
 
-  String getExtruderActualTemp() { return {req1.text_ext_actual_temp}; }
-  String getExtruderTargetTemp() { return {req1.text_ext_target_temp}; }
-  String getBedActualTemp() { return {req1.text_bed_actual_temp}; }
-  String getBedTargetTemp() { return {req1.text_bed_target_temp}; }
+  String &getExtruderActualTemp() { return {req1.text_ext_actual_temp}; }
+  String &getExtruderTargetTemp() { return {req1.text_ext_target_temp}; }
+  String &getBedActualTemp() { return {req1.text_bed_actual_temp}; }
+  String &getBedTargetTemp() { return {req1.text_bed_target_temp}; }
   int getProgressData() const { return req2.progress_data; }
 
   int getExtruderActualTempValue() const { return req1.tooltemp_actual; }
@@ -41,6 +38,9 @@ public:
   bool isHoming() const { return req3.homing_status == 1; }
   bool isLeveling() const { return req4.levelling_status == 1; }
   bool isPrinting() const { return req1.print_status == 1; }
+  bool isHeating() const {
+    return req1.bedtemp_actual < req1.bedtemp_target || req1.tooltemp_actual < req1.tooltemp_target;
+  }
 
   bool isKlipperNotAvailable() {
     int failCount = req1.getFailCount() + req2.getFailCount() + req3.getFailCount() + req4.getFailCount();

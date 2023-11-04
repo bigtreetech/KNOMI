@@ -9,7 +9,7 @@
 #include "WiFi.h"
 #include "WiFiClient.h"
 #include "WifiManager.h"
-#include "lvgl.h"
+#include "log.h"
 #include <ESPmDNS.h>
 
 class KnomiWebServer {

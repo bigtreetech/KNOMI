@@ -16,4 +16,6 @@ public:
     }
     return nullptr;
   }
+
+  void Tick() override { ri_leveling->tick(deps.displayHAL); }
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <WString.h>
-#include <lvgl.h>
+#include <log.h>
 
 class BaseConfig {
 protected:

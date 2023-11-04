@@ -18,7 +18,8 @@ enum SceneId {
   Printing1Percent = 99,
   Printing100Percent = 100,
   BootupLogo = 1,
-  FirmwareUpdate = 666
+  FirmwareUpdate = 666,
+  Demo = 999
 };
 
 class SwitchSceneRequest {

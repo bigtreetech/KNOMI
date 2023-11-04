@@ -5,7 +5,6 @@
 #include "NetworkConfig.h"
 #include "UIConfig.h"
 #include <Preferences.h>
-#include <lvgl.h>
 #include <nvs_flash.h>
 
 class Config : BaseConfig {

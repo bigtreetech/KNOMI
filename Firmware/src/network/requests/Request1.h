@@ -16,10 +16,10 @@ class Request1 : public KlipperApiRequest {
     tooltemp_actual = (uint16_t)((doc["temperature"]["tool0"]["actual"].as<double>()) * 100);
     tooltemp_target = (uint16_t)((doc["temperature"]["tool0"]["target"].as<double>()) * 100);
 
-    text_ext_actual_temp = nameStr3 + "°C";
-    text_ext_target_temp = nameStr4 + "°C";
-    text_bed_actual_temp = nameStr1 + "°C";
-    text_bed_target_temp = nameStr2 + "°C";
+    text_ext_actual_temp = nameStr3 + " C"; // TODO return degree (°) sign
+    text_ext_target_temp = nameStr4 + " C";
+    text_bed_actual_temp = nameStr1 + " C";
+    text_bed_target_temp = nameStr2 + " C";
 
     LV_LOG_INFO(text_ext_actual_temp.c_str());
     LV_LOG_INFO(text_ext_target_temp.c_str());
@@ -43,10 +43,10 @@ class Request1 : public KlipperApiRequest {
 public:
   String text_print_status = "standby"; // 打印状态
   uint8_t print_status;
-  String text_ext_actual_temp = " °C";
-  String text_ext_target_temp = " °C";
-  String text_bed_actual_temp = " °C";
-  String text_bed_target_temp = " °C";
+  String text_ext_actual_temp = " C"; // TODO return degree (°) sign
+  String text_ext_target_temp = " C";
+  String text_bed_actual_temp = " C";
+  String text_bed_target_temp = " C";
   uint16_t bedtemp_actual = 0;
   uint16_t bedtemp_target = 0;
   uint16_t tooltemp_actual = 0;

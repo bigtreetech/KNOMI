@@ -399,7 +399,7 @@
                         type="radio"
                         name="firmwaretype"
                         value="filesystem"
-                    />Filesystem
+                    />Theme
                 </label>
                 <button
                     type="button"
