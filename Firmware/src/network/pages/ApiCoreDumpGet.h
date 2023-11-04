@@ -3,8 +3,7 @@
 
 class ApiCoreDumpGet : public AbstractPage {
 public:
-  explicit ApiCoreDumpGet(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_GET, "/api/coredump") {}
+  explicit ApiCoreDumpGet(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/api/coredump") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     /* TODO

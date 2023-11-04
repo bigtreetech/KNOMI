@@ -3,8 +3,7 @@
 
 class ApiUploadFileDelete : public AbstractPage {
 public:
-  explicit ApiUploadFileDelete(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_DELETE, "/api/uploadFile") {}
+  explicit ApiUploadFileDelete(httpd_handle_t server) : AbstractPage(server, HTTP_DELETE, "/api/uploadFile") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     /* TODO

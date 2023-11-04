@@ -3,8 +3,7 @@
 
 class WebsocketLog : public AbstractPage {
 public:
-  explicit WebsocketLog(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_GET, "/ws") {}
+  explicit WebsocketLog(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/ws") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     /* TODO

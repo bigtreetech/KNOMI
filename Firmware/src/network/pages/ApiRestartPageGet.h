@@ -3,8 +3,7 @@
 
 class ApiRestartPageGet : public AbstractPage {
 public:
-  explicit ApiRestartPageGet(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_GET, "/api/restart") {}
+  explicit ApiRestartPageGet(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/api/restart") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     httpd_resp_set_type(req, "text/plain");

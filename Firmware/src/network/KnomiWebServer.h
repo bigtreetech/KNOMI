@@ -100,19 +100,19 @@ public:
       if (httpd_start(&server, &httpdConfig) == ESP_OK) {
         // Set URI handlers
         LV_LOG_INFO("Registering URI handlers");
-        this->rootPage = new RootPage(this, server);
-        this->apiRestartPageGet = new ApiRestartPageGet(this, server);
-        this->apiDumpHeapGet = new ApiDumpHeapGet(this, server);
-        this->apiListFilesGet = new ApiListFilesGet(this, server);
-        this->apiStatusGet = new ApiStatusGet(this, config, server);
-        this->apiCoreDumpGet = new ApiCoreDumpGet(this, server);
-        this->apiUploadFileDelete = new ApiUploadFileDelete(this, server);
-        this->apiUploadFilePost = new ApiUploadFilePost(this, server);
-        this->apiConfigWifiPost = new ApiConfigWifiPost(this, manager, server);
-        this->updatePost = new UpdatePost(this, server);
-        this->staticFileContentGet = new StaticFileContentGet(this, server);
+        this->rootPage = new RootPage(server);
+        this->apiRestartPageGet = new ApiRestartPageGet(server);
+        this->apiDumpHeapGet = new ApiDumpHeapGet(server);
+        this->apiListFilesGet = new ApiListFilesGet(server);
+        this->apiStatusGet = new ApiStatusGet(config, server);
+        this->apiCoreDumpGet = new ApiCoreDumpGet(server);
+        this->apiUploadFileDelete = new ApiUploadFileDelete(server);
+        this->apiUploadFilePost = new ApiUploadFilePost(server);
+        this->apiConfigWifiPost = new ApiConfigWifiPost(manager, server);
+        this->updatePost = new UpdatePost(server);
+        this->staticFileContentGet = new StaticFileContentGet(server);
 
-        this->websocketPage = new WebsocketLog(this, server);
+        this->websocketPage = new WebsocketLog(server);
         registerNotFound();
       }
 

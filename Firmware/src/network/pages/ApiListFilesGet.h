@@ -7,8 +7,7 @@
 
 class ApiListFilesGet : public AbstractPage {
 public:
-  explicit ApiListFilesGet(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_GET, "/api/listFiles") {}
+  explicit ApiListFilesGet(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/api/listFiles") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     httpd_resp_set_type(req, "application/json");

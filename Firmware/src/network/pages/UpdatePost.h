@@ -3,8 +3,7 @@
 
 class UpdatePost : public AbstractPage {
 public:
-  explicit UpdatePost(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_GET, "/update") {}
+  explicit UpdatePost(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/update") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     /* TODO

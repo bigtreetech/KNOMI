@@ -7,13 +7,8 @@ class AbstractPage {
 private:
   httpd_uri_t handlerInfo;
 
-protected:
-  KnomiWebServer *webServer = nullptr;
-
 public:
-  AbstractPage(KnomiWebServer *knomiWebServer, httpd_handle_t server, http_method method, const char *path) {
-    this->webServer = knomiWebServer;
-
+  explicit AbstractPage(httpd_handle_t server, http_method method, const char *path) {
     handlerInfo = {
         .uri = path,
         .method = method,

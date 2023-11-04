@@ -3,8 +3,7 @@
 
 class ApiUploadFilePost : public AbstractPage {
 public:
-  explicit ApiUploadFilePost(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_POST, "/api/uploadFile") {}
+  explicit ApiUploadFilePost(httpd_handle_t server) : AbstractPage(server, HTTP_POST, "/api/uploadFile") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     /* TODO

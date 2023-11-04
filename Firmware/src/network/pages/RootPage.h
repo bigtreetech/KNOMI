@@ -3,8 +3,7 @@
 
 class RootPage : public AbstractPage {
 public:
-  explicit RootPage(KnomiWebServer *knomiWebServer, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_GET, "/") {}
+  explicit RootPage(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/") {}
 
   esp_err_t handler(httpd_req_t *req) override {
     httpd_resp_set_type(req, "text/html");

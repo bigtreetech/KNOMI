@@ -5,8 +5,7 @@ class ApiStatusGet : public AbstractPage {
   Config *config;
 
 public:
-  explicit ApiStatusGet(KnomiWebServer *knomiWebServer, Config *config, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_GET, "/api/status") {
+  explicit ApiStatusGet(Config *config, httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/api/status") {
     this->config = config;
   }
 

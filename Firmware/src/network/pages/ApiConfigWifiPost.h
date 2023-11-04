@@ -5,8 +5,8 @@ class ApiConfigWifiPost : public AbstractPage {
   WifiManager *wifimanager = nullptr;
 
 public:
-  explicit ApiConfigWifiPost(KnomiWebServer *knomiWebServer, WifiManager *manager, httpd_handle_t server)
-      : AbstractPage(knomiWebServer, server, HTTP_POST, "/api/configwifi") {
+  explicit ApiConfigWifiPost(WifiManager *manager, httpd_handle_t server)
+      : AbstractPage(server, HTTP_POST, "/api/configwifi") {
     this->wifimanager = manager;
   }
 
