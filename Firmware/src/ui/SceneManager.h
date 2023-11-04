@@ -21,6 +21,7 @@ private:
     while (true) {
       esp_task_wdt_reset();
       ((SceneManager*)arg)->refreshScene();
+      vTaskDelay(33 / portTICK_PERIOD_MS);
     }
   }
 
@@ -39,11 +40,6 @@ public:
         0,
         NULL,
         0);         /* Core ID */
-  }
-
-  ~SceneManager() {
-    //esp_timer_stop(periodic_timer);
-    //esp_timer_delete(periodic_timer);
   }
 
   SceneId getCurrentSceneId() { return currentSceneId; }
@@ -74,7 +70,7 @@ public:
 
     if (timer_contne == 0) {
       if (currentScene != nullptr) {
-        // todo reimplement this timer_contne to scene actually being able to track it's lifetime in millis + merge tick
+        // todo reimplement this timer_contne to scene actually being able to track it's lifetime in millis
         // and nextscene();
         timer_contne = 5;
         switchSceneRequest = currentScene->NextScene();
