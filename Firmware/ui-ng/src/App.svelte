@@ -4,6 +4,7 @@
     import prettyBytes from "pretty-bytes";
     import SparkMD5 from "spark-md5/spark-md5";
     import Theme from "./components/Theme.svelte";
+    import semver from "semver";
 
     let fileinput: HTMLInputElement;
     let selectedFile: File;
@@ -26,6 +27,7 @@
     var otaKind = "";
     var accentColor = "";
     var backgroundColor = "";
+    var availableUpdate = "";
 
     var gateway = `ws://${window.location.hostname}/ws`;
     var websocket;
@@ -45,6 +47,80 @@
         accentColor = json.accentColor;
         backgroundColor = json.backgroundColor;
         initWebSocket();
+        checkForUpdates();
+    }
+
+    function getLocalStorageWithExpiry(key: string) {
+        let data = localStorage.getItem(key);
+
+        if (data) {
+            let item = JSON.parse(data);
+            let now = new Date();
+
+            if (now.getTime() > item.expiry) {
+                localStorage.removeItem(key);
+                return null;
+            }
+
+            return item.value;
+        }
+
+        return null;
+    }
+
+    function setLocalStorageWithExpiry(key: string, value: any, ttl: number) {
+        let now = new Date();
+        let item = {
+            value: value,
+            expiry: now.getTime() + ttl,
+        };
+
+        localStorage.setItem(key, JSON.stringify(item));
+    }
+
+    async function checkForUpdates() {
+        let lastCheck = getLocalStorageWithExpiry("availableUpdate");
+        var currentRelease = branch;
+        if (currentRelease.startsWith("v")) {
+            currentRelease = currentRelease.substring(1);
+        }
+
+        if (lastCheck != null) {
+            console.log("Cached update check available");
+
+            if (semver.valid(currentRelease) && semver.valid(lastCheck)) {
+                if (semver.gt(lastCheck, currentRelease)) {
+                    availableUpdate = lastCheck;
+                }
+            } else {
+                console.log("Already upto date");
+            }
+        } else {
+            console.log("Checking for updates");
+            let response = await fetch(
+                "https://api.github.com/repos/DiverOfDark/KNOMI/releases/latest",
+            );
+            let res = await response.json();
+            let latestRelease = res.name;
+
+            if (latestRelease.startsWith("v")) {
+                latestRelease = latestRelease.substring(1);
+            }
+
+            console.log(currentRelease);
+            if (semver.valid(currentRelease) && semver.valid(latestRelease)) {
+                if (semver.gt(latestRelease, currentRelease)) {
+                    availableUpdate = res.name;
+                    setLocalStorageWithExpiry(
+                        "availableUpdate",
+                        res.name,
+                        3600,
+                    );
+                } else {
+                    console.log("Already upto date");
+                }
+            }
+        }
     }
 
     function initWebSocket() {
@@ -418,6 +494,7 @@
                     {/if}
                 </button>
                 <input
+                    id="fileinput"
                     style="display:none"
                     type="file"
                     accept=".bin,.bin.gz"
@@ -446,7 +523,14 @@
                 Check
                 <a href="https://github.com/DiverOfDark/KNOMI" target="_blank"
                     >repository</a
-                > for more details.
+                >
+                for more details.
+                {#if availableUpdate != ""}
+                    Update to <a
+                        href="https://github.com/DiverOfDark/KNOMI/releases/tag/{availableUpdate}"
+                        >{availableUpdate}</a
+                    > available.
+                {/if}
             </small>
         </p>
     </footer>
