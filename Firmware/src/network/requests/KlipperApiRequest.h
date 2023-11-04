@@ -45,7 +45,7 @@ public:
     response = "";
 
     const char *path = getUrl();
-    LV_LOG_INFO("Http request to %s %s", klipper_ip.c_str(), path);
+    LV_LOG_DEBUG("Http request to %s %s", klipper_ip.c_str(), path);
 
     esp_http_client_config_t config = {
         .host = klipper_ip.c_str(),
@@ -57,7 +57,7 @@ public:
     esp_http_client_handle_t client = esp_http_client_init(&config);
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-      LV_LOG_INFO("HTTP GET Status = %d, content_length = %i", esp_http_client_get_status_code(client), esp_http_client_get_content_length(client));
+      LV_LOG_DEBUG("HTTP GET Status = %d, content_length = %i", esp_http_client_get_status_code(client), esp_http_client_get_content_length(client));
     } else {
       LV_LOG_INFO("HTTP GET request failed: %s", esp_err_to_name(err));
     }
@@ -104,12 +104,14 @@ public:
         StaticJsonDocument<2048> doc;
         deserializeJson(doc, response.c_str());
         failCount = 0;
+#if DEBUG
         unsigned int bufLen = response.length() * 2;
         auto buf = new char[bufLen];
         serializeJson(doc, buf, bufLen);
         LV_LOG_INFO("Parsed response:");
         LV_LOG_INFO(buf);
         delete[] buf;
+#endif
         processJson(doc);
       } else {
         LV_LOG_INFO("Error on HTTP asyncHttpRequest");
