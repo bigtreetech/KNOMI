@@ -24,6 +24,8 @@
     var otaProgress = false;
     var otaPercentage = 0;
     var otaKind = "";
+    var accentColor = "";
+    var backgroundColor = "";
 
     var gateway = `ws://${window.location.hostname}/ws`;
     var websocket;
@@ -40,7 +42,8 @@
         branch = json.branch;
         gitTimestamp = new Date(json.gitTimestamp).toLocaleString();
         buildTimestamp = new Date(json.buildTimestamp).toLocaleString();
-
+        accentColor = json.accentColor;
+        backgroundColor = json.backgroundColor;
         initWebSocket();
     }
 

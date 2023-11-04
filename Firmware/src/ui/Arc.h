@@ -34,7 +34,7 @@ public:
 
     uint32_t color = config->getAccentColor();
     uint32_t fgColor = hal->toSpiColor(color);
-    uint32_t bgColor = hal->toSpiColor(0x000000);
+    uint32_t bgColor = hal->toSpiColor(config->getBackgroundColor());
 
     int start = 180;
     int end = ((360 * progress) / 100 + 180) % 360;

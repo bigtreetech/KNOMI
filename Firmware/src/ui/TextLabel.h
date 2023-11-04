@@ -38,7 +38,7 @@ public:
       return;
 
     uint32_t color = config->getAccentColor();
-    uint32_t bgColor = DisplayHAL::toSpiColor(0x000000);
+    uint32_t bgColor = DisplayHAL::toSpiColor(config->getBackgroundColor());
 
     hal->tft->startWrite();
 
