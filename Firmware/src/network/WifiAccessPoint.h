@@ -1,6 +1,6 @@
 #pragma once
 #include "esp_wifi.h"
-#include "lvgl.h"
+#include "log.h"
 #include <DNSServer.h>
 #include <ESPmDNS.h>
 #include <WiFi.h>

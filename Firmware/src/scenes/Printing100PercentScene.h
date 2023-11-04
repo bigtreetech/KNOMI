@@ -12,4 +12,6 @@ public:
   ~Printing100PercentScene() override { delete ri_ok; }
 
   SwitchSceneRequest *NextScene() override { return new SwitchSceneRequest(deps, SceneId::AfterPrint); }
+
+  void Tick() override { ri_ok->tick(deps.displayHAL); }
 };

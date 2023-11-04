@@ -1,6 +1,5 @@
 #pragma once
 #include "../config/Config.h"
-#include "lvgl.h"
 #include <Arduino.h>
 #include <Ticker.h>
 

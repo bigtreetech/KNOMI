@@ -2,19 +2,21 @@
 #include "../generated/images.h"
 #include "../network/KlipperApi.h"
 #include "../network/WifiManager.h"
-#include "Styles.h"
 #include "SwitchSceneRequest.h"
-#include "lvgl.h"
+#include "log.h"
+#include "ui/Arc.h"
+#include "ui/DisplayHAL.h"
+#include "ui/TextLabel.h"
 
 class AbstractScene {
 protected:
   SceneDeps deps;
 
-  explicit AbstractScene(SceneDeps deps) : deps(deps) {}
+  explicit AbstractScene(SceneDeps deps) : deps(deps) { deps.displayHAL->setBackgroundColor(0x000000); }
 
 public:
   virtual SwitchSceneRequest *NextScene() = 0;
   virtual ~AbstractScene(){};
 
-  virtual void RefreshData() {}
+  virtual void Tick() {}
 };

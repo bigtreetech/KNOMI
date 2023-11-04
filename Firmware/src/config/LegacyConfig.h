@@ -1,7 +1,6 @@
 #pragma once
 #include "BaseConfig.h"
 #include <EEPROM.h>
-#include <lvgl.h>
 
 class LegacyConfig : BaseConfig {
 protected:

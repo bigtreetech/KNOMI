@@ -39,9 +39,7 @@
 
         if (file.size)
             if (getExtension(file.name) === ".gif") {
-                checkGif(file);
-            } else if (getExtension(file.name) === ".bmp") {
-                checkBmp(file);
+                loadToImgAndCheckResolution(file);
             } else {
                 selectedFileError =
                     "Not supported file format! Expected '" +
@@ -50,18 +48,6 @@
                     getExtension(file.name) +
                     "'";
             }
-    }
-
-    function checkBmp(file: File) {
-        // recode using https://github.com/shaozilee/bmp-js/blob/master/index.js
-        selectedFileError = "Bmp not supported yet";
-        return;
-
-        loadToImgAndCheckResolution(file);
-    }
-
-    function checkGif(file: File) {
-        loadToImgAndCheckResolution(file);
     }
 
     function loadToImgAndCheckResolution(file: File) {

@@ -1,5 +1,5 @@
 #pragma once
-#include "lvgl.h"
+#include "log.h"
 #include "network/WifiManager.h"
 #include "scenes/AbstractScene.h"
 #include "scenes/BootupLogo.h"
@@ -14,15 +14,16 @@ private:
   SceneDeps deps;
 
 public:
-  explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager, Styles *styles)
-      : deps(klipperApi, manager, webServer, styles) {
+  explicit SceneManager(KnomiWebServer *webServer, KlipperApi *klipperApi, WifiManager *manager, UIConfig *config,
+                        DisplayHAL *displayHAL)
+      : deps(klipperApi, manager, webServer, config, displayHAL) {
     this->currentScene = new BootupLogoScene(deps);
     this->currentSceneId = SceneId::BootupLogo;
   }
 
   SceneId getCurrentSceneId() { return currentSceneId; }
 
-  void SwitchSceneIfRequired() {
+  void switchSceneIfRequired() {
     if (switchSceneRequest != nullptr) {
       LV_LOG_INFO("Deleting current scene");
       delete currentScene;
@@ -35,9 +36,9 @@ public:
     }
   }
 
-  void RefreshScene() {
+  void refreshScene() {
     if (currentScene != nullptr) {
-      currentScene->RefreshData();
+      currentScene->Tick();
     }
   }
 
@@ -47,6 +48,8 @@ public:
 
     if (timer_contne == 0) {
       if (currentScene != nullptr) {
+        // todo reimplement this timer_contne to scene actually being able to track it's lifetime in millis + merge tick
+        // and nextscene();
         timer_contne = 5;
         switchSceneRequest = currentScene->NextScene();
         if (switchSceneRequest != nullptr && switchSceneRequest->timerOverride >= 0) {
@@ -58,6 +61,6 @@ public:
 
   void SwitchScene(SceneId id, int timerOverride = -1) {
     switchSceneRequest = new SwitchSceneRequest(deps, id, timerOverride);
-    SwitchSceneIfRequired();
+    switchSceneIfRequired();
   }
 };
