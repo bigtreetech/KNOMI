@@ -21,7 +21,7 @@ private:
     while (true) {
       esp_task_wdt_reset();
       ((SceneManager*)arg)->refreshScene();
-      vTaskDelay(33 / portTICK_PERIOD_MS);
+      vTaskDelay(15);
     }
   }
 
@@ -37,7 +37,7 @@ public:
         "displayUpdateTask",
         10000,      /* Stack size in words */
         this,
-        0,
+        21, // see https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/performance/speed.html
         NULL,
         0);         /* Core ID */
   }
