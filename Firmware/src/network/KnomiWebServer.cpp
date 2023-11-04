@@ -176,19 +176,6 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
     req->send(pResponse);
   });
 
-  pServer->on("/api/themeConfig", HTTP_GET, [&](AsyncWebServerRequest *req) {
-    if (this->config != nullptr && this->config->getUiConfig() != nullptr) {
-      AsyncResponseStream *response = req->beginResponseStream("application/json");
-      DynamicJsonDocument doc(128);
-      doc["accentColor"] = String("#") + String(this->config->getUiConfig()->getAccentColor(), HEX);
-
-      serializeJsonPretty(doc, *response);
-      req->send(response);
-    } else {
-      req->send(500, "text/html", "Failed to access UI config");
-    }
-  });
-
   pServer->on("/api/themeConfig", HTTP_POST, [&](AsyncWebServerRequest *req) {
     String newAccentColor;
     if (req->hasArg("accentColor")) {
@@ -230,6 +217,10 @@ KnomiWebServer::KnomiWebServer(Config *config, WifiManager *manager) {
 
     if (this->config->getKlipperConfig() != nullptr) {
       doc["ip"] = this->config->getKlipperConfig()->getHost();
+    }
+
+    if (this->config->getUiConfig() != nullptr) {
+      doc["accentColor"] = String("#") + String(this->config->getUiConfig()->getAccentColor(), HEX);
     }
 
     doc["ota_partition"] = String(esp_ota_get_running_partition()->label);
