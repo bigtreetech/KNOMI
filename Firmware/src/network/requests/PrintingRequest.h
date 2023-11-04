@@ -2,7 +2,7 @@
 #include "KlipperApiRequest.h"
 
 class PrintingRequest : public KlipperApiRequest {
-  const char* getUrl() override { return "/printer/objects/query?display_status"; }
+  const char *getUrl() override { return "/printer/objects/query?display_status"; }
 
   void processJson(JsonDocument &doc) override {
     double nameStr7 = (doc["result"]["status"]["display_status"]["progress"].as<double>()) * 100;

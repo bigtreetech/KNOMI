@@ -21,15 +21,13 @@ protected:
   int failCount = 0;
   int intervalCall = 2000; // ms
 
-  virtual const char* getUrl() = 0;
+  virtual const char *getUrl() = 0;
   virtual void processJson(JsonDocument &doc) = 0;
 
 public:
   int getFailCount() const { return failCount; }
 
-  KlipperApiRequest() {
-
-  }
+  KlipperApiRequest() {}
 
   void Execute(String &klipper_ip) {
     if (inProgress) {
@@ -47,17 +45,16 @@ public:
     const char *path = getUrl();
     LV_LOG_DEBUG("Http request to %s %s", klipper_ip.c_str(), path);
 
-    esp_http_client_config_t config = {
-        .host = klipper_ip.c_str(),
-        .path = path,
-        .disable_auto_redirect = true,
-        .event_handler = _http_event_handler,
-        .user_data = this
-    };
+    esp_http_client_config_t config = {.host = klipper_ip.c_str(),
+                                       .path = path,
+                                       .disable_auto_redirect = true,
+                                       .event_handler = _http_event_handler,
+                                       .user_data = this};
     esp_http_client_handle_t client = esp_http_client_init(&config);
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-      LV_LOG_DEBUG("HTTP GET Status = %d, content_length = %i", esp_http_client_get_status_code(client), esp_http_client_get_content_length(client));
+      LV_LOG_DEBUG("HTTP GET Status = %d, content_length = %i", esp_http_client_get_status_code(client),
+                   esp_http_client_get_content_length(client));
     } else {
       LV_LOG_INFO("HTTP GET request failed: %s", esp_err_to_name(err));
     }

@@ -7,9 +7,8 @@ public:
 
   esp_err_t handler(httpd_req_t *req) override {
     httpd_resp_set_type(req, "text/html");
-    // TODO change knomi_html generation to avoid cast
     httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-    httpd_resp_send(req, (char *)KNOMI_HTML, KNOMI_HTML_SIZE);
+    httpd_resp_send(req, KNOMI_HTML, KNOMI_HTML_SIZE);
     return ESP_OK;
   }
 };

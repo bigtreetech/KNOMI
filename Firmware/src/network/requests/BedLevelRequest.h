@@ -3,7 +3,7 @@
 
 class BedLevelRequest : public KlipperApiRequest {
 
-  const char* getUrl() override { return "/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"; }
+  const char *getUrl() override { return "/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"; }
 
   void processJson(JsonDocument &doc) override {
     String nameStr9 = doc["result"]["status"]["gcode_macro BED_MESH_CALIBRATE"]["probing"].as<String>();

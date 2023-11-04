@@ -1,11 +1,11 @@
 #pragma once
+#include "esp_task_wdt.h"
+#include "esp_timer.h"
 #include "log.h"
 #include "network/WifiManager.h"
 #include "scenes/AbstractScene.h"
 #include "scenes/BootupLogo.h"
 #include "scenes/SwitchSceneRequest.h"
-#include "esp_timer.h"
-#include "esp_task_wdt.h"
 #include "soc/rtc_wdt.h"
 
 class SceneManager {
@@ -16,11 +16,11 @@ private:
   SwitchSceneRequest *switchSceneRequest = nullptr;
   SceneDeps deps;
 
-  static void refreshSceneCallback(void* arg) {
+  static void refreshSceneCallback(void *arg) {
     esp_task_wdt_add(NULL);
     while (true) {
       esp_task_wdt_reset();
-      ((SceneManager*)arg)->refreshScene();
+      ((SceneManager *)arg)->refreshScene();
       vTaskDelay(15);
     }
   }
@@ -33,13 +33,10 @@ public:
     this->currentSceneId = SceneId::BootupLogo;
 
     xTaskCreatePinnedToCore(
-        refreshSceneCallback,
-        "displayUpdateTask",
-        10000,      /* Stack size in words */
+        refreshSceneCallback, "displayUpdateTask", 10000, /* Stack size in words */
         this,
-        21, // see https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/performance/speed.html
-        NULL,
-        0);         /* Core ID */
+        21,       // see https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/performance/speed.html
+        NULL, 0); /* Core ID */
   }
 
   SceneId getCurrentSceneId() { return currentSceneId; }

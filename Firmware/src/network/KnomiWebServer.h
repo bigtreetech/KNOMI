@@ -120,8 +120,6 @@ public:
     } else {
       // socket->cleanupClients();
     }
-
-
   }
 
   void websocketLog(const char *logString) { this->websocketPage->textAll(logString); }

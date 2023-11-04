@@ -2,7 +2,7 @@
 #include "KlipperApiRequest.h"
 
 class HomingRequest : public KlipperApiRequest {
-  const char* getUrl() override { return "/printer/objects/query?gcode_macro%20G28"; }
+  const char *getUrl() override { return "/printer/objects/query?gcode_macro%20G28"; }
 
   void processJson(JsonDocument &doc) override {
 
