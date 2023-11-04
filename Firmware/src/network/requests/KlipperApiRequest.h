@@ -15,9 +15,11 @@ class KlipperApiRequest {
 private:
   String response = "";
   bool inProgress = false;
+  ulong nextCall = 0;
 
 protected:
   int failCount = 0;
+  int intervalCall = 2000; // ms
 
   virtual const char* getUrl() = 0;
   virtual void processJson(JsonDocument &doc) = 0;
@@ -33,6 +35,11 @@ public:
     if (inProgress) {
       return;
     }
+    ulong now = millis();
+    if (nextCall > now) {
+      return;
+    }
+    nextCall = now + intervalCall;
 
     inProgress = true;
     response = "";
