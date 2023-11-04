@@ -20,7 +20,7 @@
     export let hash = "master";
 
     async function load() {
-        let themeConfig = await fetch("/api/themeConfig");
+        let themeConfig = await fetch("/api/status");
         let themeJson = await themeConfig.json();
         accentColor = themeJson.accentColor;
 
