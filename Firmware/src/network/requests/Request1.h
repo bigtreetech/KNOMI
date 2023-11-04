@@ -16,10 +16,10 @@ class Request1 : public KlipperApiRequest {
     tooltemp_actual = (uint16_t)((doc["temperature"]["tool0"]["actual"].as<double>()) * 100);
     tooltemp_target = (uint16_t)((doc["temperature"]["tool0"]["target"].as<double>()) * 100);
 
-    text_ext_actual_temp = nameStr3 + "°C";
-    text_ext_target_temp = nameStr4 + "°C";
-    text_bed_actual_temp = nameStr1 + "°C";
-    text_bed_target_temp = nameStr2 + "°C";
+    text_ext_actual_temp = nameStr3 + " C"; // TODO return degree (°) sign
+    text_ext_target_temp = nameStr4 + " C";
+    text_bed_actual_temp = nameStr1 + " C";
+    text_bed_target_temp = nameStr2 + " C";
 
     LV_LOG_INFO(text_ext_actual_temp.c_str());
     LV_LOG_INFO(text_ext_target_temp.c_str());
