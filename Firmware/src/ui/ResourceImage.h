@@ -46,7 +46,9 @@ public:
 
     if (nextFrame < now) {
       int delay = 0;
-      gif->playFrame(false, &delay, this);
+      if (!gif->playFrame(false, &delay, this)) {
+        delay = 500;
+      }
       nextFrame = now + delay;
     }
   }

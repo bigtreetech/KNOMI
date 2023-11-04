@@ -18,6 +18,7 @@ public:
         .user_ctx = this,
     };
 
+    LV_LOG_INFO("Registering %s %s", http_method_str(method), path);
     httpd_register_uri_handler(server, &hello);
   }
 

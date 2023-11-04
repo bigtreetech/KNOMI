@@ -77,8 +77,6 @@ __attribute__((unused)) void loop() {
     }
   }
 
-  sceneManager->switchSceneIfRequired();
-
   uint32_t nowtime = millis();
 
   if (nowtime > keyscan_nexttime) {

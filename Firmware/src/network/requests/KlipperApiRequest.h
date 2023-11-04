@@ -66,23 +66,23 @@ public:
   esp_err_t httpEventHandler(esp_http_client_event_t *evt) {
     switch (evt->event_id) {
     case HTTP_EVENT_ERROR:
-      LV_LOG_WARN("HTTP_EVENT_ERROR");
+      LV_LOG_DEBUG("HTTP_EVENT_ERROR");
       break;
     case HTTP_EVENT_ON_CONNECTED:
       // Incoming order: 1
-      LV_LOG_INFO("HTTP_EVENT_ON_CONNECTED");
+      LV_LOG_DEBUG("HTTP_EVENT_ON_CONNECTED");
       break;
     case HTTP_EVENT_HEADER_SENT:
       // Incoming order: 2
-      LV_LOG_INFO("HTTP_EVENT_HEADER_SENT");
+      LV_LOG_DEBUG("HTTP_EVENT_HEADER_SENT");
       break;
     case HTTP_EVENT_ON_HEADER:
       // Incoming order: 3. Good place to save headers.
-      LV_LOG_INFO("HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
+      LV_LOG_DEBUG("HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
       break;
     case HTTP_EVENT_ON_DATA:
       // Incoming order: 4. Aggregate data
-      LV_LOG_INFO("HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
+      LV_LOG_DEBUG("HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
       char *buffer;
       buffer = new char[evt->data_len + 1];
       memset(buffer, 0, evt->data_len + 1);
@@ -92,7 +92,7 @@ public:
       break;
     case HTTP_EVENT_ON_FINISH:
       // Incoming order: 5. Request fully buffered locally. process
-      LV_LOG_INFO("HTTP_EVENT_ON_FINISH");
+      LV_LOG_DEBUG("HTTP_EVENT_ON_FINISH");
       if (esp_http_client_get_status_code(evt->client) == 200) {
         StaticJsonDocument<2048> doc;
         deserializeJson(doc, response.c_str());
@@ -112,7 +112,7 @@ public:
       response = "";
       break;
     case HTTP_EVENT_DISCONNECTED: {
-      LV_LOG_INFO("HTTP_EVENT_DISCONNECTED");
+      LV_LOG_DEBUG("HTTP_EVENT_DISCONNECTED");
       int mbedtls_err = 0;
       esp_err_t err = esp_tls_get_and_clear_last_error((esp_tls_error_handle_t)evt->data, &mbedtls_err, NULL);
       if (err != 0) {

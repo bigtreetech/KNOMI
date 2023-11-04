@@ -15,10 +15,13 @@ private:
   SceneId currentSceneId;
   SwitchSceneRequest *switchSceneRequest = nullptr;
   SceneDeps deps;
-  esp_timer_handle_t periodic_timer;
 
   static void refreshSceneCallback(void* arg) {
-    ((SceneManager*)arg)->refreshScene();
+    esp_task_wdt_add(NULL);
+    while (true) {
+      esp_task_wdt_reset();
+      ((SceneManager*)arg)->refreshScene();
+    }
   }
 
 public:
@@ -28,19 +31,19 @@ public:
     this->currentScene = new BootupLogoScene(deps);
     this->currentSceneId = SceneId::BootupLogo;
 
-    const esp_timer_create_args_t periodic_timer_args = {
-        .callback = &refreshSceneCallback,
-        .arg = this,
-        .name = "screen",
-        .skip_unhandled_events = true
-    };
-    esp_timer_create(&periodic_timer_args, &periodic_timer);
-    esp_timer_start_periodic(periodic_timer, 33000); // 33 ms for screen update
+    xTaskCreatePinnedToCore(
+        refreshSceneCallback,
+        "displayUpdateTask",
+        10000,      /* Stack size in words */
+        this,
+        0,
+        NULL,
+        0);         /* Core ID */
   }
 
   ~SceneManager() {
-    esp_timer_stop(periodic_timer);
-    esp_timer_delete(periodic_timer);
+    //esp_timer_stop(periodic_timer);
+    //esp_timer_delete(periodic_timer);
   }
 
   SceneId getCurrentSceneId() { return currentSceneId; }
@@ -61,6 +64,7 @@ public:
   void refreshScene() {
     if (currentScene != nullptr) {
       currentScene->Tick();
+      switchSceneIfRequired();
     }
   }
 
