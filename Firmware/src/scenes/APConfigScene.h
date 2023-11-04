@@ -7,7 +7,7 @@ private:
 
 public:
   explicit APConfigScene(SceneDeps deps) : AbstractScene(deps) {
-    deps.displayHAL->setBackgroundColor(0x000000);
+    deps.displayHAL->setBackgroundColor(deps.styles->getBackgroundColor());
     logo = KnownResourceImages::get_AP_Config_Back();
     apcfg = KnownResourceImages::get_AP_Config(0, -36);
   }

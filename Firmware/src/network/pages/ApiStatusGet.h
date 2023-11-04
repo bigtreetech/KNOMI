@@ -28,6 +28,11 @@ public:
       doc["ip"] = this->config->getKlipperConfig()->getHost();
     }
 
+    if (this->config->getUiConfig() != nullptr) {
+      doc["accentColor"] = String("#") + String(this->config->getUiConfig()->getAccentColor(), HEX);
+      doc["backgroundColor"] = String("#") + String(this->config->getUiConfig()->getBackgroundColor(), HEX);
+    }
+
     doc["ota_partition"] = String(esp_ota_get_running_partition()->label);
     multi_heap_info_t info;
     heap_caps_get_info(&info, MALLOC_CAP_DEFAULT);

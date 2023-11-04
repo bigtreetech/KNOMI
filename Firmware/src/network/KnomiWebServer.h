@@ -20,6 +20,7 @@
 #include "pages/ApiListFilesGet.h"
 #include "pages/ApiRestartPageGet.h"
 #include "pages/ApiStatusGet.h"
+#include "pages/ApiThemeConfigPost.h"
 #include "pages/ApiUploadFileDelete.h"
 #include "pages/ApiUploadFilePost.h"
 #include "pages/RootPage.h"
@@ -48,6 +49,7 @@ private:
   ApiUploadFileDelete *apiUploadFileDelete = nullptr;
   ApiUploadFilePost *apiUploadFilePost = nullptr;
   ApiConfigWifiPost *apiConfigWifiPost = nullptr;
+  ApiThemeConfigPost *apiThemeConfigPost = nullptr;
   UpdatePost *updatePost = nullptr;
   StaticFileContentGet *staticFileContentGet = nullptr;
 
@@ -106,6 +108,7 @@ public:
         this->apiListFilesGet = new ApiListFilesGet(server);
         this->apiStatusGet = new ApiStatusGet(config, server);
         this->apiCoreDumpGet = new ApiCoreDumpGet(server);
+        this->apiThemeConfigPost = new ApiThemeConfigPost(server);
         this->apiUploadFileDelete = new ApiUploadFileDelete(server);
         this->apiUploadFilePost = new ApiUploadFilePost(server);
         this->apiConfigWifiPost = new ApiConfigWifiPost(manager, server);
