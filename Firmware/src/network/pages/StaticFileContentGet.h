@@ -9,7 +9,7 @@ public:
   esp_err_t handler(httpd_req_t *req) override {
     String filename = String(req->uri);
     LV_LOG_INFO("Checking for filename %s", filename.c_str());
-    filename = filename.substring(filename.indexOf("fs/") + 3);
+    filename = filename.substring(filename.indexOf("fs/") + 2);
     int idx = filename.indexOf('?');
     if (idx >= 0)
       filename = filename.substring(0, idx);

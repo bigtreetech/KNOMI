@@ -100,6 +100,7 @@ public:
       httpdConfig.lru_purge_enable = true;
       httpdConfig.uri_match_fn = httpd_uri_match_wildcard;
       httpdConfig.stack_size = 8192;
+      httpdConfig.max_uri_handlers = 32;
 
       LV_LOG_INFO("Starting server on port: '%d'", httpdConfig.server_port);
       if (httpd_start(&server, &httpdConfig) == ESP_OK) {

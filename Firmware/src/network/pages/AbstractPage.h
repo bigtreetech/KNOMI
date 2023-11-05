@@ -17,7 +17,10 @@ public:
     };
 
     LV_LOG_INFO("Registering %s %s", http_method_str(method), path);
-    httpd_register_uri_handler(server, &handlerInfo);
+    esp_err_t i = httpd_register_uri_handler(server, &handlerInfo);
+    if (i != ESP_OK) {
+      LV_LOG_WARN("Failed to register uri %s: %s", path, esp_err_to_name(i));
+    }
   }
 
   static esp_err_t handlerStatic(httpd_req_t *request) { return ((AbstractPage *)request->user_ctx)->handler(request); }
