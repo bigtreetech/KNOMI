@@ -33,7 +33,7 @@ public:
     this->currentSceneId = SceneId::BootupLogo;
 
     xTaskCreatePinnedToCore(
-        refreshSceneCallback, "displayUpdateTask", 10000, /* Stack size in words */
+        refreshSceneCallback, "displayUpdate", 10000, /* Stack size in words */
         this,
         21,       // see https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/performance/speed.html
         NULL, 0); /* Core ID */

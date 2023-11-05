@@ -71,6 +71,7 @@ public:
     delete apiUploadFileDelete;
     delete apiUploadFilePost;
     delete apiConfigWifiPost;
+    delete apiThemeConfigPost;
     delete updatePost;
     delete staticFileContentGet;
 
@@ -80,6 +81,7 @@ public:
 
   void registerNotFound() { httpd_register_err_handler(server, HTTPD_404_NOT_FOUND, notFoundStaticCode); }
   static esp_err_t notFoundStaticCode(httpd_req_t *req, httpd_err_code_t error) {
+    LV_LOG_INFO("Failed to find page for %s", req->uri);
     httpd_resp_set_hdr(req, "Location", "/");
     httpd_resp_set_status(req, "303 See Other");
     httpd_resp_sendstr(req, "");
@@ -97,6 +99,7 @@ public:
       httpd_config_t httpdConfig = HTTPD_DEFAULT_CONFIG();
       httpdConfig.lru_purge_enable = true;
       httpdConfig.uri_match_fn = httpd_uri_match_wildcard;
+      httpdConfig.stack_size = 8192;
 
       LV_LOG_INFO("Starting server on port: '%d'", httpdConfig.server_port);
       if (httpd_start(&server, &httpdConfig) == ESP_OK) {

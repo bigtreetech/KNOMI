@@ -27,20 +27,20 @@ ulong lastLogTime;
 void logToSerial(const char *logLevel, const char *file, int line, const char *func, const char *format, ...) {
   va_list args;
   va_start(args, format);
-  char buf[2048];
-  char msg[1024];
+  static char msg[1024];
   ulong t = millis();
   vsnprintf(msg, sizeof(msg), format, args);
-  snprintf(buf, sizeof(buf), "[%s] \t[%u] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s:%d)\n", logLevel,
-           esp_get_free_heap_size(), t / 1000, t % 1000, t - lastLogTime, func, msg, file, line);
+  va_end(args);
+
+  static char buf[2048];
+  snprintf(buf, sizeof(buf), "[%s] \t[%u] [%s] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s:%d)\n", logLevel,
+           esp_get_free_heap_size(), pcTaskGetName(xTaskGetCurrentTaskHandle()), t / 1000, t % 1000, t - lastLogTime, func, msg, file, line);
   lastLogTime = t;
 
-  Serial.print(buf);
+  printf(buf);
   if (webServer != nullptr) {
     webServer->websocketLog(buf);
   }
-
-  va_end(args);
 }
 
 __attribute__((unused)) void setup() {
