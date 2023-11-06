@@ -20,7 +20,4 @@ Online manual & customize UI tutorials：[here](https://bigtreetech.github.io/do
 
 ## Development notes:
 
-To create suitable BMP files:
- # ffmpeg -i source.gif -sws_flags neighbor -sws_dither none -pix_fmt rgb565 -y result.bmp
-
 For building you need nodejs installed and available on path.
