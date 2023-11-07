@@ -69,6 +69,7 @@ __attribute__((unused)) void setup() {
 }
 
 __attribute__((unused)) void loop() {
+  // TODO move to display tick and sync with file upload
   if (webServer->isUpdateInProgress() && sceneManager->getCurrentSceneId() != SceneId::FirmwareUpdate) {
     sceneManager->SwitchScene(SceneId::FirmwareUpdate, 0);
   } else if (WiFi.isConnected() && !btn->isPressed()) {
