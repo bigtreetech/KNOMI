@@ -16,8 +16,8 @@ private:
   AnimatedGIF *gif;
   int x;
   int y;
-  int width;
-  int height;
+  int width = 0;
+  int height = 0;
   ulong nextFrame = 0;
 
   // we don't own this
@@ -32,15 +32,19 @@ public:
     const char *szFilename = this->filename.c_str();
     gif = new AnimatedGIF();
     gif->begin(BIG_ENDIAN_PIXELS);
-    gif->open(szFilename, gifOpen, gifClose, gifRead, gifSeek, gifDraw);
-    this->width = gif->getCanvasWidth();
-    this->height = gif->getCanvasHeight();
+    if (gif->open(szFilename, gifOpen, gifClose, gifRead, gifSeek, gifDraw)) {
+      this->width = gif->getCanvasWidth();
+      this->height = gif->getCanvasHeight();
+    }
     LV_LOG_DEBUG(("Created resource image " + this->filename).c_str());
   }
 
   void tick(GIFDRAW *pDraw) { currentHal->GIFDraw(pDraw, x, y, width, height); }
 
   void tick(DisplayHAL *displayHal) {
+    if (this->width == 0 || this->height == 0)
+      return;
+
     this->currentHal = displayHal;
     ulong now = millis();
 

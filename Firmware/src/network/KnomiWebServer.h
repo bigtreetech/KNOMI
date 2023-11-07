@@ -27,6 +27,7 @@
 #include "pages/StaticFileContentGet.h"
 #include "pages/UpdatePost.h"
 #include "pages/WebsocketLog.h"
+#include "UpdateProgress.h"
 
 class KnomiWebServer {
 private:
@@ -36,9 +37,7 @@ private:
   bool started = false;
   Config *config = nullptr;
 
-  bool updateInProgress = false;
-  ulong updateTotal = 0;
-  ulong updateDone = 0;
+  UpdateProgress progress;
 
   RootPage *rootPage = nullptr;
   ApiRestartPageGet *apiRestartPageGet = nullptr;
@@ -88,10 +87,10 @@ public:
     return ESP_OK;
   }
 
-  bool isUpdateInProgress() { return updateInProgress; }
+  bool isUpdateInProgress() { return progress.isInProgress; }
 
-  ulong getUpdateDone() { return updateDone; }
-  ulong getUpdateTotal() { return updateTotal; }
+  ulong getUpdateDone() { return progress.current; }
+  ulong getUpdateTotal() { return progress.total; }
 
   void tick() {
     if (!this->started) {
@@ -114,7 +113,7 @@ public:
         this->apiCoreDumpGet = new ApiCoreDumpGet(server);
         this->apiThemeConfigPost = new ApiThemeConfigPost(server);
         this->apiUploadFileDelete = new ApiUploadFileDelete(server);
-        this->apiUploadFilePost = new ApiUploadFilePost(server);
+        this->apiUploadFilePost = new ApiUploadFilePost(server, &progress);
         this->apiConfigWifiPost = new ApiConfigWifiPost(manager, server);
         this->updatePost = new UpdatePost(server);
         this->staticFileContentGet = new StaticFileContentGet(server);
