@@ -7,7 +7,8 @@ void logToSerial(const char *logLevel, const char *file, int line, const char *f
 #define LV_LOG_DEBUG(...) logToSerial("DEBUG", __FILE__, __LINE__, __func__, __VA_ARGS__)
 #else
 #define LV_LOG_DEBUG(...)                                                                                              \
-  do {} while(false)
+  do {                                                                                                                 \
+  } while (false)
 #endif
 
 #define LV_LOG_INFO(...) logToSerial("INFO", __FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)

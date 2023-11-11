@@ -14,6 +14,7 @@
 #include <esp_ota_ops.h>
 #include <set>
 
+#include "UpdateProgress.h"
 #include "pages/ApiConfigWifiPost.h"
 #include "pages/ApiCoreDumpGet.h"
 #include "pages/ApiDumpHeapGet.h"
@@ -27,7 +28,6 @@
 #include "pages/StaticFileContentGet.h"
 #include "pages/UpdatePost.h"
 #include "pages/WebsocketLog.h"
-#include "UpdateProgress.h"
 
 class KnomiWebServer {
 private:
@@ -37,7 +37,7 @@ private:
   bool started = false;
   Config *config = nullptr;
 
-  UpdateProgress progress;
+  UpdateProgress *progress = nullptr;
 
   RootPage *rootPage = nullptr;
   ApiRestartPageGet *apiRestartPageGet = nullptr;
@@ -55,9 +55,10 @@ private:
   WebsocketLog *websocketPage = nullptr;
 
 public:
-  KnomiWebServer(Config *config, WifiManager *manager) {
+  KnomiWebServer(Config *config, WifiManager *manager, UpdateProgress *progress) {
     this->config = config;
     this->manager = manager;
+    this->progress = progress;
   }
 
   ~KnomiWebServer() {
@@ -87,11 +88,6 @@ public:
     return ESP_OK;
   }
 
-  bool isUpdateInProgress() { return progress.isInProgress; }
-
-  ulong getUpdateDone() { return progress.current; }
-  ulong getUpdateTotal() { return progress.total; }
-
   void tick() {
     if (!this->started) {
       this->started = true;
@@ -113,7 +109,7 @@ public:
         this->apiCoreDumpGet = new ApiCoreDumpGet(server);
         this->apiThemeConfigPost = new ApiThemeConfigPost(server);
         this->apiUploadFileDelete = new ApiUploadFileDelete(server);
-        this->apiUploadFilePost = new ApiUploadFilePost(server, &progress);
+        this->apiUploadFilePost = new ApiUploadFilePost(server, progress);
         this->apiConfigWifiPost = new ApiConfigWifiPost(manager, server);
         this->updatePost = new UpdatePost(server);
         this->staticFileContentGet = new StaticFileContentGet(server);

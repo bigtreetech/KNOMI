@@ -16,10 +16,10 @@ WifiManager *wifiManager = nullptr;
 Button *btn = nullptr;
 KnomiWebServer *webServer = nullptr;
 KlipperApi *klipperApi = nullptr;
-SceneManager *sceneManager = nullptr;
+__attribute__((unused)) SceneManager *sceneManager = nullptr;
 DisplayHAL *displayHAL = nullptr;
+UpdateProgress *progress = nullptr;
 
-uint32_t keyscan_nexttime = 0;
 uint32_t netcheck_nexttime = 0;
 uint32_t klipper_nexttime = 0;
 
@@ -34,7 +34,8 @@ void logToSerial(const char *logLevel, const char *file, int line, const char *f
 
   static char buf[2048];
   snprintf(buf, sizeof(buf), "[%s] \t[%u] [%s] \t(%lu.%03lu, +%lu)\t %s: %s\t(in %s:%d)\n", logLevel,
-           esp_get_free_heap_size(), pcTaskGetName(xTaskGetCurrentTaskHandle()), t / 1000, t % 1000, t - lastLogTime, func, msg, file, line);
+           esp_get_free_heap_size(), pcTaskGetName(xTaskGetCurrentTaskHandle()), t / 1000, t % 1000, t - lastLogTime,
+           func, msg, file, line);
   lastLogTime = t;
 
   printf(buf);
@@ -60,32 +61,19 @@ __attribute__((unused)) void setup() {
   LV_LOG_INFO("DisplayHAL created");
   klipperApi = new KlipperApi(config);
   LV_LOG_INFO("KlipperAPI started");
-  webServer = new KnomiWebServer(config, wifiManager);
+  progress = new UpdateProgress();
+  webServer = new KnomiWebServer(config, wifiManager, progress);
   LV_LOG_INFO("WebServer started");
-  sceneManager = new SceneManager(webServer, klipperApi, wifiManager, config->getUiConfig(), displayHAL);
+  sceneManager = new SceneManager(webServer, progress, klipperApi, wifiManager, config->getUiConfig(), displayHAL, btn);
   LV_LOG_INFO("SceneManager started");
   wifiManager->connectToWiFi();
   LV_LOG_INFO("Connected to wifi");
 }
 
 __attribute__((unused)) void loop() {
-  // TODO move to display tick and sync with file upload
-  if (webServer->isUpdateInProgress() && sceneManager->getCurrentSceneId() != SceneId::FirmwareUpdate) {
-    sceneManager->SwitchScene(SceneId::FirmwareUpdate, 0);
-  } else if (WiFi.isConnected() && !btn->isPressed()) {
-    if (klipperApi->isKlipperNotAvailable() && sceneManager->getCurrentSceneId() != SceneId::NoKlipper) {
-      sceneManager->SwitchScene(SceneId::NoKlipper, 0);
-    }
-  }
-
   uint32_t nowtime = millis();
 
-  if (nowtime > keyscan_nexttime) {
-    sceneManager->Timer();
-    keyscan_nexttime = nowtime + 400;
-  }
-
-  if (nowtime > klipper_nexttime && WiFi.isConnected()) {
+  if (nowtime > klipper_nexttime && WiFi.isConnected() && !progress->isInProgress) {
     klipperApi->refreshData();
     klipper_nexttime = nowtime + 2000;
   }

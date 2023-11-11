@@ -1,14 +1,15 @@
 #pragma once
+#include "../UpdateProgress.h"
 #include "AbstractPage.h"
 #include "esp_rom_md5.h"
-#include "../UpdateProgress.h"
 #include <functional>
 
 class ApiUploadFilePost : public AbstractPage {
-  UpdateProgress* updateProgress;
+  UpdateProgress *updateProgress;
 
 public:
-  explicit ApiUploadFilePost(httpd_handle_t server, UpdateProgress* progress) : AbstractPage(server, HTTP_POST, "/api/uploadFile") {
+  explicit ApiUploadFilePost(httpd_handle_t server, UpdateProgress *progress)
+      : AbstractPage(server, HTTP_POST, "/api/uploadFile") {
     this->updateProgress = progress;
   }
 
@@ -26,7 +27,7 @@ public:
     auto builder = MD5Builder();
     builder.begin();
 
-    int errorCode = 200;
+    String errorCode = "200 OK";
     String errorText = "OK";
 
     fs::File tempFile;
@@ -48,22 +49,28 @@ public:
         int uploadSize = size.toInt();
 
         if (available < minimalAvailableSize + uploadSize) {
-          errorCode = 400;
+          errorCode = "500 Internal Server Error";
           errorText = "Not enough of free space";
           return (ReadCallback) nullptr;
         }
 
         updateProgress->total = uploadSize;
         updateProgress->current = 0;
+        updateProgress->isInProgress = true;
+        LV_LOG_INFO("UpdateProgress %i / %i", updateProgress->current, updateProgress->total);
+        if (!updateProgress->waitForCanWrite()) {
+          errorCode = "500 Internal Server Error";
+          errorText = "Internal error.";
+          return (ReadCallback) nullptr;
+        }
+        LV_LOG_INFO("UpdateProgress check done");
 
         tempFile = LittleFS.open("/" + filename, "w");
-
-        updateProgress->isInProgress = true;
         LV_LOG_INFO("Upload start %s", filename.c_str());
 
         ReadCallback md5print = [&](const char *buf, int idx, int size) {
           updateProgress->current += size;
-          tempFile.write(((uint8_t *)buf)+idx, size);
+          tempFile.write(((uint8_t *)buf) + idx, size);
           LV_LOG_INFO("Written %i", size);
 
           builder.add(((uint8_t *)buf) + idx, size);
@@ -78,15 +85,17 @@ public:
     LV_LOG_INFO(size.c_str());
     LV_LOG_INFO(builder.toString().c_str());
 
+    httpd_resp_set_status(req, errorCode.c_str());
     httpd_resp_set_type(req, "text/plain");
-    httpd_resp_set_status(req, String(errorCode).c_str());
     httpd_resp_sendstr(req, errorText.c_str());
     updateProgress->isInProgress = false;
     updateProgress->total = 0;
     updateProgress->current = 0;
 
-    tempFile.flush();
-    tempFile.close();
+    if (tempFile) {
+      tempFile.flush();
+      tempFile.close();
+    }
 
     return ESP_OK;
   }
