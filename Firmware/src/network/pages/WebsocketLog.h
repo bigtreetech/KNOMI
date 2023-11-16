@@ -2,47 +2,43 @@
 #include "AbstractPage.h"
 
 class WebsocketLog : public AbstractPage {
+private:
+  httpd_handle_t server;
+
 public:
-  explicit WebsocketLog(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/ws") {}
+  explicit WebsocketLog(httpd_handle_t server) : AbstractPage(server, HTTP_GET, "/ws") { this->server = server; }
 
   esp_err_t handler(httpd_req_t *req) override {
-    /* TODO
-    auto *pSocket = new AsyncWebSocket("/ws");
-    pSocket->onEvent([&](AsyncWebSocket *_unused, AsyncWebSocketClient *client, AwsEventType type, void *arg,
-                         uint8_t *data, size_t len) {
-      switch (type) {
-      case WS_EVT_CONNECT:
-        LV_LOG_INFO("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-        break;
-      case WS_EVT_DISCONNECT:
-        LV_LOG_INFO("WebSocket client #%u disconnected\n", client->id());
-        break;
-      case WS_EVT_DATA:
-        // Here is an example on how to handle message from JS. Probably we won't
-        // ever need that.
-        // AwsFrameInfo *info = (AwsFrameInfo*)arg;
-        // if (info->final && info->index == 0 && info->len == len && info->opcode
-        // == WS_TEXT) { data[len] = 0; String message = (char*)data;
-        // Check if the message is "getReadings"
-        // if (strcmp((char*)data, "getReadings") == 0) {
-        // if it is, send current sensor readings
-        // String sensorReadings = getSensorReadings();
-        // notifyClients(sensorReadings);
-        //}
-        //}
-      case WS_EVT_PONG:
-      case WS_EVT_ERROR:
-        break;
-      }
-    });
-    pServer->addHandler(pSocket);
-     */
+    if (req->method == HTTP_GET) {
+      ESP_LOGI(TAG, "Handshake done, the new connection was opened");
+      return ESP_OK;
+    }
+
     return ESP_OK;
   }
+
   void textAll(const char *string) {
-    // TODO
-    // if (socket != nullptr && !socket->getClients().isEmpty()) {
-    //   socket->textAll(logString);
-    // }
+    static constexpr size_t max_clients = CONFIG_LWIP_MAX_LISTENING_TCP;
+    size_t fds = max_clients;
+    int client_fds[max_clients] = {0};
+
+    esp_err_t ret = httpd_get_client_list(server, &fds, client_fds);
+
+    if (ret != ESP_OK) {
+      return;
+    }
+
+    for (int i = 0; i < fds; i++) {
+      auto client_info = httpd_ws_get_fd_info(server, client_fds[i]);
+      if (client_info == HTTPD_WS_CLIENT_WEBSOCKET) {
+        httpd_ws_frame_t ws_pkt;
+        memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+        ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+        ws_pkt.len = strlen(string);
+        ws_pkt.payload = (uint8_t *)string;
+
+        httpd_ws_send_frame_async(server, client_fds[i], &ws_pkt);
+      }
+    }
   }
 };

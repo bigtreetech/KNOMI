@@ -107,11 +107,11 @@ public:
         this->apiListFilesGet = new ApiListFilesGet(server);
         this->apiStatusGet = new ApiStatusGet(config, server);
         this->apiCoreDumpGet = new ApiCoreDumpGet(server);
-        this->apiThemeConfigPost = new ApiThemeConfigPost(server);
+        this->apiThemeConfigPost = new ApiThemeConfigPost(server, config->getUiConfig());
         this->apiUploadFileDelete = new ApiUploadFileDelete(server);
         this->apiUploadFilePost = new ApiUploadFilePost(server, progress);
-        this->apiConfigWifiPost = new ApiConfigWifiPost(manager, server);
-        this->updatePost = new UpdatePost(server);
+        this->apiConfigWifiPost = new ApiConfigWifiPost(manager, server, config);
+        this->updatePost = new UpdatePost(server, progress);
         this->staticFileContentGet = new StaticFileContentGet(server);
 
         this->websocketPage = new WebsocketLog(server);
@@ -124,5 +124,9 @@ public:
     }
   }
 
-  void websocketLog(const char *logString) { this->websocketPage->textAll(logString); }
+  void websocketLog(const char *logString) {
+    if (this->websocketPage != nullptr) {
+      this->websocketPage->textAll(logString);
+    }
+  }
 };
