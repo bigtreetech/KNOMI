@@ -1,50 +1,51 @@
 #pragma once
+#include "../../config/UIConfig.h"
 #include "AbstractPage.h"
 
 class ApiThemeConfigPost : public AbstractPage {
+  UIConfig *uiConfig;
+
 public:
-  explicit ApiThemeConfigPost(httpd_handle_t server) : AbstractPage(server, HTTP_POST, "/api/themeConfig") {}
+  explicit ApiThemeConfigPost(httpd_handle_t server, UIConfig *uiConfig)
+      : AbstractPage(server, HTTP_POST, "/api/themeConfig") {
+    this->uiConfig = uiConfig;
+  }
 
   esp_err_t handler(httpd_req_t *req) override {
-    /* TODO
     String newAccentColor;
-if (req->hasArg("accentColor")) {
- newAccentColor = req->arg("accentColor");
+    String newBackgroundColor;
+    if (!streamReadMultipart(req, [&](const String &formData, const String &fn) {
+          if (formData.equals("accentColor")) {
+            return readString(&newAccentColor);
+          }
+          if (formData.equals("backgroundColor")) {
+            return readString(&newBackgroundColor);
+          }
+          return (ReadCallback) nullptr;
+        })) {
+      return ESP_OK;
+    }
 
-if (newAccentColor.startsWith("#")) {
- newAccentColor = newAccentColor.substring(1);
-}
-}
+    if (newAccentColor.startsWith("#")) {
+      newAccentColor = newAccentColor.substring(1);
+    }
+    if (newBackgroundColor.startsWith("#")) {
+      newBackgroundColor = newBackgroundColor.substring(1);
+    }
 
-String newBackgroundColor;
-if (req->hasArg("backgroundColor")) {
-newBackgroundColor = req->arg("backgroundColor");
+    if (newAccentColor != nullptr) {
+      LV_LOG_INFO("Updating accentColor to: %s", newAccentColor.c_str());
+      uiConfig->setAccentColor(strtol(newAccentColor.c_str(), NULL, 16));
+    }
+    if (newBackgroundColor != nullptr) {
+      LV_LOG_INFO("Updating backgroundColor to: %s", newBackgroundColor.c_str());
+      uiConfig->setBackgroundColor(strtol(newBackgroundColor.c_str(), NULL, 16));
+    }
 
-if (newBackgroundColor.startsWith("#")) {
- newBackgroundColor = newBackgroundColor.substring(1);
-}
-}
+    uiConfig->save();
 
-if (this->config != nullptr && this->config->getUiConfig() != nullptr) {
-if (newAccentColor != nullptr) {
- LV_LOG_INFO((String("Updating accentColor to: ") + newAccentColor).c_str());
- this->config->getUiConfig()->setAccentColor(strtol(newAccentColor.c_str(), NULL, 16));
-}
-
-if (newBackgroundColor != nullptr) {
- LV_LOG_INFO((String("Updating backgroundColor to: ") + newBackgroundColor).c_str());
- this->config->getUiConfig()->setBackgroundColor(strtol(newBackgroundColor.c_str(), NULL, 16));
-}
-
-this->config->getUiConfig()->save();
-req->send(200, "application/json", "{result: \"ok\"}");
-
-delay(100);
-ESP.restart();
-} else {
-req->send(500, "text/html", "Failed to access UI config");
-}
-    });*/
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_sendstr(req, "{result: \"ok\"}");
     return ESP_OK;
   }
 };

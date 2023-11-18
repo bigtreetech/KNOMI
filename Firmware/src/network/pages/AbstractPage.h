@@ -30,6 +30,15 @@ private:
       xp[n] = xx[(bb[n >> 1] >> ((1 - (n & 1)) << 2)) & 0xF];
   }
 
+  static inline void dump_buf(const char* buf, int size = 512) {
+    char *debug = new char[size * 2 + 1];
+    memset(debug, 0, size * 2 + 1);
+    btox(debug, buf, size * 2);
+    LV_LOG_INFO(debug);
+
+    delete[] debug;
+  }
+
   static uint advanceBuffer(httpd_req_t *req, char *buf, int bufferSize, uint currentPos, uint maxPos) {
     LV_LOG_DEBUG("Advance buffer from %i", currentPos);
     uint copyStart = currentPos;
@@ -49,12 +58,7 @@ private:
     } while (bytesRead != 0 && copyLength < bufferSize);
 
 #if DEBUG
-    char *debug = new char[1024];
-    memset(debug, 0, 1024);
-    btox(debug, buf, 511);
-    LV_LOG_DEBUG(debug);
-
-    delete[] debug;
+    dump_buf(buf);
 #endif
 
     LV_LOG_DEBUG("Advanced buffer from %i to %i", currentPos, copyLength);
@@ -91,8 +95,21 @@ protected:
 
   typedef std::function<void(const char *, uint, uint)> ReadCallback;
 
+  static bool streamReadMultipart(httpd_req_t *req, const std::function<ReadCallback(String, String)> &func) {
+    String header = getHeader(req, "Content-Type");
+
+    if (!header.startsWith("multipart/form-data")) {
+      httpd_resp_send_500(req);
+      return false;
+    }
+
+    String boundary = "--" + header.substring(header.indexOf("boundary=") + 9);
+    streamReadMultipart(req, boundary, func);
+    return true;
+  }
+
   static void streamReadMultipart(httpd_req_t *req, const String &boundary,
-                                  const std::function<ReadCallback(String)> &func) {
+                                  const std::function<ReadCallback(String, String)> &func) {
     LV_LOG_INFO("Streaming multipart read");
     int bufferSize = 8192;
     char *buf = new char[bufferSize];
@@ -125,45 +142,25 @@ protected:
         currentCallback = nullptr;
         // need to read headers. Advance buffer;
         read = advanceBuffer(req, buf, bufferSize, boundaryPos + boundary.length(), read);
+        pos = 0;
 
         int posDisp = findString(buf, read, "Content-Disposition:");
+        int posDispEnd = findString(buf + posDisp, read - posDisp, "\r\n");
         int content = findString(buf, read, "\r\n\r\n");
+        LV_LOG_DEBUG("CD poses %i %i %i", posDisp, posDispEnd, content);
+        if (posDisp >= 0) {
+          pos = content + 4;
 
-        pos = content + 4;
+          auto pair = parseContentDisposition(buf, posDisp, posDispEnd);
+          String name = String(pair.first.c_str());
+          String filename = pair.second.empty() ? "" : String(pair.second.c_str());
 
-        std::string contentDisposition = std::string(buf + posDisp, content - posDisp);
-        contentDisposition = contentDisposition.substr(contentDisposition.find(':') + 1);
-        LV_LOG_DEBUG("CD = %s", contentDisposition.c_str());
-        do {
-          auto end = contentDisposition.find(';');
-          std::string currentPart;
-          LV_LOG_DEBUG("End = %i, Current = %s", end, contentDisposition.c_str());
-          if (end != std::string::npos) {
-            currentPart = contentDisposition.substr(0, end);
-            contentDisposition = contentDisposition.substr(end + 1);
-          } else {
-            currentPart = contentDisposition;
-            contentDisposition = "";
+          if (!name.isEmpty()) {
+            currentCallback = func(name, filename);
+            LV_LOG_DEBUG("For %s / %s currentCallback is %i", name.c_str(), filename.c_str(),
+                        currentCallback == nullptr ? 0 : 1);
           }
-          LV_LOG_DEBUG("CP = %s, CD = %s", currentPart.c_str(), contentDisposition.c_str());
-
-          auto equalsPos = currentPart.find('=');
-          LV_LOG_DEBUG("EqualsPos = %i", equalsPos);
-          if (equalsPos != std::string::npos) {
-            std::string key = currentPart.substr(0, equalsPos);
-            std::string value = currentPart.substr(equalsPos + 1);
-            key = trim(key, " ");
-            value = trim(value, "\"");
-
-            LV_LOG_DEBUG("Key = '%s', Value = '%s'", key.c_str(), value.c_str());
-
-            if (key == "name") {
-              currentCallback = func(String(value.c_str()));
-              LV_LOG_DEBUG("For %s currentCallback is %i", value.c_str(), currentCallback == nullptr ? 0 : 1);
-            }
-          }
-
-        } while (!contentDisposition.empty());
+        }
       }
 
       read = advanceBuffer(req, buf, bufferSize, pos, read);
@@ -171,19 +168,64 @@ protected:
     delete[] buf;
   }
 
+  static std::pair<std::string, std::string> parseContentDisposition(const char *buf, int posDisp, int posDispEnd) {
+    std::string contentDisposition = std::string(buf + posDisp, posDispEnd);
+    contentDisposition = contentDisposition.substr(contentDisposition.find(':') + 1);
+    LV_LOG_DEBUG("CD = %s", contentDisposition.c_str());
+    std::string name;
+    std::string filename;
+    do {
+      auto end = contentDisposition.find(';');
+      std::string currentPart;
+      LV_LOG_DEBUG("End = %i, Current = %s", end, contentDisposition.c_str());
+      if (end != std::string::npos) {
+        currentPart = contentDisposition.substr(0, end);
+        contentDisposition = contentDisposition.substr(end + 1);
+      } else {
+        currentPart = contentDisposition;
+        contentDisposition = "";
+      }
+      LV_LOG_DEBUG("CP = %s, CD = %s", currentPart.c_str(), contentDisposition.c_str());
+
+      auto equalsPos = currentPart.find('=');
+      if (equalsPos != std::string::npos) {
+        std::string key = currentPart.substr(0, equalsPos);
+        std::string value = currentPart.substr(equalsPos + 1);
+        key = trim(key, " ");
+        value = trim(value, "\"");
+
+        LV_LOG_DEBUG("Key = '%s', Value = '%s'", key.c_str(), value.c_str());
+
+        if (key == "name") {
+          name = value;
+        }
+        if (key == "filename") {
+          filename = value;
+        }
+      }
+
+    } while (!contentDisposition.empty());
+
+    return {name, filename};
+  }
+
   static ReadCallback readString(String *result) {
     result->clear();
-    ReadCallback reader = [result](const char *buf, int idx, int size) { result->concat(buf + idx, size); };
+    ReadCallback reader = [result](const char *buf, int idx, int size) {
+      result->concat(buf + idx, size);
+    };
     return reader;
   }
 
-public:
+protected:
   explicit AbstractPage(httpd_handle_t server, http_method method, const char *path) {
+    bool isWebsocket = String("/ws").equals(path);
     handlerInfo = {
         .uri = path,
         .method = method,
         .handler = handlerStatic,
         .user_ctx = this,
+        .is_websocket = isWebsocket,
     };
 
     LV_LOG_INFO("Registering %s %s", http_method_str(method), path);
