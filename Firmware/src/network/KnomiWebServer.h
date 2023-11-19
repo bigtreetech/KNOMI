@@ -108,7 +108,7 @@ public:
         this->apiStatusGet = new ApiStatusGet(config, server);
         this->apiCoreDumpGet = new ApiCoreDumpGet(server);
         this->apiThemeConfigPost = new ApiThemeConfigPost(server, config->getUiConfig());
-        this->apiUploadFileDelete = new ApiUploadFileDelete(server);
+        this->apiUploadFileDelete = new ApiUploadFileDelete(server, progress);
         this->apiUploadFilePost = new ApiUploadFilePost(server, progress);
         this->apiConfigWifiPost = new ApiConfigWifiPost(manager, server, config);
         this->updatePost = new UpdatePost(server, progress);
@@ -119,8 +119,6 @@ public:
       }
 
       LV_LOG_INFO("WebServer started!");
-    } else {
-      // socket->cleanupClients();
     }
   }
 
