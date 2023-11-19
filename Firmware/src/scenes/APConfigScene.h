@@ -4,6 +4,7 @@
 class APConfigScene : public AbstractScene {
 private:
   ResourceImage *logo = nullptr, *apcfg = nullptr;
+  bool logoTicked = false;
 
 public:
   explicit APConfigScene(SceneDeps deps) : AbstractScene(deps) {
@@ -26,7 +27,10 @@ public:
   }
 
   void Tick() override {
-    logo->tick(deps.displayHAL);
+    if (!logoTicked) {
+      logo->tick(deps.displayHAL);
+      logoTicked = true;
+    }
     apcfg->tick(deps.displayHAL);
   }
 };
