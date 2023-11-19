@@ -30,7 +30,7 @@ private:
       xp[n] = xx[(bb[n >> 1] >> ((1 - (n & 1)) << 2)) & 0xF];
   }
 
-  static inline void dump_buf(const char* buf, int size = 512) {
+  static inline void dump_buf(const char *buf, int size = 512) {
     char *debug = new char[size * 2 + 1];
     memset(debug, 0, size * 2 + 1);
     btox(debug, buf, size * 2);
@@ -158,7 +158,7 @@ protected:
           if (!name.isEmpty()) {
             currentCallback = func(name, filename);
             LV_LOG_DEBUG("For %s / %s currentCallback is %i", name.c_str(), filename.c_str(),
-                        currentCallback == nullptr ? 0 : 1);
+                         currentCallback == nullptr ? 0 : 1);
           }
         }
       }
@@ -211,9 +211,7 @@ protected:
 
   static ReadCallback readString(String *result) {
     result->clear();
-    ReadCallback reader = [result](const char *buf, int idx, int size) {
-      result->concat(buf + idx, size);
-    };
+    ReadCallback reader = [result](const char *buf, int idx, int size) { result->concat(buf + idx, size); };
     return reader;
   }
 

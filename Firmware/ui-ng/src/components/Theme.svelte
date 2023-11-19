@@ -39,7 +39,7 @@
 
     async function saveThemeConfig() {
         isSaving = true;
-        const data = new URLSearchParams();
+        const data = new FormData();
         data.append("accentColor", accentColor);
         data.append("backgroundColor", backgroundColor);
 
