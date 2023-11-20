@@ -141,7 +141,7 @@
     async function saveSetup() {
         isSaving = true;
         console.log(ssid + "/" + pass + "/" + ip);
-        const data = new URLSearchParams();
+        const data = new FormData();
         data.append("ssid", ssid);
         data.append("pass", pass);
         data.append("klipper", ip);
