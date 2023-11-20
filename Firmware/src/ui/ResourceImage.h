@@ -16,8 +16,9 @@ private:
   AnimatedGIF *gif;
   int x;
   int y;
-  int width;
-  int height;
+  int width = 0;
+  int height = 0;
+  ulong nextFrame = 0;
 
   // we don't own this
   DisplayHAL *currentHal;
@@ -31,25 +32,36 @@ public:
     const char *szFilename = this->filename.c_str();
     gif = new AnimatedGIF();
     gif->begin(BIG_ENDIAN_PIXELS);
-    gif->open(szFilename, gifOpen, gifClose, gifRead, gifSeek, gifDraw);
-    this->width = gif->getCanvasWidth();
-    this->height = gif->getCanvasHeight();
-    LV_LOG_INFO(("Created resource image " + this->filename).c_str());
+    if (gif->open(szFilename, gifOpen, gifClose, gifRead, gifSeek, gifDraw)) {
+      this->width = gif->getCanvasWidth();
+      this->height = gif->getCanvasHeight();
+    }
+    LV_LOG_DEBUG(("Created resource image " + this->filename).c_str());
   }
 
   void tick(GIFDRAW *pDraw) { currentHal->GIFDraw(pDraw, x, y, width, height); }
 
   void tick(DisplayHAL *displayHal) {
+    if (this->width == 0 || this->height == 0)
+      return;
+
     this->currentHal = displayHal;
-    // TODO switch sync to false and track time and frames by ourselves
-    gif->playFrame(true, nullptr, this);
+    ulong now = millis();
+
+    if (nextFrame < now) {
+      int delay = 0;
+      if (!gif->playFrame(false, &delay, this) && delay == 0) {
+        delay = 10;
+      }
+      nextFrame = now + delay;
+    }
   }
 
   ~ResourceImage() {
-    LV_LOG_INFO(("Deleting resource image " + this->filename).c_str());
+    LV_LOG_DEBUG(("Deleting resource image " + this->filename).c_str());
     gif->close();
     delete gif;
-    LV_LOG_INFO(("Deleted resource image " + this->filename).c_str());
+    LV_LOG_DEBUG(("Deleted resource image " + this->filename).c_str());
   }
 
   static void *gifOpen(const char *szFilename, int32_t *pFileSize) {

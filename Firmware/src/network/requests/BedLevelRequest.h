@@ -1,12 +1,11 @@
 #pragma once
+#include "KlipperApiRequest.h"
 
-class Request4 : public KlipperApiRequest {
+class BedLevelRequest : public KlipperApiRequest {
 
-  String getUrl(String klipper_ip) {
-    return "http://" + klipper_ip + "/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE";
-  }
+  const char *getUrl() override { return "/printer/objects/query?gcode_macro%20BED_MESH_CALIBRATE"; }
 
-  void processJson(JsonDocument &doc) {
+  void processJson(JsonDocument &doc) override {
     String nameStr9 = doc["result"]["status"]["gcode_macro BED_MESH_CALIBRATE"]["probing"].as<String>();
     LV_LOG_INFO(nameStr9.c_str());
 

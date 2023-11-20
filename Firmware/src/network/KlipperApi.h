@@ -1,13 +1,12 @@
 #pragma once
 #include "../config/Config.h"
 #include "log.h"
+#include "requests/BedLevelRequest.h"
+#include "requests/HeatingAndOverallRequest.h"
+#include "requests/HomingRequest.h"
 #include "requests/KlipperApiRequest.h"
-#include "requests/Request1.h"
-#include "requests/Request2.h"
-#include "requests/Request3.h"
-#include "requests/Request4.h"
+#include "requests/PrintingRequest.h"
 #include <ArduinoJson.h>
-#include <AsyncHTTPRequest_Generic.hpp>
 #include <queue>
 
 class KlipperApi {
@@ -16,10 +15,10 @@ private:
 
   String text_print_file_name = "No Printfile"; // 打印文件名
 
-  Request1 req1;
-  Request2 req2;
-  Request3 req3;
-  Request4 req4;
+  HeatingAndOverallRequest req1;
+  PrintingRequest req2;
+  HomingRequest req3;
+  BedLevelRequest req4;
 
 public:
   KlipperApi(Config *config) { this->config = config; }
@@ -50,6 +49,7 @@ public:
   void refreshData() {
     if (config->isInitialised()) {
       String klipper_ip = config->getKlipperConfig()->getHost();
+      klipper_ip.toLowerCase();
       req1.Execute(klipper_ip);
       req2.Execute(klipper_ip);
       req3.Execute(klipper_ip);
