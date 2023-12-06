@@ -246,9 +246,8 @@ void lv_roller_setting_clicked(lv_event_t * e, uint16_t opt_id) {
         {
             lv_label_set_text(ui_label_sta_ip, WiFi.localIP().toString().c_str());
             lv_label_set_text(ui_label_ap_ip, WiFi.softAPIP().toString().c_str());
-            String local = knomi_config.hostname + ".local";
-            lv_label_set_text(ui_label_local, local.c_str());
-            lv_label_set_text(ui_label_host, knomi_config.moonraker_ip.c_str());
+            lv_label_set_text_fmt(ui_label_local, "%s.local", knomi_config.hostname);
+            lv_label_set_text(ui_label_host, knomi_config.moonraker_ip);
 
             _ui_screen_change(&ui_ScreenInfo, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
             break;

@@ -48,13 +48,17 @@ String knomi_html_processor(const String& var){
             value += "</td> </tr>";
         }
     } else if (var == "hostname") {
-        value = knomi_config.hostname.isEmpty() ? "" : "value=" + knomi_config.hostname;
+        String hostname = knomi_config.hostname;
+        value = hostname.isEmpty() ? "" : "value=" + hostname;
     } else if (var == "klipper") {
-        value = (knomi_config.moonraker_ip.isEmpty() ? "" : "value=") + knomi_config.moonraker_ip;
+        String moonraker_ip = knomi_config.moonraker_ip;
+        value = (moonraker_ip.isEmpty() ? "" : "value=") + moonraker_ip;
     } else if (var == "ap_ssid") {
-        value = (knomi_config.ap_ssid.isEmpty() ? "" : "value=") + knomi_config.ap_ssid;
+        String ap_ssid = knomi_config.ap_ssid;
+        value = (ap_ssid.isEmpty() ? "" : "value=") + ap_ssid;
     } else if (var == "ap_password") {
-        value = (knomi_config.ap_pwd.isEmpty() ? "" : "value=") + knomi_config.ap_pwd;
+        String ap_pwd = knomi_config.ap_pwd;
+        value = (ap_pwd.isEmpty() ? "" : "value=") + ap_pwd;
     } else  if (var == knomi_config.mode) {
         value = "selected";
     }
@@ -68,55 +72,65 @@ String knomi_html_processor(const String& var){
 #include "favicon.h"
 #include "index_html.h"
 typedef struct {
-    String name;
-    String *value;
+    const char * name;
+    char * value;
+    uint8_t v_len;
     uint8_t require;
 } web_post_info_t;
 
 web_post_info_t web_post_info[] = {
     {
         .name = "ssid",
-        .value = &knomi_config.sta_ssid,
+        .value = knomi_config.sta_ssid,
+        .v_len = sizeof(knomi_config.sta_ssid),
         .require = WEB_POST_WIFI_CONFIG_STA,
     },
     {
         .name = "password",
-        .value = &knomi_config.sta_pwd,
+        .value = knomi_config.sta_pwd,
+        .v_len = sizeof(knomi_config.sta_pwd),
         .require = WEB_POST_WIFI_CONFIG_STA,
     },
     {
         .name = "mode",
-        .value = &knomi_config.mode,
+        .value = knomi_config.mode,
+        .v_len = sizeof(knomi_config.mode),
         .require = WEB_POST_WIFI_CONFIG_MODE,
     },
     {
         .name = "ap_ssid",
-        .value = &knomi_config.ap_ssid,
+        .value = knomi_config.ap_ssid,
+        .v_len = sizeof(knomi_config.ap_ssid),
         .require = WEB_POST_WIFI_CONFIG_AP,
     },
     {
         .name = "ap_password",
-        .value = &knomi_config.ap_pwd,
+        .value = knomi_config.ap_pwd,
+        .v_len = sizeof(knomi_config.ap_pwd),
         .require = WEB_POST_WIFI_CONFIG_AP,
     },
     {
         .name = "hostname",
-        .value = &knomi_config.hostname,
+        .value = knomi_config.hostname,
+        .v_len = sizeof(knomi_config.hostname),
         .require = WEB_POST_LOCAL_HOSTNAME,
     },
     {
         .name = "klipper",
-        .value = &knomi_config.moonraker_ip,
+        .value = knomi_config.moonraker_ip,
+        .v_len = sizeof(knomi_config.moonraker_ip),
         .require = WEB_POST_MOONRAKER_IP,
     },
     {
         .name = "refresh",
         .value = NULL,
+        .v_len = 0,
         .require = WEB_POST_WIFI_REFRESH,
     },
     {
         .name = "restart",
         .value = NULL,
+        .v_len = 0,
         .require = WEB_POST_RESTART,
     },
 };
@@ -130,7 +144,7 @@ void webserver_wifi_refresh_callback(void) {
 
 void webserver_setup(void) {
 
-    if(!MDNS.begin(knomi_config.hostname.c_str())) {
+    if(!MDNS.begin(knomi_config.hostname)) {
         Serial.println("Error starting mDNS");
     } else {
         Serial.println("mDNS start ok!");
@@ -153,28 +167,33 @@ void webserver_setup(void) {
             AsyncWebParameter* p = request->getParam(i);
 
             for (uint8_t i = 0; i < ACOUNT(web_post_info); i++) {
-                if (web_post_info[i].name == p->name()) {
+                if (strcmp(web_post_info[i].name, p->name().c_str()) == 0) {
                     if (web_post_info[i].value == NULL) {
                         post_require |= web_post_info[i].require;
                         break;
                     }
-                    if (*web_post_info[i].value != p->value()) {
+                    if (strcmp(web_post_info[i].value, p->value().c_str()) != 0) {
                         post_require |= web_post_info[i].require;
-                        *web_post_info[i].value = p->value();
+                        strlcpy(web_post_info[i].value, p->value().c_str(), web_post_info[i].v_len);
                     }
                     break;
                 }
             }
         }
-        if ((post_require & WEB_POST_WIFI_CONFIG_STA) && knomi_config.mode == "ap") {
-            knomi_config.mode = "sta";
-            post_require |= WEB_POST_WIFI_CONFIG_MODE;
+        if ((post_require & WEB_POST_WIFI_CONFIG_STA)) {
+            if (strcmp(knomi_config.mode, "ap") == 0) {
+                strlcpy(knomi_config.mode, "sta", sizeof(knomi_config.mode));
+                post_require |= WEB_POST_WIFI_CONFIG_MODE;
+            }
+            knomi_config.sta_auth = wifi_get_ahth_mode_from_scanned_list();
         }
 
         knomi_config_require_change(post_require);
 
         if (post_require & WEB_POST_WIFI_CONFIG_STA) {
-            request->send(200, "text/html", "SSID: " + knomi_config.sta_ssid + "<br>PWD: " + knomi_config.sta_pwd + \
+            String sta_ssid = knomi_config.sta_ssid;
+            String sta_pwd = knomi_config.sta_pwd;
+            request->send(200, "text/html", "SSID: " + sta_ssid + "<br>PWD: " + sta_pwd + \
                     "<br>The BTT KNOMI will now attempt to connect to the specified network.<br>If it fails after 15s then this access point will be re-launched and you can connect to it to try again. <br><a href=\"/\">Return to Home Page</a>");
         } else if (post_require & WEB_POST_RESTART){
             request->send(200, "text/html", "KNOMI is restarting, please wait for the restart to complete and re-establish the connection. <br><a href=\"/\">Return to Home Page</a>");

@@ -8,7 +8,8 @@
 void lv_popup_warning(const char * warning, bool clickable);
 
 String MOONRAKER::send_request(const char * type, String path) {
-    String url = "http://" + knomi_config.moonraker_ip + path;
+    String ip = knomi_config.moonraker_ip;
+    String url = "http://" + ip + path;
     String response = "";
     HTTPClient client;
     // replace all " " space to "%20" for http

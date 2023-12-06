@@ -23,20 +23,20 @@ typedef void (*p_function_t)(void);
 #include <WiFi.h>
 #include "lvgl.h"
 typedef struct {
-    String sta_ssid;
-    String sta_pwd;
+    char sta_ssid[33];
+    char sta_pwd[65];
     wifi_auth_mode_t sta_auth;
-    String ap_ssid;
-    String ap_pwd;
-    String hostname;
-    String moonraker_ip; // "192.168.255.255" max len = 16
-    String mode; // "ap":WIFI_MODE_AP, "sta":WIFI_MODE_STA, "apsta":WIFI_MODE_APSTA
+    char ap_ssid[33];
+    char ap_pwd[65];
+    char hostname[16];
+    char moonraker_ip[16]; // "192.168.255.255" max len = 16
+    char mode[6]; // "ap":WIFI_MODE_AP, "sta":WIFI_MODE_STA, "apsta":WIFI_MODE_APSTA
     lv_color_t theme_color;
 } knomi_config_t;
 
 typedef struct {
     int32_t rssi[SCAN_SSIDS_NUM]; // RSSI returned RSSI values
-    String ssid[SCAN_SSIDS_NUM]; // SSIDs returned by the wifi scan.
+    char ssid[SCAN_SSIDS_NUM][65]; // SSIDs returned by the wifi scan.
     wifi_auth_mode_t authmode[SCAN_SSIDS_NUM]; // encryptionType
     uint8_t connected[SCAN_SSIDS_NUM];
     uint8_t count; // Number of WiFi Scanned
@@ -66,6 +66,7 @@ extern knomi_wifi_scan_t wifi_scan;
 
 void knomi_config_require_change(uint16_t require);
 void wifi_scan_refresh_set_callback(p_function_t cb);
+wifi_auth_mode_t wifi_get_ahth_mode_from_scanned_list(void);
 
 void knomi_factory_reset(void);
 

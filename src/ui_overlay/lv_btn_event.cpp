@@ -9,9 +9,9 @@ void lv_btn_init(void) {
 }
 
 void lv_test_wifi_ssid_update(void) {
-    lv_label_set_text(ui_label_ssid1, wifi_scan.ssid[0].c_str());
-    lv_label_set_text(ui_label_ssid2, wifi_scan.ssid[1].c_str());
-    lv_label_set_text(ui_label_ssid3, wifi_scan.ssid[2].c_str());
+    lv_label_set_text(ui_label_ssid1, wifi_scan.ssid[0]);
+    lv_label_set_text(ui_label_ssid2, wifi_scan.ssid[1]);
+    lv_label_set_text(ui_label_ssid3, wifi_scan.ssid[2]);
 }
 
 void lv_test_sensor_btn_ok(lv_event_t * e) {
