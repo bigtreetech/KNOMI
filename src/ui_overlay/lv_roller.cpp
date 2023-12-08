@@ -30,7 +30,7 @@ char gcode_options[1024];
 char service_options[1024];
 static lv_roller_menu_t roller_menu[UI_ROLLER_MENU_NUM] = {
     {
-        .options = "UI theme color\nBacklight\nKlipper Control\nService Control\nHost Control\nKnomi Info\nFactory Reset",
+        .options = "UI color\nKlipper Control\nService Control\nHost Control\nKnomi Info\nFactory Reset\nBacklight",
         .sel_opt = 0,
         .this_type = UI_ROLLER_SETTING,
         .previous_menu = &ui_ScreenTemp,
@@ -230,19 +230,16 @@ void lv_roller_setting_clicked(lv_event_t * e, uint16_t opt_id) {
             lv_roller_set_type(UI_ROLLER_SETTING_THEME);
             break;
         case 1:
-            _ui_screen_change(&ui_ScreenBacklight, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
-            break;
-        case 2:
             lv_roller_set_type(UI_ROLLER_CONTROL_KLIPPER);
             break;
-        case 3:
+        case 2:
             // lv_roller_set_type(UI_ROLLER_SERVICE);
             lv_roller_set_service();
             break;
-        case 4:
+        case 3:
             lv_roller_set_type(UI_ROLLER_CONTROL_HOST);
             break;
-        case 5:
+        case 4:
         {
             lv_label_set_text(ui_label_sta_ip, WiFi.localIP().toString().c_str());
             lv_label_set_text(ui_label_ap_ip, WiFi.softAPIP().toString().c_str());
@@ -252,8 +249,11 @@ void lv_roller_setting_clicked(lv_event_t * e, uint16_t opt_id) {
             _ui_screen_change(&ui_ScreenInfo, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
             break;
         }
-        case 6:
+        case 5:
             lv_dialog_goto_reset_wifi();
+            break;
+        case 6:
+            _ui_screen_change(&ui_ScreenBacklight, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
             break;
     }
 }
