@@ -62,6 +62,29 @@ static void lv_goto_idle_screen(void) {
     ui_ScreenNow = NULL;
 }
 
+
+#define TEMPERATURE_ERROR_RANGE 2
+
+bool moonraker_nozzle_is_heating(void) {
+    if (moonraker.data.heating_nozzle)
+        return true;
+    if (moonraker.data.nozzle_actual + TEMPERATURE_ERROR_RANGE < moonraker.data.nozzle_target)
+        return true;
+    if ((moonraker.data.nozzle_target != 0) && (moonraker.data.nozzle_target + TEMPERATURE_ERROR_RANGE < moonraker.data.nozzle_actual))
+        return true;
+    return false;
+}
+
+bool moonraker_bed_is_heating(void) {
+    if (moonraker.data.heating_bed)
+        return true;
+    if (moonraker.data.bed_actual + TEMPERATURE_ERROR_RANGE < moonraker.data.bed_target)
+        return true;
+    if ((moonraker.data.bed_target != 0) && (moonraker.data.bed_target + TEMPERATURE_ERROR_RANGE < moonraker.data.bed_actual))
+        return true;
+    return false;
+}
+
 // screen change according to moonraker status
 void lv_loop_moonraker_change_screen(void) {
 
@@ -84,14 +107,16 @@ void lv_loop_moonraker_change_screen(void) {
         lv_goto_busy_screen(ui_ScreenMainGif, LV_MOONRAKER_STATE_QGLING, &gif_qgling);
         return;
     }
-    if (moonraker.data.heating_nozzle) {
+    if (moonraker_nozzle_is_heating()) {
         lv_goto_busy_screen(ui_ScreenHeatingNozzle, LV_MOONRAKER_STATE_NOZZLE_HEATING, NULL);
-        screen_state = LV_SCREEN_HEATED;
+        if (moonraker.data.printing)
+            screen_state = LV_SCREEN_HEATED;
         return;
     }
-    if (moonraker.data.heating_bed) {
+    if (moonraker_bed_is_heating()) {
         lv_goto_busy_screen(ui_ScreenHeatingBed, LV_MOONRAKER_STATE_BED_HEATING, NULL);
-        screen_state = LV_SCREEN_HEATED;
+        if (moonraker.data.printing)
+            screen_state = LV_SCREEN_HEATED;
         return;
     }
 
@@ -102,8 +127,8 @@ void lv_loop_moonraker_change_screen(void) {
     switch (screen_state) {
         case LV_SCREEN_STATE_INIT:
             if (moonraker.data.printing) {
-                if (moonraker.data.bed_actual + 2 > moonraker.data.bed_target &&
-                  moonraker.data.nozzle_actual + 2 > moonraker.data.nozzle_target) {
+                if (moonraker.data.bed_actual + TEMPERATURE_ERROR_RANGE > moonraker.data.bed_target &&
+                  moonraker.data.nozzle_actual + TEMPERATURE_ERROR_RANGE > moonraker.data.nozzle_target) {
                     screen_state = LV_SCREEN_HEATED;
                     return;
                 }
@@ -222,10 +247,10 @@ void lv_loop_moonraker_change_screen_value(void) {
     lv_slider_set_value(ui_slider_printing_acc_z, abs(lis2dw12_acc[2]) / 10, LV_ANIM_ON);
 #endif
 
-    if (lv_scr_act() == ui_ScreenHeatingNozzle) {
+    if ((moonraker.data.nozzle_target != 0) && (lv_scr_act() == ui_ScreenHeatingNozzle)) {
         lv_slider_set_value(ui_slider_heating_nozzle, moonraker.data.nozzle_actual * 100 / moonraker.data.nozzle_target, LV_ANIM_ON);
     }
-    if (lv_scr_act() == ui_ScreenHeatingBed) {
+    if ((moonraker.data.bed_target != 0) && (lv_scr_act() == ui_ScreenHeatingBed)) {
         lv_slider_set_value(ui_slider_heating_bed, moonraker.data.bed_actual * 100 / moonraker.data.bed_target, LV_ANIM_ON);
     }
 }
