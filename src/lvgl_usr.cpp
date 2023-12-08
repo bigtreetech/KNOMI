@@ -48,6 +48,11 @@ void lvgl_ui_task(void * parameter) {
     lv_obj_del(ui_label_printing_acc_z);
 #endif
 
+    lv_obj_t * label = lv_label_create(ui_ScreenTestImg);
+    lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -30);
+    lv_label_set_text_static(label, FW_VERSION);
+
     // Add all button style
     lv_btn_add_style();
 

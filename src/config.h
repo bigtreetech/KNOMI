@@ -3,6 +3,8 @@
 
 #include "pinout.h"
 
+#define FW_VERSION "V1.0.1"
+
  // default 80 for http
 #define SERVER_PORT 80
 
