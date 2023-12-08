@@ -484,7 +484,7 @@ text-align: center;">
           <div class="ant-form-item-row">
             <div class="ant-form-item-label" for="host">&nbsp Klipper IP:</div>
             <div class="ant-form-item-control">
-              <input type="text" id ="klipper" name="klipper" $klipper$ maxlength="15"><br>
+              <input type="text" id ="klipper" name="klipper" $klipper$ maxlength="64" placeholder="1.2.3.4 or printer.local"><br>
             </div>
             <input type ="submit" id="submitwifi" value ="Submit">
           </div>

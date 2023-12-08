@@ -102,7 +102,7 @@ void eeprom_init(void) {
         strlcpy(knomi_config.ap_ssid, AP_SSID, sizeof(knomi_config.ap_ssid));
         strlcpy(knomi_config.ap_pwd, AP_PWD, sizeof(knomi_config.ap_pwd));
         strlcpy(knomi_config.hostname, HOSTNAME, sizeof(knomi_config.hostname));
-        strlcpy(knomi_config.moonraker_ip, "0.0.0.0", sizeof(knomi_config.moonraker_ip));
+        strlcpy(knomi_config.moonraker_ip, "", sizeof(knomi_config.moonraker_ip));
         strlcpy(knomi_config.mode, "ap", sizeof(knomi_config.mode));
         knomi_config.theme_color = lv_color_hex(LV_DEFAULT_COLOR);
 

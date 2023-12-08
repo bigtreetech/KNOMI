@@ -44,8 +44,8 @@ void ui_ScreenInfo_screen_init(void)
     lv_obj_set_style_text_font(ui_label_sta_ip_name, &ui_font_InterSemiBold14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_label_sta_ip = lv_label_create(ui_img_mid_sta_ip);
-    lv_obj_set_width(ui_label_sta_ip, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_label_sta_ip, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_size(ui_label_sta_ip, 110, 20);   /// 1
+    lv_label_set_long_mode(ui_label_sta_ip, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_x(ui_label_sta_ip, 55);
     lv_obj_set_y(ui_label_sta_ip, 0);
     lv_obj_set_align(ui_label_sta_ip, LV_ALIGN_LEFT_MID);
@@ -84,8 +84,8 @@ void ui_ScreenInfo_screen_init(void)
     lv_obj_set_style_text_font(ui_label_ap_ip_name, &ui_font_InterSemiBold14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_label_ap_ip = lv_label_create(ui_img_mid_ap_ip);
-    lv_obj_set_width(ui_label_ap_ip, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_label_ap_ip, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_size(ui_label_ap_ip, 110, 20);   /// 1
+    lv_label_set_long_mode(ui_label_ap_ip, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_x(ui_label_ap_ip, 55);
     lv_obj_set_y(ui_label_ap_ip, 0);
     lv_obj_set_align(ui_label_ap_ip, LV_ALIGN_LEFT_MID);
@@ -144,8 +144,8 @@ void ui_ScreenInfo_screen_init(void)
     lv_obj_set_style_text_font(ui_label_local_name, &ui_font_InterSemiBold14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_label_local = lv_label_create(ui_img_mid_local);
-    lv_obj_set_width(ui_label_local, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_label_local, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_size(ui_label_local, 110, 20);   /// 1
+    lv_label_set_long_mode(ui_label_local, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_x(ui_label_local, 55);
     lv_obj_set_y(ui_label_local, 0);
     lv_obj_set_align(ui_label_local, LV_ALIGN_LEFT_MID);
@@ -194,8 +194,8 @@ void ui_ScreenInfo_screen_init(void)
     lv_obj_set_style_text_font(ui_label_host_name, &ui_font_InterSemiBold16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_label_host = lv_label_create(ui_img_mid_host);
-    lv_obj_set_width(ui_label_host, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_label_host, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_size(ui_label_host, 110, 20);   /// 1
+    lv_label_set_long_mode(ui_label_host, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_x(ui_label_host, 55);
     lv_obj_set_y(ui_label_host, 0);
     lv_obj_set_align(ui_label_host, LV_ALIGN_LEFT_MID);

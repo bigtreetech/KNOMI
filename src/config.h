@@ -31,7 +31,7 @@ typedef struct {
     char ap_ssid[33];
     char ap_pwd[65];
     char hostname[16];
-    char moonraker_ip[16]; // "192.168.255.255" max len = 16
+    char moonraker_ip[65]; // "192.168.255.255:65535" or "<hostname>.local:65535" max len = 22
     char mode[6]; // "ap":WIFI_MODE_AP, "sta":WIFI_MODE_STA, "apsta":WIFI_MODE_APSTA
     lv_color_t theme_color;
 } knomi_config_t;
