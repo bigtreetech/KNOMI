@@ -244,7 +244,7 @@ void lv_loop_moonraker_change_screen_value(void) {
     // accelerometer
     lv_slider_set_value(ui_slider_printing_acc_x, abs(lis2dw12_acc[0]) / 10, LV_ANIM_ON);
     lv_slider_set_value(ui_slider_printing_acc_y, abs(lis2dw12_acc[1]) / 10, LV_ANIM_ON);
-    lv_slider_set_value(ui_slider_printing_acc_z, abs(lis2dw12_acc[2]) / 10, LV_ANIM_ON);
+    lv_slider_set_value(ui_slider_printing_acc_z, abs(lis2dw12_acc[2] + 980) / 10, LV_ANIM_ON); // +980 for counteract the value of gravitational acceleration
 #endif
 
     if ((moonraker.data.nozzle_target != 0) && (lv_scr_act() == ui_ScreenHeatingNozzle)) {
