@@ -31,7 +31,9 @@ typedef struct {
     char ap_ssid[33];
     char ap_pwd[65];
     char hostname[16];
-    char moonraker_ip[65]; // "192.168.255.255:65535" or "<hostname>.local:65535" max len = 22
+    char moonraker_ip[65]; // "192.168.255.255" or "<hostname>.local"
+    char moonraker_port[6]; // "65536", max_len=6
+    char moonraker_tool[7];
     char mode[6]; // "ap":WIFI_MODE_AP, "sta":WIFI_MODE_STA, "apsta":WIFI_MODE_APSTA
     lv_color_t theme_color;
 } knomi_config_t;
@@ -53,7 +55,7 @@ extern knomi_wifi_scan_t wifi_scan;
 #define WEB_POST_WIFI_CONFIG_MODE     BIT(1)
 #define WEB_POST_WIFI_CONFIG_AP       BIT(2)
 #define WEB_POST_WIFI_CONFIG_STA      BIT(3)
-#define WEB_POST_MOONRAKER_IP         BIT(4)
+#define WEB_POST_MOONRAKER            BIT(4)
 #define WEB_POST_WIFI_REFRESH         BIT(5)
 #define WEB_POST_RESTART              BIT(6)
 
@@ -62,7 +64,7 @@ extern knomi_wifi_scan_t wifi_scan;
                                  WEB_POST_WIFI_CONFIG_STA  | \
                                  WEB_POST_WIFI_CONFIG_MODE | \
                                  WEB_POST_LOCAL_HOSTNAME   | \
-                                 WEB_POST_MOONRAKER_IP     | \
+                                 WEB_POST_MOONRAKER        | \
                                  LOCAL_POST_LV_THEME_COLOR)
 
 

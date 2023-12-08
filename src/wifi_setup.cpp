@@ -64,7 +64,7 @@ wifi_auth_mode_t wifi_get_ahth_mode_from_scanned_list(void) {
 
 #include <EEPROM.h>
 
-#define EEPROM_SIGN 0x20230000
+#define EEPROM_SIGN 0x20231201
 #define EEPROM_SIGN_SIZE 4
 // Init the EEPROM and restore all NV vars.
 void eeprom_init(void) {
@@ -92,6 +92,10 @@ void eeprom_init(void) {
         Serial.println(knomi_config.hostname);
         Serial.print("moonraker_ip: ");
         Serial.println(knomi_config.moonraker_ip);
+        Serial.print("moonraker_port: ");
+        Serial.println(knomi_config.moonraker_port);
+        Serial.print("moonraker_tool: ");
+        Serial.println(knomi_config.moonraker_tool);
         Serial.print("mode: ");
         Serial.println(knomi_config.mode);
     } else {
@@ -103,6 +107,8 @@ void eeprom_init(void) {
         strlcpy(knomi_config.ap_pwd, AP_PWD, sizeof(knomi_config.ap_pwd));
         strlcpy(knomi_config.hostname, HOSTNAME, sizeof(knomi_config.hostname));
         strlcpy(knomi_config.moonraker_ip, "", sizeof(knomi_config.moonraker_ip));
+        strlcpy(knomi_config.moonraker_port, "80", sizeof(knomi_config.moonraker_port));
+        strlcpy(knomi_config.moonraker_tool, "tool0", sizeof(knomi_config.moonraker_tool));
         strlcpy(knomi_config.mode, "ap", sizeof(knomi_config.mode));
         knomi_config.theme_color = lv_color_hex(LV_DEFAULT_COLOR);
 
@@ -179,6 +185,10 @@ void eeprom_write_knomi_config(void) {
     Serial.println(knomi_config.hostname);
     Serial.print("moonraker_ip: ");
     Serial.println(knomi_config.moonraker_ip);
+    Serial.print("moonraker_port: ");
+    Serial.println(knomi_config.moonraker_port);
+    Serial.print("moonraker_tool: ");
+    Serial.println(knomi_config.moonraker_tool);
     Serial.print("mode: ");
     Serial.println(knomi_config.mode);
     EEPROM.put<knomi_config_t>(0x00 + sizeof(EEPROM_SIGN), knomi_config);
@@ -302,10 +312,14 @@ restart:
     }
 
     //
-    if (knomi_config_require & WEB_POST_MOONRAKER_IP) {
-        knomi_config_require &= ~WEB_POST_MOONRAKER_IP;
+    if (knomi_config_require & WEB_POST_MOONRAKER) {
+        knomi_config_require &= ~WEB_POST_MOONRAKER;
         Serial.print("klipper ip: ");
         Serial.println(knomi_config.moonraker_ip);
+        Serial.print("port: ");
+        Serial.println(knomi_config.moonraker_port);
+        Serial.print("tool: ");
+        Serial.println(knomi_config.moonraker_tool);
     }
 
     // refresh wifi scan

@@ -9,7 +9,8 @@ void lv_popup_warning(const char * warning, bool clickable);
 
 String MOONRAKER::send_request(const char * type, String path) {
     String ip = knomi_config.moonraker_ip;
-    String url = "http://" + ip + path;
+    String port = knomi_config.moonraker_port;
+    String url = "http://" + ip + ":" + port + path;
     String response = "";
     HTTPClient client;
     // replace all " " space to "%20" for http
@@ -117,8 +118,8 @@ void MOONRAKER::get_printer_info(void) {
         data.printing |= data.pause; // pause
         data.bed_actual = int16_t(json_parse["temperature"]["bed"]["actual"].as<double>() + 0.5f);
         data.bed_target = int16_t(json_parse["temperature"]["bed"]["target"].as<double>() + 0.5f);
-        data.nozzle_actual = int16_t(json_parse["temperature"]["tool0"]["actual"].as<double>() + 0.5f);
-        data.nozzle_target = int16_t(json_parse["temperature"]["tool0"]["target"].as<double>() + 0.5f);
+        data.nozzle_actual = int16_t(json_parse["temperature"][knomi_config.moonraker_tool]["actual"].as<double>() + 0.5f);
+        data.nozzle_target = int16_t(json_parse["temperature"][knomi_config.moonraker_tool]["target"].as<double>() + 0.5f);
 #ifdef MOONRAKER_DEBUG
         Serial.print("unoperational: ");
         Serial.println(unoperational);

@@ -127,6 +127,7 @@ text-align: center;">
       font-size: 1.2rem;
       text-align: center;
       padding: 10px;
+      display: flex;
     }
     .value{
       font-size: 1.2rem;
@@ -226,6 +227,7 @@ text-align: center;">
       color: #666;
       display: block;
       padding: 0 0 5px;
+      white-space: nowrap;
     }
     .modal_form {
       padding: 25px;
@@ -405,7 +407,7 @@ text-align: center;">
           alert("You must enter a valid ap-ssid.");
           return false;
         }
-        let v = document.getElementById("ap-PWD").value;
+        let v = document.getElementById("ap-pwd").value;
         if (v == "Mode: Forced access point scanning")
         if (v == "" || v == "empty") {
           alert("You must enter a valid ap-ssid.");
@@ -474,20 +476,19 @@ text-align: center;">
     <div class="card-grid">
       <div class="card">
         <form name="wifidata" action="/" method="POST">
-          <div class="ant-form-item-row">
-            <div class="ant-form-item-label" for="hostname">Hostname:</div>
-            <div class="ant-form-item-control">
-              <input type="text" id ="hostname" name="hostname" $hostname$ maxlength="15"><br>
-            </div>
-            <input type ="submit" id="submitwifi" value ="Submit">
-          </div>
-          <div class="ant-form-item-row">
-            <div class="ant-form-item-label" for="host">&nbsp Klipper IP:</div>
-            <div class="ant-form-item-control">
-              <input type="text" id ="klipper" name="klipper" $klipper$ maxlength="64" placeholder="1.2.3.4 or printer.local"><br>
-            </div>
-            <input type ="submit" id="submitwifi" value ="Submit">
-          </div>
+            <label class="ant-form-item-row">
+                <span>Klipper IP:&nbsp</span>
+                <input type="text" id ="klipper" name="klipper" $klipper$ maxlength="64" placeholder="1.2.3.4 or printer.local">
+            </label>
+            <label class="ant-form-item-row">
+                <span>Klipper Port:&nbsp</span>
+                <input type="text" id ="port" name="port" $port$ maxlength="5">
+            </label>
+            <label class="ant-form-item-row">
+                <span>Tool ID:&nbsp</span>
+                <input type="text" id ="tool" name="tool" $tool$ maxlength="6">
+            </label>
+          <input type ="submit" id="submitwifi" value ="Submit">
         </form>
       </div>
     </div>
@@ -499,18 +500,18 @@ text-align: center;">
             <option value="sta" $sta$>STA</option>
             <option value="apsta" $apsta$>AP+STA</option>          <!--selected默认选择-->
           </select>
-          <div class="ant-form-item-row">
-            <div class="ant-form-item-label" for="ap_ssid">AP-SSID:</div>
-            <div class="ant-form-item-control">
-              <input type="text" id ="ap-ssid" name="ap_ssid" $ap_ssid$ minlength="1" maxlength="32"><br>
-            </div>
-          </div>
-          <div class="ant-form-item-row">
-            <div class="ant-form-item-label" for="ap_password">AP-PWD:</div>
-            <div class="ant-form-item-control">
-              <input type="text" id ="ap-PWD" name="ap_password" $ap_password$  minlength="6"  maxlength="64"><br>
-            </div>
-          </div>
+          <label class="ant-form-item-row">
+              <span>AP SSID:&nbsp</span>
+              <input type="text" id ="ap-ssid" name="ap_ssid" $ap_ssid$ minlength="1" maxlength="32">
+          </label>
+          <label class="ant-form-item-row">
+              <span>AP PWD:&nbsp</span>
+              <input type="text" id ="ap-pwd" name="ap_password" $ap_password$ minlength="6" maxlength="64">
+          </label>
+          <label class="ant-form-item-row">
+              <span>Hostname:&nbsp</span>
+              <input type="text" id ="hostname" name="hostname" $hostname$ maxlength="15">
+          </label>
           <input type ="submit" id="submitwifi" value ="Submit">
         </form>
       </div>
