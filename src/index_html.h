@@ -3,13 +3,10 @@ const char index_html[] PROGMEM = R"rawliteral(<!DOCTYPE html>
 display: inline-block;
 text-align: center;">
 <head>
-  <!-- <link rel="stylesheet" type="text/css" href="test.css" /> -->
   <title>BTT KNOMI SETTINGS MANAGER</title>
   <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!--link rel="icon" href="data:,"-->
   <style>
-    /* body {background-color: powderblue;} */
     h1 {
       font-size: 1.8rem;
       color: white;
@@ -23,7 +20,7 @@ text-align: center;">
     }
     .topnav {
       overflow: hidden;
-      background-color: #c02f30;
+      background-color: #C02E2F;
     }
     body {
       margin: 0;
@@ -55,57 +52,41 @@ text-align: center;">
       font-weight: bold;
       color: #034078
     }
-    input[id="FWbtn"] {
+    input[id="sys-btn"] {
       border: none;
       color: #FEFCFB;
-      background-color: #c02f30;
+      background-color: #C02E2F;
       padding: 15px 15px;
       text-align: center;
       text-decoration: none;
       display: inline-block;
       font-size: 16px;
-      width: 120px;
+      width: 230px;
+      height: 45;
       margin-right: 0px;
       margin-bottom: 0px;
-      border-radius: 4px;
+      border-radius: 45px;
       transition-duration: 0.4s;
     }
-    input[id="FWbtn"]:hover {
-      background-color: #EF2f30;
-    }
-    input[id="submitwifi"] {
+    input[id="submit-btn"] {
       border: none;
       color: #FEFCFB;
-      background-color: #c02f30;
+      background-color: #0085FF;
       padding: 10px 10px;
       text-align: center;
       text-decoration: none;
       display: inline-block;
       font-size: 16px;
       width: 100px;
+      height: 45;
       margin-left: 20px;
       margin-right: 0px;
       margin-bottom: 0px;
-      border-radius: 4px;
-      transition-duration: 0.4s;
-    }
-    input[id="submitap"] {
-      border: none;
-      color: #FEFCFB;
-      background-color: #c02f30;
-      padding: 15px 15px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      width: 200px;
-      margin-right: 0px;
-      margin-bottom: 1px;
-      border-radius: 4px;
+      border-radius: 45px;
       transition-duration: 0.4s;
     }
     input[type=submit]:hover {
-      background-color: #EF2f30;
+      background: #0085FF;
     }
     p {
       display: flex;
@@ -133,7 +114,7 @@ text-align: center;">
       font-size: 1.2rem;
       color: #1282A2;
     }
-    .input-btn{
+    .refresh-btn{
       max-width: 800px;
       margin: 0 auto;
       position: relative;
@@ -143,11 +124,11 @@ text-align: center;">
       width: 100%;
       border: none;
       color: #FEFCFB;
-      background-color: #c02f30;
+      background-color: #0085FF;
       text-align: center;
       text-decoration: none;
       font-size: 16px;
-      border-radius: 4px;
+      border-radius: 0px;
       transition-duration: 0.4s;
     };
     .state {
@@ -196,7 +177,7 @@ text-align: center;">
         text-align: center;
     }
     table th {
-        background-color: #c02f30;
+        background-color: #C02E2F;
         color: white;
     }
     tr:nth-child(even) {background-color: #f2f2f2;}
@@ -246,13 +227,13 @@ text-align: center;">
       width: 100%;
       padding: 10px;
       border: none;
-      background: #c02f30;
+      background: #0085FF;
       font-size: 16px;
       font-weight: 400;
       color: #fff;
     }
     button:hover {
-      background: #c02f30;
+      background: #0085FF;
     }
     .close {
       color: #aaa;
@@ -265,21 +246,6 @@ text-align: center;">
       color: black;
       text-decoration: none;
       cursor: pointer;
-    }
-    button.button {
-      background: none;
-      border-top: none;
-      outline: none;
-      border-right: none;
-      border-left: none;
-      border-bottom: #02274a 1px solid;
-      padding: 0 0 3px 0;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button.button:hover {
-      border-bottom: #a99567 1px solid;
-      color: #a99567;
     }
     .ant-form-item-row{
       display: flex;
@@ -383,77 +349,74 @@ text-align: center;">
     }
 </style>
   <script>
-      function moveSSID(nname){
-          document.getElementById("ssid").value  = nname;
-      }
-      function validateForm() {
-        // let x = document.getElementById("ssid").value;
-        // if (x == "" || x == "empty") {
-        //   alert("You must enter a valid SSID.");
-        //   return false;
-        // }
-        // let y = document.getElementById("host").value;
-        // if (y == "") {
-        //   alert("You must enter a valid hostname.");
-        //   return false;
-        // }
-        // alert("The BTT KNOMI will now attempt to connect to the specified network.\n\nIf it fails after 15s then this access point will be re-launched and you can connect to it to try again.");
-        return true;
-      }
-      function validateModeForm() {
-        let z = document.getElementById("ap-ssid").value;
-        console.log(document.getElementById("ap-ssid").value)
-        if (z == "" || z == "empty") {
-          alert("You must enter a valid ap-ssid.");
-          return false;
-        }
-        let v = document.getElementById("ap-pwd").value;
-        if (v == "Mode: Forced access point scanning")
-        if (v == "" || v == "empty") {
-          alert("You must enter a valid ap-ssid.");
-          return false;
-        }
-        return true
-        // return confirm("This will disconnect you from the current access point and allow you to scan for WiFi networks.\n\nTo get back into normal mode you'll need to enter and submit WiFi credentials.\n\nWould you like to proceed?");
-			}
       function validateRestartForm(){
-        alert("KNOMI will disconnect the network connection and restart\n\nPlease reconnect after KNOMI restart");
-        return true
+        return confirm("KNOMI will disconnect the network connection and restart\n\nPlease reconnect after KNOMI restart");
       }
-      function togglePassFunction()
-      {
-        var x = document.getElementById("pass");
-        if (x.type === "password") {
-          x.type = "text";
-        } else {
-          x.type = "password";
+      function validateKlipperForm(){
+        var ip = document.getElementById("ip").value;
+        var port = document.getElementById("port").value;
+        var tool = document.getElementById("tool").value;
+        return confirm("Klipper IP: " + ip + "\nKlipper Port: " + port + "\nTool ID: " + tool);
+      }
+      function validateKnomiForm(){
+        var obj_mode = document.getElementById("mode");
+        var mode = obj_mode.options[obj_mode.selectedIndex].text;
+        var ssid = document.getElementById("ap-ssid").value;
+        var pwd = document.getElementById("ap-pwd").value;
+        var name = document.getElementById("hostname").value;
+        return confirm("WiFi mode: " + mode + "\nAP SSID: " + ssid + "\nAP PWD: " + pwd + "\nhostname: " + name);
+      }
+      function validateAPForm() {
+        let ssid = document.getElementById("ap-ssid").value;;
+        console.log(document.getElementById("ap-ssid").value);
+        if (ssid == "" || ssid == "empty") {
+          alert("You must enter a valid ap-ssid.");
+          return false;
         }
-      }
+        return validateKnomiForm();
+			}
   </script>
 </head>
 <body>
   <div class="topnav">
-    <h1>BTT KNOMI SETTINGS MANAGER</h1>
-    <h2>*Refresh to update wifi network list</h2>
+    <h1>BTT KNOMI SETTINGS MANAGER ;)</h1>
   </div>
-  <div id="modalOne" class="modal">
-    <div class="modal-content">
-      <div class="contact-form">
-        <a class="close">&times;</a>
-        <form class="modal_form" action="/" method="POST" onsubmit="return validateForm()">
-          <!-- <h2 id ="ssid">Contact Us</h2> -->
-          <div>
-            <input readonly id ="ssid" class="fname" type="text" name="ssid" placeholder="ssid" />
-            <span></span>
-            <input class="fname" type="text" name="password" placeholder="password" />
-            <span></span>
-          </div>
-          <button type="submit" >Connect</button>
+  <div class="content">
+    <div class="card-grid">
+      <div class="card">
+        <form name="wifidata" action="/" method="POST" onsubmit="return validateKlipperForm()">
+            <label class="ant-form-item-row">
+                <span>Klipper IP:&nbsp</span>
+                <input type="text" id ="ip" name="ip" $ip$ maxlength="64" placeholder="1.2.3.4 or printer.local">
+            </label>
+            <label class="ant-form-item-row">
+                <span>Klipper Port:&nbsp</span>
+                <input type="text" id ="port" name="port" $port$ maxlength="5">
+            </label>
+            <label class="ant-form-item-row">
+                <span>Tool ID:&nbsp</span>
+                <input type="text" id ="tool" name="tool" $tool$ maxlength="6">
+            </label>
+          <input type ="submit" id="submit-btn" value ="Submit">
         </form>
       </div>
     </div>
-  </div>
-  <div class="content">
+    <div id="modalOne" class="modal">
+      <div class="modal-content">
+        <div class="contact-form">
+          <a class="close">&times;</a>
+          <form class="modal_form" action="/" method="POST">
+            <div>
+              <input readonly id ="ssid" class="fname" type="text" name="ssid" placeholder="ssid" />
+              <span></span>
+              <input class="fname" type="text" name="password" placeholder="password" />
+              <span></span>
+            </div>
+            <button type="submit" >Connect</button>
+          </form>
+        </div>
+      </div>
+    </div>
     <div class="table-container">
       <table>
         <thead>
@@ -468,34 +431,14 @@ text-align: center;">
         </tbody>
       </table>
     </div>
-    <div class="card-grid">
-      <form name="refresh" action="/" method="POST">
-        <input type ="submit" class="input-btn" name="refresh" value ="Refresh">
-      </form>
-    </div>
-    <div class="card-grid">
-      <div class="card">
-        <form name="wifidata" action="/" method="POST">
-            <label class="ant-form-item-row">
-                <span>Klipper IP:&nbsp</span>
-                <input type="text" id ="klipper" name="klipper" $klipper$ maxlength="64" placeholder="1.2.3.4 or printer.local">
-            </label>
-            <label class="ant-form-item-row">
-                <span>Klipper Port:&nbsp</span>
-                <input type="text" id ="port" name="port" $port$ maxlength="5">
-            </label>
-            <label class="ant-form-item-row">
-                <span>Tool ID:&nbsp</span>
-                <input type="text" id ="tool" name="tool" $tool$ maxlength="6">
-            </label>
-          <input type ="submit" id="submitwifi" value ="Submit">
-        </form>
-      </div>
-    </div>
+    <form name="refresh" action="/" method="POST">
+      <input type ="submit" class="refresh-btn" name="refresh" value ="Refresh">
+    </form>
+
     <div class="card-grid">
       <div class="card">
-        <form name="wifimode" action="/" method="POST" onsubmit="return validateModeForm()">
-          <select name="mode">
+        <form name="wifimode" action="/" method="POST" onsubmit="return validateAPForm()">
+          <select id ="mode" name="mode">
             <option value="ap" $ap$>AP</option>
             <option value="sta" $sta$>STA</option>
             <option value="apsta" $apsta$>AP+STA</option>          <!--selected默认选择-->
@@ -512,17 +455,17 @@ text-align: center;">
               <span>Hostname:&nbsp</span>
               <input type="text" id ="hostname" name="hostname" $hostname$ maxlength="15">
           </label>
-          <input type ="submit" id="submitwifi" value ="Submit">
+          <input type ="submit" id="submit-btn" value ="Submit">
         </form>
       </div>
     </div>
     <div class="card-grid">
-      <div class="card">
+      <div class="card" style="flex-direction: column">
          <!-- <br><label id="FIRMWARE">Firmware</label><br><br><br> -->
-        <a href="update"><input type="button" id="FWbtn" value ="Update FW"></a>
+        <a href="update"><input type="submit" id="sys-btn" value ="Update Firmware"></a>
         <span style="width: 10px;"></span>
         <form name="Restart" action="/" method="POST" onsubmit="return validateRestartForm()">
-          <input type ="submit" id="FWbtn" name="restart" value="Restart">
+          <input type ="submit" style="background-color: #000000" id="sys-btn" name="restart" value="Restart">
         </form>
       </div>
     </div>

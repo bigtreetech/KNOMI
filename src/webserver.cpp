@@ -47,7 +47,7 @@ String knomi_html_processor(const String& var){
             value += wifi_scan.connected[i] ? "connected" : "";
             value += "</td> </tr>";
         }
-    } else if (var == "klipper") {
+    } else if (var == "ip") {
         String moonraker_ip = knomi_config.moonraker_ip;
         value = (moonraker_ip.isEmpty() ? "" : "value=") + moonraker_ip;
     } else if (var == "port") {
@@ -122,7 +122,7 @@ web_post_info_t web_post_info[] = {
         .require = WEB_POST_LOCAL_HOSTNAME,
     },
     {
-        .name = "klipper",
+        .name = "ip",
         .value = knomi_config.moonraker_ip,
         .v_len = sizeof(knomi_config.moonraker_ip),
         .require = WEB_POST_MOONRAKER,
@@ -213,6 +213,8 @@ void webserver_setup(void) {
             String sta_pwd = knomi_config.sta_pwd;
             request->send(200, "text/html", "SSID: " + sta_ssid + "<br>PWD: " + sta_pwd + \
                     "<br>The BTT KNOMI will now attempt to connect to the specified network.<br>If it fails after 15s then this access point will be re-launched and you can connect to it to try again. <br><a href=\"/\">Return to Home Page</a>");
+        } else if (post_require & WEB_POST_LOCAL_HOSTNAME){
+            request->send(200, "text/html", "The hostname needs to be restarted before it takes effect.<br>Please return to the home page and manually restart. <br><a href=\"/\">Return to Home Page</a>");
         } else if (post_require & WEB_POST_RESTART){
             request->send(200, "text/html", "KNOMI is restarting, please wait for the restart to complete and re-establish the connection. <br><a href=\"/\">Return to Home Page</a>");
         } else if (post_require & WEB_POST_WIFI_REFRESH) {
