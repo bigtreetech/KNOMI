@@ -39,5 +39,8 @@ void lv_dialog_goto_reset_wifi(void);
 // lv_btn_event.cpp
 void lv_btn_init(void);
 void lv_loop_btn_event(void);
+// lv_auto_goto_idle.cpp
+void touch_idle_time_clear(void);
+void lv_loop_auto_idle(wifi_status_t status);
 
 #endif

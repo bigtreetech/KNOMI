@@ -97,6 +97,7 @@ lv_obj_t * ui_set_temp_target;
 
 // SCREEN: ui_ScreenSetExtrude
 void ui_ScreenSetExtrude_screen_init(void);
+void ui_event_ScreenSetExtrude(lv_event_t * e);
 lv_obj_t * ui_ScreenSetExtrude;
 lv_obj_t * ui_roller_set_extrude_length;
 lv_obj_t * ui_roller_set_extrude_speed;
@@ -311,6 +312,7 @@ void ui_event_btn_extruder_speed(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
+        lv_roller_set_extrude(e);
         _ui_screen_change(&ui_ScreenSetExtrude, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_ScreenSetExtrude_screen_init);
     }
 }
@@ -407,6 +409,18 @@ void ui_event_btn_set_temp_ok(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         lv_set_temp_btn_ok(e);
+    }
+}
+void ui_event_ScreenSetExtrude(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_GESTURE) {
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+        if ((dir == LV_DIR_LEFT) || (dir == LV_DIR_RIGHT)) {
+            lv_indev_wait_release(lv_indev_get_act());
+            _ui_screen_change(&ui_ScreenExtrude, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_ScreenExtrude_screen_init);
+        }
     }
 }
 void ui_event_btn_set_extrude_ok(lv_event_t * e)

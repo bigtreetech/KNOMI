@@ -1,5 +1,5 @@
 #include "ui/ui.h"
-#include "config.h"
+#include "knomi.h"
 #include "lv_overlay.h"
 
 void lv_theme_update_color(lv_color_t c) {

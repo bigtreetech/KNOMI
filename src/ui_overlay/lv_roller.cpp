@@ -1,5 +1,5 @@
 #include "ui/ui.h"
-#include "config.h"
+#include "knomi.h"
 #include "moonraker.h"
 #include <ArduinoJson.h>
 #include "lv_overlay.h"
@@ -30,7 +30,7 @@ char gcode_options[1024];
 char service_options[1024];
 static lv_roller_menu_t roller_menu[UI_ROLLER_MENU_NUM] = {
     {
-        .options = "UI color\nKlipper Control\nService Control\nHost Control\nKnomi Info\nFactory Reset\nBacklight",
+        .options = "UI color\nBacklight\nKlipper Control\nService Control\nHost Control\nKnomi Info\nFactory Reset",
         .sel_opt = 0,
         .this_type = UI_ROLLER_SETTING,
         .previous_menu = &ui_ScreenTemp,
@@ -121,7 +121,7 @@ void lv_roller_set_type_print(lv_event_t * e) {
         for (JsonObject file : files) {
             gcodes += file["path"].as<String>() + "\n";
         }
-        strncpy(gcode_options, gcodes.c_str(), sizeof(gcode_options));
+        strlcpy(gcode_options, gcodes.c_str(), sizeof(gcode_options));
         gcode_options[min(sizeof(gcode_options), gcodes.length()) - 1] = 0;
     }
 
@@ -181,7 +181,7 @@ void lv_colorwheel_btn_ok(lv_event_t * e) {
     lv_color_t c = lv_colorwheel_get_rgb(ui_theme_color_wheel);
 
     lv_theme_update_color(c);
-     _ui_screen_change(&ui_ScreenRoller, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
+    _ui_screen_change(&ui_ScreenRoller, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
 }
 
 void lv_roller_preheat_clicked(lv_event_t * e, uint16_t opt_id) {
@@ -203,6 +203,7 @@ void lv_roller_preheat_clicked(lv_event_t * e, uint16_t opt_id) {
     lv_roller_back_to_previous_menu(e);
 }
 
+String service_name_id[20];
 void lv_roller_set_service(void) {
     String list = moonraker.send_request("GET", "/machine/system_info");
     if (!list.isEmpty()) {
@@ -210,13 +211,15 @@ void lv_roller_set_service(void) {
         deserializeJson(json_parse, list);
         JsonArray files = json_parse["result"]["system_info"]["available_services"].as<JsonArray>();
         String services;
-        //     gcodes += file["path"].as<String>() + "\n";
-        uint8_t len = 0;
+        uint8_t i = 0;
         for (JsonObject file : files) {
-            services += files[len].as<String>() + "\n";
-            len++;
+            String option = files[i].as<String>();
+            service_name_id[i] = option;
+            option[0] = toupper(option[0]);
+            services += option + "\n";
+            i++;
         }
-        strncpy(service_options, services.c_str(), sizeof(service_options));
+        strlcpy(service_options, services.c_str(), sizeof(service_options));
         service_options[min(sizeof(service_options), services.length()) - 1] = 0;
     }
 
@@ -230,16 +233,19 @@ void lv_roller_setting_clicked(lv_event_t * e, uint16_t opt_id) {
             lv_roller_set_type(UI_ROLLER_SETTING_THEME);
             break;
         case 1:
-            lv_roller_set_type(UI_ROLLER_CONTROL_KLIPPER);
+            _ui_screen_change(&ui_ScreenBacklight, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
             break;
         case 2:
+            lv_roller_set_type(UI_ROLLER_CONTROL_KLIPPER);
+            break;
+        case 3:
             // lv_roller_set_type(UI_ROLLER_SERVICE);
             lv_roller_set_service();
             break;
-        case 3:
+        case 4:
             lv_roller_set_type(UI_ROLLER_CONTROL_HOST);
             break;
-        case 4:
+        case 5:
         {
             lv_label_set_text(ui_label_sta_ip, WiFi.localIP().toString().c_str());
             lv_label_set_text(ui_label_ap_ip, WiFi.softAPIP().toString().c_str());
@@ -249,42 +255,53 @@ void lv_roller_setting_clicked(lv_event_t * e, uint16_t opt_id) {
             _ui_screen_change(&ui_ScreenInfo, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
             break;
         }
-        case 5:
-            lv_dialog_goto_reset_wifi();
-            break;
         case 6:
-            _ui_screen_change(&ui_ScreenBacklight, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
+            lv_dialog_goto_reset_wifi();
             break;
     }
 }
 
+void lv_dialog_set_custom(const char * text, String cmd);
 void lv_roller_control_klipper_clicked(lv_event_t * e, uint16_t opt_id) {
-    String cmd[] = {
+    const String label[] = {
+        "Restart?",
+        "Firmware Restart?",
+    };
+    const String cmd[] = {
         "/printer/restart",
         "/printer/firmware_restart",
     };
-    moonraker.post_to_queue(cmd[opt_id]);
-    lv_roller_back_to_previous_menu(e);
+    lv_dialog_set_custom(label[opt_id].c_str(), cmd[opt_id]);
 }
-char service[64];
+uint16_t service_opt_id = 0;
 void lv_roller_control_service_clicked(lv_event_t * e, uint16_t opt_id) {
+    const String label[] = {
+        "Start?",
+        "Stop?",
+        "Restart?",
+    };
     String action_cmd[] = {
         "start",
         "stop",
         "restart",
     };
-    String cmd = "/machine/services/" + action_cmd[opt_id] + "?service=" + service;
-    moonraker.post_to_queue(cmd);
-    lv_roller_back_to_previous_menu(e);
+    if (service_opt_id >= 20) {
+        return;
+    }
+    String cmd = "/machine/services/" + action_cmd[opt_id] + "?service=" + service_name_id[service_opt_id];
+    lv_dialog_set_custom(label[opt_id].c_str(), cmd);
 }
 
 void lv_roller_control_host_clicked(lv_event_t * e, uint16_t opt_id) {
+    const String label[] = {
+        "Reboot?",
+        "Shutdown?",
+    };
     String cmd[] = {
         "/machine/reboot",
         "/machine/shutdown",
     };
-    moonraker.post_to_queue(cmd[opt_id]);
-    lv_roller_back_to_previous_menu(e);
+    lv_dialog_set_custom(label[opt_id].c_str(), cmd[opt_id]);
 }
 
 // gesture
@@ -345,7 +362,7 @@ void lv_roller_btn_clicked(lv_event_t * e) {
             lv_roller_control_klipper_clicked(e, opt_id);
             break;
         case UI_ROLLER_SERVICE:
-            lv_roller_get_selected_str(ui_roller, service, sizeof(service));
+            service_opt_id = lv_roller_get_selected(ui_roller);
             lv_roller_set_type(UI_ROLLER_CONTROL_SERVICE);
             break;
         case UI_ROLLER_CONTROL_SERVICE:

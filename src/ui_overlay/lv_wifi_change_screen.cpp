@@ -1,5 +1,5 @@
 #include "ui/ui.h"
-#include "config.h"
+#include "knomi.h"
 
 static wifi_status_t lv_wifi_status = WIFI_STATUS_INIT;
 

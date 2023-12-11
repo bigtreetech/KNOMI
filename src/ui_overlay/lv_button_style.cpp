@@ -1,5 +1,5 @@
 #include "ui/ui.h"
-#include "config.h"
+#include "knomi.h"
 #include "lv_overlay.h"
 
 // Add a transition to the outline

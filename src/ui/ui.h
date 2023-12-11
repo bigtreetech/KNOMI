@@ -97,6 +97,7 @@ extern lv_obj_t * ui_img_set_temp_ok;
 extern lv_obj_t * ui_set_temp_target;
 // SCREEN: ui_ScreenSetExtrude
 void ui_ScreenSetExtrude_screen_init(void);
+void ui_event_ScreenSetExtrude(lv_event_t * e);
 extern lv_obj_t * ui_ScreenSetExtrude;
 extern lv_obj_t * ui_roller_set_extrude_length;
 extern lv_obj_t * ui_roller_set_extrude_speed;

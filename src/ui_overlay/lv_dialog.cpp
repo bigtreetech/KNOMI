@@ -1,5 +1,5 @@
 #include "ui/ui.h"
-#include "config.h"
+#include "knomi.h"
 #include "moonraker.h"
 
 enum UI_DIALOG_TYPE {
@@ -11,7 +11,10 @@ enum UI_DIALOG_TYPE {
     UI_DIALOG_PAUSE_PRINT,
     UI_DIALOG_RESUME_PRINT,
     UI_DIALOG_FACTORY_RESET,
+    UI_DIALOG_MOONRAKER_CUSTOM,
 };
+
+static String moonraker_custom_cmd;
 
 static lv_obj_t * dialog_previous_menu;
 
@@ -31,9 +34,18 @@ static UI_DIALOG_TYPE dialog_type;
 static void lv_dialog_goto(UI_DIALOG_TYPE type) {
     dialog_type = type;
     dialog_previous_menu = lv_scr_act();
-    lv_label_set_text(ui_label_dialog, dialog_title[dialog_type]);
+    if (dialog_type != UI_DIALOG_MOONRAKER_CUSTOM) {
+        lv_label_set_text(ui_label_dialog, dialog_title[dialog_type]);
+    }
     _ui_screen_change(&ui_ScreenDialog, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, NULL);
 }
+
+void lv_dialog_set_custom(const char * text, String cmd) {
+    lv_label_set_text(ui_label_dialog, text);
+    moonraker_custom_cmd = cmd;
+    lv_dialog_goto(UI_DIALOG_MOONRAKER_CUSTOM);
+}
+
 
 void lv_dialog_goto_abl(lv_event_t * e) {
     lv_dialog_goto(UI_DIALOG_ABL);
@@ -104,6 +116,9 @@ void lv_dialog_btn_ok(lv_event_t * e) {
             break;
         case UI_DIALOG_FACTORY_RESET:
             knomi_factory_reset();
+            break;
+        case UI_DIALOG_MOONRAKER_CUSTOM:
+            moonraker.post_to_queue(moonraker_custom_cmd);
             break;
     }
 

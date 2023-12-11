@@ -6,7 +6,7 @@
 #include <SPI.h>
 #include <CST816S.h>
 
-#include "config.h"
+#include "knomi.h"
 #include "lvgl.h"
 
 void lvgl_hal_init(void);

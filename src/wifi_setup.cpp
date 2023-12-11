@@ -1,8 +1,9 @@
 #include <WiFi.h>
-
-#include "config.h"
-
 #include "DNSServer.h"
+#include "knomi.h"
+
+#define DEFAULT_KLIPPER_PORT "80"
+#define DEFAULT_KLIPPER_TOOL "tool0"
 
 #define DNS_PORT 53
 DNSServer dnsServer;
@@ -13,17 +14,7 @@ static IPAddress ap_gateway = AP_GATEWAY;   // gateway IP
 static IPAddress ap_subnet = AP_SUBNET;     // subnet mask
 
 knomi_wifi_scan_t wifi_scan;
-knomi_config_t knomi_config = {
-    // .sta_ssid = {0},
-    // .sta_pwd = {0},
-    // .sta_auth = WIFI_AUTH_WPA2_PSK,
-    // .ap_ssid = {AP_SSID}, // Create a SSID for BTT KNOMI Access Point
-    // .ap_pwd = {AP_PWD}, // Create Password for BTT KNOMI AP
-    // .hostname = {HOSTNAME},
-    // .moonraker_ip = {"0.0.0.0"},
-    // .mode = {"ap"},
-    // .theme_color = lv_color_hex(LV_DEFAULT_COLOR),
-};
+knomi_config_t knomi_config;
 
 void webserver_setup(void);
 
@@ -64,7 +55,7 @@ wifi_auth_mode_t wifi_get_ahth_mode_from_scanned_list(void) {
 
 #include <EEPROM.h>
 
-#define EEPROM_SIGN 0x20231201
+#define EEPROM_SIGN 0x20231212
 #define EEPROM_SIGN_SIZE 4
 // Init the EEPROM and restore all NV vars.
 void eeprom_init(void) {
@@ -74,7 +65,7 @@ void eeprom_init(void) {
     }
     // Get sign flag
     uint32_t eeprom_sign;
-    EEPROM.get(0x00, eeprom_sign);
+    EEPROM.get<uint32_t>(0x00, eeprom_sign);
     if (eeprom_sign == EEPROM_SIGN) {
         EEPROM.get<knomi_config_t>(0x00 + EEPROM_SIGN_SIZE, knomi_config);
         Serial.println("knomi_config from EEPROM");
@@ -107,21 +98,20 @@ void eeprom_init(void) {
         strlcpy(knomi_config.ap_pwd, AP_PWD, sizeof(knomi_config.ap_pwd));
         strlcpy(knomi_config.hostname, HOSTNAME, sizeof(knomi_config.hostname));
         strlcpy(knomi_config.moonraker_ip, "", sizeof(knomi_config.moonraker_ip));
-        strlcpy(knomi_config.moonraker_port, "80", sizeof(knomi_config.moonraker_port));
-        strlcpy(knomi_config.moonraker_tool, "tool0", sizeof(knomi_config.moonraker_tool));
+        strlcpy(knomi_config.moonraker_port, DEFAULT_KLIPPER_PORT, sizeof(knomi_config.moonraker_port));
+        strlcpy(knomi_config.moonraker_tool, DEFAULT_KLIPPER_TOOL, sizeof(knomi_config.moonraker_tool));
         strlcpy(knomi_config.mode, "ap", sizeof(knomi_config.mode));
         knomi_config.theme_color = lv_color_hex(LV_DEFAULT_COLOR);
 
-        EEPROM.put(0x00, EEPROM_SIGN);
-        EEPROM.put(0x00 + EEPROM_SIGN_SIZE, knomi_config);
+        EEPROM.put<uint32_t>(0x00, EEPROM_SIGN);
+        EEPROM.put<knomi_config_t>(0x00 + EEPROM_SIGN_SIZE, knomi_config);
         EEPROM.commit();
         Serial.println("knomi_config from default & INIT EEPROM");
     }
 }
 
 void knomi_factory_reset(void) {
-    EEPROM.put(0x00, EEPROM_SIGN + 1); // Any value other than 'EEPROM_SIGN'
-    // EEPROM.put(0x00 + EEPROM_SIGN_SIZE, knomi_config);
+    EEPROM.put<uint32_t>(0x00, EEPROM_SIGN + 1); // Any value other than 'EEPROM_SIGN'
     EEPROM.commit();
     Serial.println("EEPROM reset factory");
     ESP.restart();
@@ -191,7 +181,7 @@ void eeprom_write_knomi_config(void) {
     Serial.println(knomi_config.moonraker_tool);
     Serial.print("mode: ");
     Serial.println(knomi_config.mode);
-    EEPROM.put<knomi_config_t>(0x00 + sizeof(EEPROM_SIGN), knomi_config);
+    EEPROM.put<knomi_config_t>(0x00 + EEPROM_SIGN_SIZE, knomi_config);
     EEPROM.commit();
 }
 

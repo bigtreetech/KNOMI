@@ -23,6 +23,7 @@ void lv_roller_set_type_preheat(lv_event_t * e);
 void lv_set_temp_back_to_previous(lv_event_t * e);
 void lv_set_temp_btn_ok(lv_event_t * e);
 void lv_btn_set_extrude(lv_event_t * e);
+void lv_roller_set_extrude(lv_event_t * e);
 void lv_dialog_goto_cancel(lv_event_t * e);
 void lv_dialog_goto_pause_resume(lv_event_t * e);
 void lv_roller_gesture_left(lv_event_t * e);

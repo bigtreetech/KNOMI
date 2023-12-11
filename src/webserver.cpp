@@ -2,7 +2,7 @@
 #include <AsyncElegantOTA.h>
 #include <ESPmDNS.h>
 
-#include "config.h"
+#include "knomi.h"
 
 static AsyncWebServer server(SERVER_PORT);
 
@@ -183,6 +183,8 @@ void webserver_setup(void) {
         int paramsNr = request->params();
         for (int i = 0; i < paramsNr; i++) {
             AsyncWebParameter* p = request->getParam(i);
+            Serial.printf("name: %s\r\n", p->name().c_str());
+            Serial.printf("value: %s\r\n", p->value().c_str());
 
             for (uint8_t i = 0; i < ACOUNT(web_post_info); i++) {
                 if (strcmp(web_post_info[i].name, p->name().c_str()) == 0) {

@@ -67,5 +67,6 @@ void ui_ScreenSetExtrude_screen_init(void)
     lv_obj_clear_flag(ui_img_set_extrude_ok, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     lv_obj_add_event_cb(ui_btn_set_extrude_ok, ui_event_btn_set_extrude_ok, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_ScreenSetExtrude, ui_event_ScreenSetExtrude, LV_EVENT_ALL, NULL);
 
 }

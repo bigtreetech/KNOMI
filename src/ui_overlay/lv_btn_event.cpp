@@ -1,5 +1,5 @@
 #include "ui/ui.h"
-#include "config.h"
+#include "knomi.h"
 #include "lv_overlay.h"
 #include "pinout.h"
 #include "button.h"

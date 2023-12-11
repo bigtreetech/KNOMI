@@ -22,6 +22,7 @@ void usr_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *colo
 }
 
 #ifdef CST816S_SUPPORT
+void touch_idle_time_clear(void);
 void usr_touchpad_read(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data) {
     static touch_event_t event;
     if(ts_cst816s.ready()) {
@@ -32,6 +33,7 @@ void usr_touchpad_read(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * dat
         /*Set the coordinates*/
         data->point.x = event.x;
         data->point.y = event.y;
+        touch_idle_time_clear();
     } else {
         data->state = LV_INDEV_STATE_REL;
     }

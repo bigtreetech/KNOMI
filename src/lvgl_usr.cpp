@@ -21,8 +21,22 @@ void lv_btn_set_extrude(lv_event_t * e) {
     char roller_str[10];
     lv_roller_get_selected_str(ui_roller_set_extrude_length, roller_str, sizeof(roller_str));
     lv_label_set_text(ui_label_extruder_length, roller_str);
+    uint32_t sel = lv_roller_get_selected(ui_roller_set_extrude_length);
+    lv_obj_set_user_data(ui_label_extruder_length, (void *)sel);
     lv_roller_get_selected_str(ui_roller_set_extrude_speed, roller_str, sizeof(roller_str));
     lv_label_set_text(ui_label_extruder_speed, roller_str);
+    sel = lv_roller_get_selected(ui_roller_set_extrude_speed);
+    lv_obj_set_user_data(ui_label_extruder_speed, (void *)sel);
+}
+
+// set extruder roller
+void lv_roller_set_extrude(lv_event_t * e) {
+    // Initialize parameter values from roller settings
+    uint32_t sel = (uint32_t)lv_obj_get_user_data(ui_label_extruder_length);
+    lv_roller_set_selected(ui_roller_set_extrude_length, sel, LV_ANIM_OFF);
+
+    sel = (uint32_t)lv_obj_get_user_data(ui_label_extruder_speed);
+    lv_roller_set_selected(ui_roller_set_extrude_speed, sel, LV_ANIM_OFF);
 }
 /***********************************************************/
 
@@ -118,6 +132,7 @@ void lvgl_ui_task(void * parameter) {
             }
         }
 
+        lv_loop_auto_idle(status);
         lv_loop_btn_event();
 
         delay(5);
