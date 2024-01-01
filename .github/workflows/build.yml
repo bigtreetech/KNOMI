@@ -89,7 +89,7 @@ jobs:
         with:
           path: |
             ~/.cargo
-            ${{ github.workspace }}/Firmware/rs-flasher/target
+            ${{ github.workspace }}/rs-flasher/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
 
       - name: Install Rust toolchain ${{ matrix.target }}
@@ -102,31 +102,31 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: firmware
-          path: Firmware/rs-flasher/resources
+          path: rs-flasher/resources
 
       - name: Build Flasher
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --manifest-path Firmware/rs-flasher/Cargo.toml
+          args: --release --manifest-path rs-flasher/Cargo.toml
 
       - name: Copy result
         if: matrix.os == 'windows-latest'
         run: | 
-            dir Firmware/rs-flasher/target/release
-            copy Firmware/rs-flasher/target/release/rs-flasher.exe rs-flasher.exe
+            dir rs-flasher/target/release
+            copy rs-flasher/target/release/rs-flasher.exe rs-flasher.exe
 
       - name: Copy result
         if: matrix.os == 'macos-latest'
         run: | 
-            ls Firmware/rs-flasher/target/release
-            cp Firmware/rs-flasher/target/release/rs-flasher rs-flasher.macOS
+            ls rs-flasher/target/release
+            cp rs-flasher/target/release/rs-flasher rs-flasher.macOS
 
       - name: Copy result
         if: matrix.os == 'ubuntu-latest'
         run: | 
-            ls Firmware/rs-flasher/target/release
-            cp Firmware/rs-flasher/target/release/rs-flasher rs-flasher.linux-amd64
+            ls rs-flasher/target/release
+            cp rs-flasher/target/release/rs-flasher rs-flasher.linux-amd64
 
       - name: Archive Flasher
         uses: actions/upload-artifact@v3
