@@ -52,11 +52,11 @@ jobs:
 
       - name: Prepare artifacts for archive 
         run: | 
-            cp .pio/build/esp32dev/buildinfo.json ../buildinfo.json
-            cp .pio/build/esp32dev/firmware_full.bin ../firmware_full.bin
-            cp .pio/build/esp32dev/firmware.bin ../firmware.bin 
-            cp .pio/build/esp32dev/firmware.elf ../firmware.elf
-            cp .pio/build/esp32dev/littlefs.bin ../littlefs.bin
+            cp .pio/build/esp32dev/buildinfo.json buildinfo.json
+            cp .pio/build/esp32dev/firmware_full.bin firmware_full.bin
+            cp .pio/build/esp32dev/firmware.bin firmware.bin 
+            cp .pio/build/esp32dev/firmware.elf firmware.elf
+            cp .pio/build/esp32dev/littlefs.bin littlefs.bin
           
       - name: Archive Firmware Files
         uses: actions/upload-artifact@v3
