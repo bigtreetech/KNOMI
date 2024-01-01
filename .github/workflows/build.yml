@@ -59,7 +59,7 @@ jobs:
             cp .pio/build/esp32dev/littlefs.bin littlefs.bin
           
       - name: Archive Firmware Files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: 
           name: firmware
           path: |
@@ -99,7 +99,7 @@ jobs:
           override: true
 
       - name: Download Firmware Files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: firmware
           path: rs-flasher/resources
@@ -129,7 +129,7 @@ jobs:
             cp rs-flasher/target/release/rs-flasher rs-flasher.linux-amd64
 
       - name: Archive Flasher
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: 
           name: flasher
           path: |
@@ -147,12 +147,12 @@ jobs:
     steps:
     - name: Download Firmware Files
       id: download1
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: firmware
     - name: Download Flasher Files
       id: download2
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: flasher
 
