@@ -92,7 +92,7 @@ jobs:
             ${{ github.workspace }}/rs-flasher/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
 
-      - name: Install Rust toolchain ${{ matrix.target }}
+      - name: Install Rust toolchain ${{ matrix.os }}
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -131,7 +131,7 @@ jobs:
       - name: Archive Flasher
         uses: actions/upload-artifact@v4
         with: 
-          name: flasher
+          name: flasher-${{matrix.os}}
           path: |
             rs-flasher.exe
             rs-flasher.macOS
@@ -150,11 +150,23 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: firmware
-    - name: Download Flasher Files
-      id: download2
+    - name: Download Flasher MacOS Files
+      id: download-mac
       uses: actions/download-artifact@v4
       with:
-        name: flasher
+        name: flasher-macos-latest
+
+    - name: Download Flasher Windows Files
+      id: download-win
+      uses: actions/download-artifact@v4
+      with:
+        name: flasher-windows-latest
+
+    - name: Download Flasher Ubuntu Files
+      id: download-ubuntu
+      uses: actions/download-artifact@v4
+      with:
+        name: flasher-ubuntu-latest
 
     - name: Build Changelog
       id: build_changelog
@@ -177,6 +189,6 @@ jobs:
           ${{steps.download1.outputs.download-path}}/firmware.bin
           ${{steps.download1.outputs.download-path}}/firmware.elf
           ${{steps.download1.outputs.download-path}}/littlefs.bin
-          ${{steps.download2.outputs.download-path}}/rs-flasher.exe
-          ${{steps.download2.outputs.download-path}}/rs-flasher.linux-amd64
-          ${{steps.download2.outputs.download-path}}/rs-flasher.macOS
+          ${{steps.download-win.outputs.download-path}}/rs-flasher.exe
+          ${{steps.download-ubuntu.outputs.download-path}}/rs-flasher.linux-amd64
+          ${{steps.download-mac.outputs.download-path}}/rs-flasher.macOS
