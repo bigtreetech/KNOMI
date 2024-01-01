@@ -18,7 +18,7 @@ jobs:
         with:
           path: |
             ~/.npm
-            ${{ github.workspace }}/Firmware/ui-ng/node_modules
+            ${{ github.workspace }}/ui-ng/node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
       - name: Cache PIO
@@ -27,7 +27,7 @@ jobs:
           path: |
             ~/.platformio
             ~/.cache/pip
-            ${{ github.workspace }}/Firmware/.pio
+            ${{ github.workspace }}/.pio
           key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
 
       - name: Setup Python 3.9
@@ -40,22 +40,18 @@ jobs:
 
       - name: Build Firmware Core
         run: | 
-            cd Firmware 
             pio run --disable-auto-clean -e esp32dev
 
       - name: Build Firmware LittleFS
         run: | 
-            cd Firmware 
             pio run --disable-auto-clean -e esp32dev -t buildfs
 
       - name: Build Full Firmware
         run: | 
-            cd Firmware 
             pio run --disable-auto-clean -e esp32dev -t merge_firmware
 
       - name: Prepare artifacts for archive 
         run: | 
-            cd Firmware 
             cp .pio/build/esp32dev/buildinfo.json ../buildinfo.json
             cp .pio/build/esp32dev/firmware_full.bin ../firmware_full.bin
             cp .pio/build/esp32dev/firmware.bin ../firmware.bin 

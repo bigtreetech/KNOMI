@@ -10,11 +10,11 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/Firmware/ui-ng" # Location of package manifests
+    directory: "/ui-ng" # Location of package manifests
     schedule:
       interval: "weekly"
   - package-ecosystem: "cargo"
-    directory: "/Firmware/rs-flasher"
+    directory: "/rs-flasher"
     schedule:
       interval: "weekly"
     ignore:
