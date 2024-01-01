@@ -57,6 +57,8 @@ String Version::getBuildTimestamp() {
         "buildTime": buildTime
     }
 
+    print("Updating {} with json data...".format(VERSION_JSON))
+
     with open(VERSION_JSON, 'w+') as FILE:
         json.dump(data, FILE)
 
