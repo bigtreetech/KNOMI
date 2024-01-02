@@ -150,23 +150,12 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: firmware
-    - name: Download Flasher MacOS Files
+    - name: Download Flasher Files
       id: download-mac
       uses: actions/download-artifact@v4
       with:
-        name: flasher-macos-latest
-
-    - name: Download Flasher Windows Files
-      id: download-win
-      uses: actions/download-artifact@v4
-      with:
-        name: flasher-windows-latest
-
-    - name: Download Flasher Ubuntu Files
-      id: download-ubuntu
-      uses: actions/download-artifact@v4
-      with:
-        name: flasher-ubuntu-latest
+        pattern: flasher-*
+        merge-multiple: true
 
     - name: Build Changelog
       id: build_changelog
