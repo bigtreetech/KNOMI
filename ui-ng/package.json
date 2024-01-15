@@ -28,7 +28,7 @@
         "cross-env": "^7.0.3",
         "eslint": "^8.56.0",
         "eslint-plugin-svelte": "^2.35.1",
-        "prettier": "^3.1.1",
+        "prettier": "^3.2.2",
         "prettier-plugin-svelte": "^3.1.2",
         "sass": "^1.69.7",
         "sass-loader": "^13.3.3",
