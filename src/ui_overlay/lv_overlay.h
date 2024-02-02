@@ -7,7 +7,7 @@ extern lv_obj_t * ui_img_main_gif;
 extern const lv_img_dsc_t * gif_idle[];
 
 LV_IMG_DECLARE(gif_welcome);
-LV_IMG_DECLARE(gif_voron);
+LV_IMG_DECLARE(gif_zerog);
 LV_IMG_DECLARE(gif_standby);
 LV_IMG_DECLARE(gif_homing);
 LV_IMG_DECLARE(gif_probing);

@@ -21,7 +21,7 @@ typedef enum {
 } lv_screen_state_t;
 
 lv_obj_t * ui_img_main_gif;
-const lv_img_dsc_t * gif_idle[] = {&gif_voron, &gif_standby};
+const lv_img_dsc_t * gif_idle[] = {&gif_zerog, &gif_standby};
 
 static char string_buffer[8];
 static lv_screen_state_t lv_screen_state = LV_MOONRAKER_STATE_IDLE;
