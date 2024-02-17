@@ -9,7 +9,7 @@ You can comment out some sections if you don't have bed mesh or QGL.
 
 # Upgrade
 You can download filesystem / firmware from github releases and install them from KNOMI webpage.
-If major version changed (1.0.0 -> 2.0.0) - then you MUST update filesystem, it had some incompatible changes.
+If major version changed (1.0.0 -> 2.0.0) - then you MUST update filesystem (theme), it had some incompatible changes.
 If minor version changed (1.0.0 -> 1.1.0) - then you can just upgrade firmware, all changes were backwards compatible.
 
 # Differences from original KNOMI Firmware
