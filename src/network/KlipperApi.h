@@ -1,10 +1,9 @@
 #pragma once
 #include "../config/Config.h"
 #include "log.h"
-#include "requests/BedLevelRequest.h"
 #include "requests/HeatingAndOverallRequest.h"
-#include "requests/HomingRequest.h"
 #include "requests/KlipperApiRequest.h"
+#include "requests/KnomiStatusRequest.h"
 #include "requests/PrintingRequest.h"
 #include <ArduinoJson.h>
 #include <queue>
@@ -17,8 +16,7 @@ private:
 
   HeatingAndOverallRequest req1;
   PrintingRequest req2;
-  HomingRequest req3;
-  BedLevelRequest req4;
+  KnomiStatusRequest req3;
 
 public:
   KlipperApi(Config *config) { this->config = config; }
@@ -34,15 +32,24 @@ public:
   int getBedActualTempValue() const { return req1.bedtemp_actual; }
   int getBedTargetTempValue() const { return req1.bedtemp_target; }
 
-  bool isHoming() const { return req3.homing_status == 1; }
-  bool isLeveling() const { return req4.levelling_status == 1; }
+  bool isHoming() const { return req3.isHoming; }
+  bool isLeveling() const { return req3.isProbing; }
+  bool isQGLeveling() const { return req3.isQgling; }
   bool isPrinting() const { return req1.print_status == 1; }
   bool isHeating() const {
     return req1.bedtemp_actual < req1.bedtemp_target || req1.tooltemp_actual < req1.tooltemp_target;
   }
 
+  ulong getLastSuccessfullCall() const {
+    ulong lastCall1 = req1.getLastSuccessfullCall();
+    ulong lastCall2 = req2.getLastSuccessfullCall();
+    ulong lastCall3 = req3.getLastSuccessfullCall();
+
+    return max(max(lastCall1, lastCall2), lastCall3);
+  }
+
   bool isKlipperNotAvailable() {
-    int failCount = req1.getFailCount() + req2.getFailCount() + req3.getFailCount() + req4.getFailCount();
+    int failCount = req1.getFailCount() + req2.getFailCount() + req3.getFailCount();
     return failCount > 3;
   }
 
@@ -53,7 +60,6 @@ public:
       req1.Execute(klipper_ip);
       req2.Execute(klipper_ip);
       req3.Execute(klipper_ip);
-      req4.Execute(klipper_ip);
     }
   }
 };

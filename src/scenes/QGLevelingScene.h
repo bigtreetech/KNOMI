@@ -1,17 +1,17 @@
 #pragma once
 #include "AbstractScene.h"
 
-class LevelingScene : public AbstractScene {
+class QGLevelingScene : public AbstractScene {
 private:
   ResourceImage *ri_leveling;
 
 public:
-  explicit LevelingScene(SceneDeps deps) : AbstractScene(deps) { ri_leveling = KnownResourceImages::get_probing(); }
+  explicit QGLevelingScene(SceneDeps deps) : AbstractScene(deps) { ri_leveling = KnownResourceImages::get_qgling(); }
 
-  ~LevelingScene() override { delete ri_leveling; }
+  ~QGLevelingScene() override { delete ri_leveling; }
 
   SwitchSceneRequest *NextScene() override {
-    if (!deps.klipperApi->isLeveling()) {
+    if (!deps.klipperApi->isQGLeveling()) {
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;

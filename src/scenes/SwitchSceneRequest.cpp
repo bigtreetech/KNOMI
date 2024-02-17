@@ -13,6 +13,7 @@
 #include "Printing100PercentScene.h"
 #include "Printing1PercentScene.h"
 #include "PrintingScene.h"
+#include "QGLevelingScene.h"
 #include "StandbyScene.h"
 #include "VoronScene.h"
 
@@ -50,6 +51,8 @@ AbstractScene *SwitchSceneRequest::Provide() {
     return new FirmwareUpdateScene(deps);
   case SceneId::Demo:
     return new DemoScene(deps);
+  case SceneId::QGLeveling:
+    return new QGLevelingScene(deps);
   }
   LV_LOG_WARN((String("Unhandled scene %s") + id).c_str());
   return new StandbyScene(deps);

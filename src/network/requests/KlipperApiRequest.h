@@ -16,6 +16,7 @@ private:
   String response = "";
   bool inProgress = false;
   ulong nextCall = 0;
+  ulong lastCall;
 
 protected:
   int failCount = 0;
@@ -26,6 +27,8 @@ protected:
 
 public:
   int getFailCount() const { return failCount; }
+
+  ulong getLastSuccessfullCall() const { return lastCall; }
 
   KlipperApiRequest() {}
 
@@ -116,6 +119,7 @@ public:
       }
 
       response = "";
+      lastCall = millis();
       break;
     case HTTP_EVENT_DISCONNECTED: {
       LV_LOG_DEBUG("HTTP_EVENT_DISCONNECTED");
