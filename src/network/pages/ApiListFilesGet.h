@@ -12,17 +12,17 @@ public:
   esp_err_t handler(httpd_req_t *req) override {
     httpd_resp_set_type(req, "application/json");
 
-    DynamicJsonDocument doc(2048);
+    JsonDocument doc;
     doc["total"] = LittleFS.totalBytes();
     doc["used"] = LittleFS.usedBytes();
-    const JsonArray &array = doc.createNestedArray("files");
+    const JsonArray &array = doc["files"].to<JsonArray>();
 
     fs::File root = LittleFS.open("/");
     fs::File file = root.openNextFile();
 
     std::set<String> added;
     while (file) {
-      const JsonObject &item = array.createNestedObject();
+      const JsonObject &item = array.add<JsonObject>();
       added.insert(String(file.name()));
       item["name"] = String(file.name());
       item["size"] = file.size();
@@ -33,7 +33,7 @@ public:
 
     for (const char *file : KnownResourceImages::enumerateFiles()) {
       if (added.find(String(file)) == added.end()) {
-        const JsonObject &item = array.createNestedObject();
+        const JsonObject &item = array.add<JsonObject>();
 
         String fileName = String(file);
         item["name"] = fileName;
