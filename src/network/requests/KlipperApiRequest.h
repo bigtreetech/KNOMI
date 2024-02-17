@@ -16,7 +16,7 @@ private:
   String response = "";
   bool inProgress = false;
   ulong nextCall = 0;
-  ulong lastCall;
+  ulong lastCall = millis();
 
 protected:
   int failCount = 0;
