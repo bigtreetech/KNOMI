@@ -6,6 +6,7 @@
 #include "network/WifiManager.h"
 #include "ui/DisplayHAL.h"
 #include "ui/SceneManager.h"
+#include "watchdog.h"
 #include <Arduino.h>
 #include <WiFi.h>
 
@@ -19,6 +20,7 @@ KlipperApi *klipperApi = nullptr;
 __attribute__((unused)) SceneManager *sceneManager = nullptr;
 DisplayHAL *displayHAL = nullptr;
 UpdateProgress *progress = nullptr;
+Watchdog *watchDog = nullptr;
 
 uint32_t netcheck_nexttime = 0;
 uint32_t klipper_nexttime = 0;
@@ -68,6 +70,8 @@ __attribute__((unused)) void setup() {
   LV_LOG_INFO("SceneManager started");
   wifiManager->connectToWiFi();
   LV_LOG_INFO("Connected to wifi");
+  watchDog = new Watchdog(klipperApi);
+  LV_LOG_INFO("Watchdog started");
 }
 
 __attribute__((unused)) void loop() {

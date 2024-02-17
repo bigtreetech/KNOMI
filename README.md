@@ -1,5 +1,16 @@
-# KNOMI
-Online manual & customize UI tutorials：[here](https://bigtreetech.github.io/docs/KNOMI.html#)
+# Compatibility
+Currently this firmware supports only KNOMI V1.
+
+# Installation
+
+1. Please include "knomi.cfg" from repo to your klipper installation.
+You can comment out some sections if you don't have bed mesh or QGL.
+2. Download latest release from GitHub releases - it will guide you on first installation. You'll have to connect your KNOMI display directly to PC.
+
+# Upgrade
+You can download filesystem / firmware from github releases and install them from KNOMI webpage.
+If major version changed (1.0.0 -> 2.0.0) - then you MUST update filesystem (theme), it had some incompatible changes.
+If minor version changed (1.0.0 -> 1.1.0) - then you can just upgrade firmware, all changes were backwards compatible.
 
 # Differences from original KNOMI Firmware
 

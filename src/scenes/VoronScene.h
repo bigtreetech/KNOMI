@@ -15,6 +15,8 @@ public:
       return new SwitchSceneRequest(deps, SceneId::Homing);
     else if (deps.klipperApi->isLeveling())
       return new SwitchSceneRequest(deps, SceneId::Leveling);
+    else if (deps.klipperApi->isQGLeveling())
+      return new SwitchSceneRequest(deps, SceneId::QGLeveling);
     else if (deps.klipperApi->isPrinting() || deps.klipperApi->isHeating())
       return new SwitchSceneRequest(deps, SceneId::BedHeating);
     else

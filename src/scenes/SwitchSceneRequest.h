@@ -15,6 +15,7 @@ enum SceneId {
   AfterPrint = 10,
   APConfig = 7,
   NoKlipper = 8,
+  QGLeveling = 16,
   Printing1Percent = 99,
   Printing100Percent = 100,
   BootupLogo = 1,
