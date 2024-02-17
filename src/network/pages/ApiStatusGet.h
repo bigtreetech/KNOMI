@@ -12,7 +12,7 @@ public:
   esp_err_t handler(httpd_req_t *req) override {
     httpd_resp_set_type(req, "application/json");
 
-    DynamicJsonDocument doc(512);
+    JsonDocument doc;
     doc["hash"] = Version::getGitCommitSha1();
     doc["branch"] = Version::getGitBranch();
     doc["gitTimestamp"] = Version::getGitTimestamp();
@@ -36,7 +36,7 @@ public:
     doc["ota_partition"] = String(esp_ota_get_running_partition()->label);
     multi_heap_info_t info;
     heap_caps_get_info(&info, MALLOC_CAP_DEFAULT);
-    auto heap = doc.createNestedObject("heap");
+    auto heap = doc["heap"].to<JsonObject>();
     heap["allocated_blocks"] = info.allocated_blocks;
     heap["free_blocks"] = info.free_blocks;
     heap["largest_free_block"] = info.largest_free_block;

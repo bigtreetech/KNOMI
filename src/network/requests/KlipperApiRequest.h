@@ -101,7 +101,7 @@ public:
       // Incoming order: 5. Request fully buffered locally. process
       LV_LOG_DEBUG("HTTP_EVENT_ON_FINISH");
       if (esp_http_client_get_status_code(evt->client) == 200) {
-        StaticJsonDocument<2048> doc;
+        JsonDocument doc;
         deserializeJson(doc, response.c_str());
         failCount = 0;
 #if DEBUG
