@@ -19,8 +19,10 @@ public:
       return new SwitchSceneRequest(deps, SceneId::QGLeveling);
     else if (deps.klipperApi->isPrinting() || deps.klipperApi->isHeating())
       return new SwitchSceneRequest(deps, SceneId::BedHeating);
-    else
+    else if (ri_voron->isPlayedToEnd())
       return new SwitchSceneRequest(deps, SceneId::Standby);
+    else
+      return nullptr;
   };
 
   void Tick() override { ri_voron->tick(deps.displayHAL); }

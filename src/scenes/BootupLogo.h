@@ -7,7 +7,6 @@ class BootupLogoScene : public AbstractScene {
 private:
   WifiManager *wifiManager;
   ResourceImage *ri_logo = nullptr;
-  Arc *arc = nullptr;
 
 public:
   explicit BootupLogoScene(SceneDeps deps) : AbstractScene(deps) {
@@ -22,7 +21,7 @@ public:
 
   SwitchSceneRequest *NextScene() override {
     if (wifiManager->isInConfigMode()) {
-      return new SwitchSceneRequest(deps, SceneId::APConfig, 0);
+      return new SwitchSceneRequest(deps, SceneId::APConfig);
     } else if (wifiManager->isConnected()) {
       // return new SwitchSceneRequest(deps, SceneId::Demo);
       return new SwitchSceneRequest(deps, SceneId::Standby);

@@ -38,7 +38,7 @@ public:
 
   SwitchSceneRequest *NextScene() override {
     if (!progress->isInProgress) {
-      return new SwitchSceneRequest(deps, SceneId::Standby, 0);
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
   }

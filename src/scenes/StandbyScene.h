@@ -13,7 +13,7 @@ public:
   ~StandbyScene() override { delete ri_standby; }
 
   SwitchSceneRequest *NextScene() override {
-   if (deps.klipperApi->isHoming())
+    if (deps.klipperApi->isHoming())
       return new SwitchSceneRequest(deps, SceneId::Homing);
     else if (deps.klipperApi->isLeveling())
       return new SwitchSceneRequest(deps, SceneId::Leveling);
@@ -21,8 +21,10 @@ public:
       return new SwitchSceneRequest(deps, SceneId::QGLeveling);
     else if (deps.klipperApi->isPrinting() || deps.klipperApi->isHeating())
       return new SwitchSceneRequest(deps, SceneId::BedHeating);
-    else
+    else if (ri_standby->isPlayedToEnd())
       return new SwitchSceneRequest(deps, SceneId::Voron);
+    else
+      return nullptr;
   }
 
   void Tick() override { ri_standby->tick(deps.displayHAL); }

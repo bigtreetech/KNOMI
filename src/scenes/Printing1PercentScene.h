@@ -5,6 +5,7 @@ class Printing1PercentScene : public AbstractScene {
 public:
   TextLabel *text;
   Arc *arc;
+  SceneTimer *timer = nullptr;
 
   explicit Printing1PercentScene(SceneDeps deps) : AbstractScene(deps) {
     text = new TextLabel(deps.styles, fontSize::large, 0, 0);
@@ -13,12 +14,17 @@ public:
   ~Printing1PercentScene() override {
     delete text;
     delete arc;
+    delete timer;
   }
 
   SwitchSceneRequest *NextScene() override {
     if (deps.klipperApi->isPrinting()) {
       if (deps.klipperApi->getProgressData() == 100) {
-        return new SwitchSceneRequest(deps, SceneId::Printing100Percent, 7);
+        if (timer == nullptr) {
+          timer = new SceneTimer(7000);
+        } else if (timer->isCompleted()) {
+          return new SwitchSceneRequest(deps, SceneId::Printing100Percent);
+        }
       }
     } else {
       return new SwitchSceneRequest(deps, SceneId::Standby);
