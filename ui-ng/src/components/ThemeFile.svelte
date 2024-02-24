@@ -142,10 +142,6 @@
                     >
                 </form>
             </div>
-            <div data-tooltip="Not implemented yet.">
-                <!-- Had to be done on KNOMI because of CORS issue -->
-                <button type="submit" disabled="true">Restore Original</button>
-            </div>
         </div>
     </footer>
 </article>
@@ -171,9 +167,5 @@
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-
-    [data-tooltip] {
-        border-bottom: 0;
     }
 </style>

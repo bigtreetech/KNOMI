@@ -94,7 +94,7 @@
                 </label>
                 <button disabled={isSaving || null} type="submit">SAVE</button>
             </form>
-            <table role="grid">
+            <table role="grid" class="striped">
                 <thead>
                     <tr>
                         <th scope="col">Filename</th>

@@ -282,9 +282,6 @@
                 >
             </li>
         </ul>
-        <ul>
-            <li />
-        </ul>
     </nav>
 
     <Route path="/" redirect="/setup" />
@@ -553,7 +550,7 @@
     }
 
     nav a {
-        padding: 1em;
+        padding: 1em !important;
         margin: 0;
     }
 
