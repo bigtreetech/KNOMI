@@ -14,7 +14,6 @@ private:
 public:
   WifiAccessPoint() {
     IPAddress apIP(192, 9, 200, 1);
-    WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     if (WiFi.softAP(AP_SSID)) // 开启AP热点,如需要密码则添加第二个参数
     {

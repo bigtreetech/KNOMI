@@ -17,6 +17,7 @@ public:
   explicit WifiManager(Config *config) {
     this->config = config;
     this->networkConfig = config->getNetworkConfig();
+    WiFi.mode(WIFI_AP_STA);
   }
 
   ~WifiManager() { delete ap; }
