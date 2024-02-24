@@ -168,8 +168,4 @@
         justify-content: center;
         align-items: center;
     }
-
-    [data-tooltip] {
-        border-bottom: 0;
-    }
 </style>
