@@ -1,7 +1,8 @@
 #include "Button.h"
 
-Button::Button(Config *config) {
+Button::Button(WifiManager *mgr, Config *config) {
   this->config = config;
+  this->manager = mgr;
   pinMode(0, INPUT); // input mode; default -> high, pressed -> low.
   delay(200);
   currentState = HIGH;
@@ -21,10 +22,7 @@ void Button::KeyScan() {
     unsigned long pressDuration = releasedTime - pressedTime;
 
     if (pressDuration > WIFI_RESET_LONG_PRESS_MS) {
-      LV_LOG_INFO("Clearing wifi setup");
-      config->reset();
-      delay(100);
-      ESP.restart();
+      manager->resetWifi();
     }
   }
   lastState = currentState;

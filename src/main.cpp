@@ -57,7 +57,7 @@ __attribute__((unused)) void setup() {
   LV_LOG_INFO("Config created");
   wifiManager = new WifiManager(config);
   LV_LOG_INFO("WifiManager created");
-  btn = new Button(config);
+  btn = new Button(wifiManager, config);
   LV_LOG_INFO("Timer and button created");
   displayHAL = new DisplayHAL();
   LV_LOG_INFO("DisplayHAL created");

@@ -23,6 +23,7 @@ public:
   ~WifiManager() { delete ap; }
 
   void resetWifi() {
+    LV_LOG_INFO("Clearing wifi setup");
     config->reset();
     delay(500);
     WiFi.disconnect(true, true);

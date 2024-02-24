@@ -1,12 +1,13 @@
 #pragma once
 #include "../config/Config.h"
+#include "./network/WifiManager.h"
 #include <Arduino.h>
 #include <Ticker.h>
 
 class Button final {
 
 public:
-  explicit Button(Config *config);
+  explicit Button(WifiManager *mgr, Config *config);
   void KeyScan();
 
   static void KeyScan(Button *button) { button->KeyScan(); }
@@ -15,6 +16,7 @@ public:
 
 private:
   Config *config;
+  WifiManager *manager;
   Ticker timer;
 
   const int WIFI_RESET_LONG_PRESS_MS = 4000; // long press for ~4 sec
