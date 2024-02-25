@@ -2,10 +2,10 @@
     import { active, Route, router, meta } from "tinro";
     import { onDestroy } from "svelte";
     import voronLogo from "./assets/voron.svg";
-    import wifiBad from "./assets/wifi-bad.svg";
-    import wifiBarely from "./assets/wifi-barely.svg";
-    import wifiMiddle from "./assets/wifi-middle.svg";
-    import wifiOk from "./assets/wifi-ok.svg";
+    import wifiBad from "./assets/wifi-1.svg";
+    import wifiBarely from "./assets/wifi-2.svg";
+    import wifiMiddle from "./assets/wifi-3.svg";
+    import wifiOk from "./assets/wifi-4.svg";
     import wifiProtected from "./assets/protected.svg";
     import prettyBytes from "pretty-bytes";
     import SparkMD5 from "spark-md5/spark-md5";
