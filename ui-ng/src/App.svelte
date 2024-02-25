@@ -1,6 +1,12 @@
 <script lang="ts">
-    import { active, Route, router } from "tinro";
+    import { active, Route, router, meta } from "tinro";
+    import { onDestroy } from "svelte";
     import voronLogo from "./assets/voron.svg";
+    import wifiBad from "./assets/wifi-bad.svg";
+    import wifiBarely from "./assets/wifi-barely.svg";
+    import wifiMiddle from "./assets/wifi-middle.svg";
+    import wifiOk from "./assets/wifi-ok.svg";
+    import wifiProtected from "./assets/protected.svg";
     import prettyBytes from "pretty-bytes";
     import SparkMD5 from "spark-md5/spark-md5";
     import Theme from "./components/Theme.svelte";
@@ -19,6 +25,7 @@
     var buildTimestamp = "";
 
     var isSaving = false;
+    var isWifiFocused = false;
 
     var otaSuccess = false;
     var otaError: String | boolean = false;
@@ -28,9 +35,14 @@
     var accentColor = "";
     var backgroundColor = "";
     var availableUpdate = "";
+    var networks = [];
 
     var gateway = `ws://${window.location.hostname}/ws`;
     var websocket;
+
+    var interval: number;
+
+    router.mode.hash();
 
     async function load() {
         let response = await fetch("/api/status");
@@ -48,6 +60,26 @@
         backgroundColor = json.backgroundColor;
         initWebSocket();
         checkForUpdates();
+        interval = setTimeout(fetchNetworks, 3000);
+        onDestroy(() => clearTimeout(interval));
+    }
+
+    function setWifi(name: string) {
+        ssid = name;
+        return false;
+    }
+
+    async function fetchNetworks() {
+        if (window.location.hash.endsWith("/setup")) {
+            let response = await fetch("/api/scanWifi");
+            let json = await response.json();
+            networks = json;
+        }
+
+        interval = setTimeout(
+            fetchNetworks,
+            networks.length == 0 ? 1000 : 10000,
+        );
     }
 
     function getLocalStorageWithExpiry(key: string) {
@@ -290,11 +322,58 @@
             <form on:submit|preventDefault={saveSetup}>
                 <label class="input">
                     <span>WiFi SSID</span>
-                    <input
-                        disabled={isSaving || null}
-                        type="text"
-                        bind:value={ssid}
-                    />
+                    <div class="select-editable">
+                        <input
+                            disabled={isSaving || null}
+                            type="text"
+                            bind:value={ssid}
+                            on:focus={() => (isWifiFocused = true)}
+                            on:blur={() => (isWifiFocused = false)}
+                            style="margin-bottom: 0"
+                        />
+                        {#if !networks.length}
+                            <span aria-busy="true" class="wifiLoading" />
+                        {/if}
+                        <details class="dropdown" bind:open={isWifiFocused}>
+                            <summary
+                                style="display: none; margin: 0; padding:0;"
+                            />
+                            <ul>
+                                {#each networks as network}
+                                    <li>
+                                        <a
+                                            href="/#"
+                                            on:mousedown={() =>
+                                                setWifi(network.name)}
+                                            class="wifiNetworkItem"
+                                        >
+                                            <span class="wifiIcon"
+                                                ><!-- eslint-disable -->
+                                                {#if network.signal < -80}
+                                                    {@html wifiBarely}
+                                                {:else if network.signal < -70}
+                                                    {@html wifiBad}
+                                                {:else if network.signal < -60}
+                                                    {@html wifiMiddle}
+                                                {:else}
+                                                    {@html wifiOk}
+                                                {/if}
+                                                <!-- eslint-enable --></span
+                                            >
+                                            {#if !network.isPublic}
+                                                <span class="wifiProtected">
+                                                    <!-- eslint-disable -->
+                                                    {@html wifiProtected}
+                                                    <!-- eslint-enable -->
+                                                </span>
+                                            {/if}
+                                            <span>{network.name}</span>
+                                        </a>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </details>
+                    </div>
                 </label>
                 <label class="input">
                     <span>WiFi PASS</span>
@@ -503,8 +582,8 @@
                     bind:this={fileinput}
                 />
                 <button type="submit" disabled={!otaKind || !selectedFile}
-                    >Upload</button
-                >
+                    >Upload
+                </button>
             </form>
         {/if}
     </Route>
@@ -547,6 +626,38 @@
         box-sizing: content-box;
         will-change: filter;
         transition: filter 300ms;
+    }
+
+    .wifiNetworkItem {
+        display: block;
+    }
+
+    .wifiIcon {
+        width: 32px;
+        height: 32px;
+        display: inline-block;
+        box-sizing: content-box;
+    }
+
+    .wifiProtected {
+        width: 16px;
+        height: 16px;
+        margin-left: -16px;
+        margin-bottom: -16px;
+        display: inline-block;
+        box-sizing: content-box;
+        position: relative;
+        top: 8px;
+    }
+
+    .wifiLoading {
+        float: right;
+        width: 16px;
+        height: 16px;
+        z-index: 100;
+        position: relative;
+        top: -50px;
+        right: 24px;
     }
 
     nav a {
