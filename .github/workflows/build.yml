@@ -93,10 +93,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
 
       - name: Install Rust toolchain ${{ matrix.os }}
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Download Firmware Files
         uses: actions/download-artifact@v4
@@ -105,10 +102,7 @@ jobs:
           path: rs-flasher/resources
 
       - name: Build Flasher
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --manifest-path rs-flasher/Cargo.toml
+        run: cargo build --release --manifest-path rs-flasher/Cargo.toml
 
       - name: Copy result
         if: matrix.os == 'windows-latest'
