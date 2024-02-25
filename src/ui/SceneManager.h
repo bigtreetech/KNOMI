@@ -66,7 +66,9 @@ public:
       if (deps.klipperApi->isKlipperNotAvailable() && this->getCurrentSceneId() != SceneId::NoKlipper) {
         switchSceneRequest = new SwitchSceneRequest(deps, SceneId::NoKlipper);
       }
-    } else if (currentScene != nullptr) {
+    }
+
+    if (switchSceneRequest == nullptr) {
       switchSceneRequest = currentScene->NextScene();
     }
 
