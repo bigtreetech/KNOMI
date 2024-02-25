@@ -13,7 +13,7 @@
     import semver from "semver";
 
     let fileinput: HTMLInputElement;
-    let selectedFile : File | null;
+    let selectedFile: File | null;
 
     var ssid = "";
     var pass = "";

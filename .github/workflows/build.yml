@@ -140,12 +140,12 @@ jobs:
       name: github-releases
     steps:
     - name: Download Firmware Files
-      id: download1
+      id: download-firmware
       uses: actions/download-artifact@v4
       with:
         name: firmware
     - name: Download Flasher Files
-      id: download-mac
+      id: download-flasher
       uses: actions/download-artifact@v4
       with:
         pattern: flasher-*
@@ -168,10 +168,10 @@ jobs:
 
           ${{steps.build_changelog.outputs.changelog}}
         files: | 
-          ${{steps.download1.outputs.download-path}}/firmware_full.bin
-          ${{steps.download1.outputs.download-path}}/firmware.bin
-          ${{steps.download1.outputs.download-path}}/firmware.elf
-          ${{steps.download1.outputs.download-path}}/littlefs.bin
-          ${{steps.download-win.outputs.download-path}}/rs-flasher.exe
-          ${{steps.download-ubuntu.outputs.download-path}}/rs-flasher.linux-amd64
-          ${{steps.download-mac.outputs.download-path}}/rs-flasher.macOS
+          ${{steps.download-firmware.outputs.download-path}}/firmware_full.bin
+          ${{steps.download-firmware.outputs.download-path}}/firmware.bin
+          ${{steps.download-firmware.outputs.download-path}}/firmware.elf
+          ${{steps.download-firmware.outputs.download-path}}/littlefs.bin
+          ${{steps.download-flasher.outputs.download-path}}/rs-flasher.exe
+          ${{steps.download-flasher.outputs.download-path}}/rs-flasher.linux-amd64
+          ${{steps.download-flasher.outputs.download-path}}/rs-flasher.macOS
