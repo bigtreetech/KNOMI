@@ -20,7 +20,6 @@ public:
     this->config = config;
     this->networkConfig = config->getNetworkConfig();
     this->scanner = new WifiScanner();
-    WiFiClass::mode(WIFI_AP_STA);
   }
 
   ~WifiManager() {
@@ -54,8 +53,10 @@ public:
     // So the idea is:
     // - always have WifiStation working (and trying to reconnect + handling network config changes)
     // - if there is no connection from WifiStation - bring up WifiAccessPoint. Bring it down once WifiStation connects.
-
+    _isConnected = false;
     WiFiClass::hostname(this->networkConfig->getHostname());
+    WiFi.softAPsetHostname(this->networkConfig->getHostname().c_str());
+    WiFiClass::mode(WIFI_AP_STA);
 
     if (sta != nullptr) {
       delete sta;

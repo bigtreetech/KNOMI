@@ -7,6 +7,7 @@ class BootupLogoScene : public AbstractScene {
 private:
   WifiManager *wifiManager;
   ResourceImage *ri_logo = nullptr;
+  SceneTimer *timer = nullptr;
 
 public:
   explicit BootupLogoScene(SceneDeps deps) : AbstractScene(deps) {
@@ -15,12 +16,16 @@ public:
     LV_LOG_INFO("Loading boot logo");
     ri_logo = KnownResourceImages::get_BTT_LOGO();
     LV_LOG_INFO("Boot logo loaded");
+    timer = new SceneTimer(5000);
   }
 
-  ~BootupLogoScene() override { delete ri_logo; }
+  ~BootupLogoScene() override {
+    delete ri_logo;
+    delete timer;
+  }
 
   SwitchSceneRequest *NextScene() override {
-    if (wifiManager->isInConfigMode()) {
+    if (wifiManager->isInConfigMode() || timer->isCompleted()) {
       return new SwitchSceneRequest(deps, SceneId::APConfig);
     } else if (wifiManager->isConnected()) {
       // return new SwitchSceneRequest(deps, SceneId::Demo);

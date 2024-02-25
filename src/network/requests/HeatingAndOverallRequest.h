@@ -34,9 +34,9 @@ class HeatingAndOverallRequest : public KlipperApiRequest {
         print_status = 0;
       }
     }
-    LV_LOG_INFO("Ext: %s / %s, Bed: %s / %s, Status: %i / %s", text_ext_actual_temp.c_str(),
-                text_ext_target_temp.c_str(), text_bed_actual_temp.c_str(), text_bed_target_temp.c_str(), print_status,
-                text_print_status.c_str());
+    LV_LOG_DEBUG("Ext: %s / %s, Bed: %s / %s, Status: %i / %s", text_ext_actual_temp.c_str(),
+                 text_ext_target_temp.c_str(), text_bed_actual_temp.c_str(), text_bed_target_temp.c_str(), print_status,
+                 text_print_status.c_str());
   }
 
 public:

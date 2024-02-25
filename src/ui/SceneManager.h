@@ -60,7 +60,8 @@ public:
   void refreshScene() {
     if (deps.progress->isInProgress && this->getCurrentSceneId() != SceneId::FirmwareUpdate) {
       switchSceneRequest = new SwitchSceneRequest(deps, SceneId::FirmwareUpdate);
-    } else if (deps.mgr->isInConfigMode() && this->getCurrentSceneId() != SceneId::APConfig) {
+    } else if (deps.mgr->isInConfigMode() && this->getCurrentSceneId() != SceneId::APConfig &&
+               this->getCurrentSceneId() != SceneId::BootupLogo) {
       switchSceneRequest = new SwitchSceneRequest(deps, SceneId::APConfig);
     } else if (WiFi.isConnected() && !button->isPressed()) {
       if (deps.klipperApi->isKlipperNotAvailable() && this->getCurrentSceneId() != SceneId::NoKlipper) {

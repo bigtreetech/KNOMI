@@ -16,17 +16,17 @@ public:
   esp_err_t handler(httpd_req_t *req) override {
     auto foundNetworks = manager->scan();
 
-    JsonArray array;
+    JsonDocument doc;
+    JsonArray array = doc.add<JsonArray>();
     for (NetworkInfo info : foundNetworks) {
-      JsonObject obj;
+      JsonObject obj = array.add<JsonObject>();
       obj["name"] = info.networkName;
       obj["signal"] = info.signal;
       obj["isPublic"] = info.isPublic;
-      array.add(obj);
     }
 
     String output;
-    serializeJsonPretty(array, output);
+    serializeJsonPretty(doc, output);
 
     httpd_resp_send(req, output.c_str(), output.length());
     return ESP_OK;
