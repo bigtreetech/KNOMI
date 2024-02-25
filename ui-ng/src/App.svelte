@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { active, Route, router, meta } from "tinro";
+    import { active, Route, router } from "tinro";
     import { onDestroy } from "svelte";
     import voronLogo from "./assets/voron.svg";
     import wifiBad from "./assets/wifi-1.svg";
@@ -13,7 +13,7 @@
     import semver from "semver";
 
     let fileinput: HTMLInputElement;
-    let selectedFile: File;
+    let selectedFile : File | null;
 
     var ssid = "";
     var pass = "";
@@ -28,7 +28,7 @@
     var isWifiFocused = false;
 
     var otaSuccess = false;
-    var otaError: String | boolean = false;
+    var otaError: String | null = null;
     var otaProgress = false;
     var otaPercentage = 0;
     var otaKind = "";
@@ -60,7 +60,7 @@
         backgroundColor = json.backgroundColor;
         initWebSocket();
         checkForUpdates();
-        interval = setTimeout(fetchNetworks, 3000);
+        fetchNetworks();
         onDestroy(() => clearTimeout(interval));
     }
 
@@ -187,14 +187,14 @@
             isSaving = false;
             router.goto("/setupdone");
         } else if (res.status == 500) {
-            const error = res.json().error;
+            const error = (await res.json()).error;
             alert(error);
         }
         isSaving = false;
     }
 
     const onFileSelected = (e: Event) => {
-        selectedFile = e.target.files[0];
+        selectedFile = e.target!.files[0];
     };
 
     function retryOTA() {
