@@ -19,6 +19,7 @@ private:
   int width = 0;
   int height = 0;
   ulong nextFrame = 0;
+  bool playedTillEnd = false;
 
   // we don't own this
   DisplayHAL *currentHal;
@@ -36,7 +37,7 @@ public:
       this->width = gif->getCanvasWidth();
       this->height = gif->getCanvasHeight();
     }
-    LV_LOG_DEBUG(("Created resource image " + this->filename).c_str());
+    LV_LOG_RESOURCEIMAGE(("Created resource image " + this->filename).c_str());
   }
 
   void tick(GIFDRAW *pDraw) { currentHal->GIFDraw(pDraw, x, y, width, height); }
@@ -50,18 +51,24 @@ public:
 
     if (nextFrame < now) {
       int delay = 0;
-      if (!gif->playFrame(false, &delay, this) && delay == 0) {
+      int hasNextFrame = gif->playFrame(false, &delay, this);
+      if (!hasNextFrame && delay == 0) {
         delay = 10;
+      }
+      if (!hasNextFrame) {
+        playedTillEnd = true;
       }
       nextFrame = now + delay;
     }
   }
 
+  bool isPlayedToEnd() const { return playedTillEnd; }
+
   ~ResourceImage() {
-    LV_LOG_DEBUG(("Deleting resource image " + this->filename).c_str());
+    LV_LOG_RESOURCEIMAGE(("Deleting resource image " + this->filename).c_str());
     gif->close();
     delete gif;
-    LV_LOG_DEBUG(("Deleted resource image " + this->filename).c_str());
+    LV_LOG_RESOURCEIMAGE(("Deleted resource image " + this->filename).c_str());
   }
 
   static void *gifOpen(const char *szFilename, int32_t *pFileSize) {

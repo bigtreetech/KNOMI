@@ -12,8 +12,8 @@ public:
   ~HomingScene() override { delete ri_home; }
 
   SwitchSceneRequest *NextScene() override {
-    if (!deps.klipperApi->isHoming()) {
-      return new SwitchSceneRequest(deps, SceneId::Standby, 1);
+    if (!deps.klipperApi->isHoming() && ri_home->isPlayedToEnd()) {
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
   }

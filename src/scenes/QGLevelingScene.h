@@ -11,7 +11,7 @@ public:
   ~QGLevelingScene() override { delete ri_leveling; }
 
   SwitchSceneRequest *NextScene() override {
-    if (!deps.klipperApi->isQGLeveling()) {
+    if (!deps.klipperApi->isQGLeveling() && ri_leveling->isPlayedToEnd()) {
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;

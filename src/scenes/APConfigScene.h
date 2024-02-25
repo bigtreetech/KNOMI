@@ -20,7 +20,7 @@ public:
   }
 
   SwitchSceneRequest *NextScene() override {
-    if (deps.mgr->isConnected()) {
+    if (!deps.mgr->isInConfigMode()) {
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;

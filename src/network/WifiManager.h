@@ -1,6 +1,7 @@
 #pragma once
 #include "../config/Config.h"
 #include "WifiAccessPoint.h"
+#include "WifiScanner.h"
 #include "WifiStation.h"
 #include <esp_wifi.h>
 
@@ -10,18 +11,25 @@ private:
   NetworkConfig *networkConfig;
   WifiAccessPoint *ap = nullptr;
   WifiStation *sta = nullptr;
-
-  bool _isConnected = false;
+  WifiScanner *scanner = nullptr;
 
 public:
   explicit WifiManager(Config *config) {
     this->config = config;
     this->networkConfig = config->getNetworkConfig();
+    this->scanner = new WifiScanner();
   }
 
-  ~WifiManager() { delete ap; }
+  ~WifiManager() {
+    delete scanner;
+    delete ap;
+    delete sta;
+  }
+
+  std::vector<NetworkInfo> scan() { return this->scanner->scan(); }
 
   void resetWifi() {
+    LV_LOG_INFO("Clearing wifi setup");
     config->reset();
     delay(500);
     WiFi.disconnect(true, true);
@@ -31,66 +39,48 @@ public:
     ESP.restart();
   }
 
-  bool isConnected() const { return _isConnected; }
-
   bool isInConfigMode() { return this->ap != nullptr; }
 
   void connectToWiFi() {
-    int timeOut_s = 30;
-    WiFiClass::hostname(this->networkConfig->getHostname().c_str());
+    // We are using mode wifi ap+sta. This means ESP32 can both connect to existing wifi net AND handle AP.
+    // We don't want to have AP working when we have connection to wifi net established.
+    // At the same time we want always to have connection to wifi (and retried, if necessary).
+    // The fact that network configuration might change - it makes lives a little bit harder.
+    // So the idea is:
+    // - always have WifiStation working (and trying to reconnect + handling network config changes)
+    // - if there is no connection from WifiStation - bring up WifiAccessPoint. Bring it down once WifiStation connects.
+    WiFiClass::hostname(this->networkConfig->getHostname());
+    WiFi.softAPsetHostname(this->networkConfig->getHostname().c_str());
+    WiFiClass::mode(WIFI_AP_STA);
 
-    if (networkConfig->getSsid().isEmpty() || !config->isInitialised()) {
-      LV_LOG_INFO("Config is not initailised starting AP mode");
-      ap = new WifiAccessPoint();
-      return;
-    }
-    LV_LOG_INFO("We have config - let's try STA");
-
-    delete ap;
-    ap = nullptr;
-
-    sta = new WifiStation(networkConfig);
-
-    while (WiFiClass::status() != WL_CONNECTED && timeOut_s > 0) {
-      timeOut_s -= 1;
-      delay(1000);
-    }
-
-    if (WiFiClass::status() != WL_CONNECTED) {
-      LV_LOG_INFO("WIFI autoconnect fail, start AP for webconfig now...");
+    if (sta != nullptr) {
       delete sta;
       sta = nullptr;
-      this->ap = new WifiAccessPoint();
+    }
+    if (ap != nullptr) {
+      delete ap;
+      ap = nullptr;
+    }
+
+    if (networkConfig->getSsid().isEmpty() || !config->isInitialised()) {
       return;
     }
 
-    LV_LOG_INFO("STA connected");
-
-    if (WiFiClass::status() == WL_CONNECTED) // 如果连接成功
-    {
-      LV_LOG_INFO("WIFI connect Success");
-      LV_LOG_INFO("SSID:%s", WiFi.SSID().c_str());
-      LV_LOG_INFO(", PSW:%s\r\n", WiFi.psk().c_str());
-      LV_LOG_INFO("LocalIP:");
-      LV_LOG_INFO(WiFi.localIP().toString().c_str());
-      LV_LOG_INFO(" ,GateIP:");
-      LV_LOG_INFO(WiFi.gatewayIP().toString().c_str());
-
-      LV_LOG_INFO("WIFI status is:");
-      LV_LOG_INFO(String(WiFi.status()).c_str());
-
-      this->_isConnected = true;
-    }
+    sta = new WifiStation(networkConfig);
   }
 
   void tick() {
-    if (ap != nullptr)
+    if (ap != nullptr) {
       ap->tick();
 
-    if (WiFiClass::status() != WL_CONNECTED && WiFiClass::getMode() != WIFI_AP && WiFiClass::getMode() != WIFI_AP_STA) {
-      LV_LOG_INFO("WiFi Mode:");
-      LV_LOG_INFO(String(WiFi.getMode()).c_str());
-      connectToWiFi();
+      if (WiFi.isConnected()) {
+        delete ap;
+        ap = nullptr;
+      }
+    } else {
+      if (!WiFi.isConnected()) {
+        ap = new WifiAccessPoint();
+      }
     }
   }
 };

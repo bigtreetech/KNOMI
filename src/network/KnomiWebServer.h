@@ -20,6 +20,7 @@
 #include "pages/ApiDumpHeapGet.h"
 #include "pages/ApiListFilesGet.h"
 #include "pages/ApiRestartPageGet.h"
+#include "pages/ApiScanNetworks.h"
 #include "pages/ApiStatusGet.h"
 #include "pages/ApiThemeConfigPost.h"
 #include "pages/ApiUploadFileDelete.h"
@@ -41,6 +42,7 @@ private:
 
   RootPage *rootPage = nullptr;
   ApiRestartPageGet *apiRestartPageGet = nullptr;
+  ApiScanNetworks *apiScanNetworks = nullptr;
   ApiDumpHeapGet *apiDumpHeapGet = nullptr;
   ApiListFilesGet *apiListFilesGet = nullptr;
   ApiStatusGet *apiStatusGet = nullptr;
@@ -64,6 +66,7 @@ public:
   ~KnomiWebServer() {
     delete rootPage;
     delete apiRestartPageGet;
+    delete apiScanNetworks;
     delete apiDumpHeapGet;
     delete apiListFilesGet;
     delete apiStatusGet;
@@ -103,6 +106,7 @@ public:
         LV_LOG_INFO("Registering URI handlers");
         this->rootPage = new RootPage(server);
         this->apiRestartPageGet = new ApiRestartPageGet(server);
+        this->apiScanNetworks = new ApiScanNetworks(server, manager);
         this->apiDumpHeapGet = new ApiDumpHeapGet(server);
         this->apiListFilesGet = new ApiListFilesGet(server);
         this->apiStatusGet = new ApiStatusGet(config, server);

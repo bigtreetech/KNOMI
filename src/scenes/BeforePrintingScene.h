@@ -12,5 +12,9 @@ public:
 
   ~BeforePrintingScene() override { delete ri_before; }
 
-  SwitchSceneRequest *NextScene() override { return new SwitchSceneRequest(deps, SceneId::Printing); }
+  SwitchSceneRequest *NextScene() override {
+    if (ri_before->isPlayedToEnd())
+      return new SwitchSceneRequest(deps, SceneId::Printing);
+    return nullptr;
+  }
 };

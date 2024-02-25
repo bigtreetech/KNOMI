@@ -7,17 +7,21 @@
 
 class WifiAccessPoint {
 private:
-  const char *AP_SSID = "BTT-KNOMI";
-  const byte DNS_PORT = 53; // 设置DNS端口号
+  const char *AP_SSID = "BTT-KNOMI-";
+  const byte DNS_PORT = 53;
   DNSServer *dnsService = nullptr;
 
 public:
   WifiAccessPoint() {
+    unsigned int chipId = 0;
+    uint64_t mac = ESP.getEfuseMac();
+    for (int i = 0; i < 17; i = i + 8) {
+      chipId |= ((mac >> (40 - i)) & 0xff) << i;
+    }
+
     IPAddress apIP(192, 9, 200, 1);
-    WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    if (WiFi.softAP(AP_SSID)) // 开启AP热点,如需要密码则添加第二个参数
-    {
+    if (WiFi.softAP(String(AP_SSID) + String(chipId, HEX))) {
       vTaskDelay(100 / portTICK_PERIOD_MS); // Add a small delay
       dnsService = new DNSServer();
       dnsService->setErrorReplyCode(DNSReplyCode::NoError);
