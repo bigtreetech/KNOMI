@@ -37,7 +37,7 @@ public:
       this->width = gif->getCanvasWidth();
       this->height = gif->getCanvasHeight();
     }
-    LV_LOG_DEBUG(("Created resource image " + this->filename).c_str());
+    LV_LOG_RESOURCEIMAGE(("Created resource image " + this->filename).c_str());
   }
 
   void tick(GIFDRAW *pDraw) { currentHal->GIFDraw(pDraw, x, y, width, height); }
@@ -65,10 +65,10 @@ public:
   bool isPlayedToEnd() const { return playedTillEnd; }
 
   ~ResourceImage() {
-    LV_LOG_DEBUG(("Deleting resource image " + this->filename).c_str());
+    LV_LOG_RESOURCEIMAGE(("Deleting resource image " + this->filename).c_str());
     gif->close();
     delete gif;
-    LV_LOG_DEBUG(("Deleted resource image " + this->filename).c_str());
+    LV_LOG_RESOURCEIMAGE(("Deleted resource image " + this->filename).c_str());
   }
 
   static void *gifOpen(const char *szFilename, int32_t *pFileSize) {

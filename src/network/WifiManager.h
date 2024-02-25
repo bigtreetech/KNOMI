@@ -13,8 +13,6 @@ private:
   WifiStation *sta = nullptr;
   WifiScanner *scanner = nullptr;
 
-  bool _isConnected = false;
-
 public:
   explicit WifiManager(Config *config) {
     this->config = config;
@@ -41,8 +39,6 @@ public:
     ESP.restart();
   }
 
-  bool isConnected() const { return _isConnected; }
-
   bool isInConfigMode() { return this->ap != nullptr; }
 
   void connectToWiFi() {
@@ -53,7 +49,6 @@ public:
     // So the idea is:
     // - always have WifiStation working (and trying to reconnect + handling network config changes)
     // - if there is no connection from WifiStation - bring up WifiAccessPoint. Bring it down once WifiStation connects.
-    _isConnected = false;
     WiFiClass::hostname(this->networkConfig->getHostname());
     WiFi.softAPsetHostname(this->networkConfig->getHostname().c_str());
     WiFiClass::mode(WIFI_AP_STA);
@@ -86,21 +81,6 @@ public:
       if (!WiFi.isConnected()) {
         ap = new WifiAccessPoint();
       }
-    }
-
-    if (!_isConnected && WiFi.isConnected()) {
-      LV_LOG_INFO("WIFI connect Success");
-      LV_LOG_INFO("SSID:%s", WiFi.SSID().c_str());
-      LV_LOG_INFO(", PSW:%s\r\n", WiFi.psk().c_str());
-      LV_LOG_INFO("LocalIP:");
-      LV_LOG_INFO(WiFi.localIP().toString().c_str());
-      LV_LOG_INFO(" ,GateIP:");
-      LV_LOG_INFO(WiFi.gatewayIP().toString().c_str());
-
-      LV_LOG_INFO("WIFI status is:");
-      LV_LOG_INFO(String(WiFi.status()).c_str());
-
-      this->_isConnected = true;
     }
   }
 };
