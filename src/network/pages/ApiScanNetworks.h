@@ -17,9 +17,8 @@ public:
     auto foundNetworks = manager->scan();
 
     JsonDocument doc;
-    JsonArray array = doc.add<JsonArray>();
     for (NetworkInfo info : foundNetworks) {
-      JsonObject obj = array.add<JsonObject>();
+      JsonObject obj = doc.add<JsonObject>();
       obj["name"] = info.networkName;
       obj["signal"] = info.signal;
       obj["isPublic"] = info.isPublic;
