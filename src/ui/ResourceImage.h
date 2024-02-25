@@ -53,14 +53,16 @@ public:
       int delay = 0;
       int hasNextFrame = gif->playFrame(false, &delay, this);
       if (!hasNextFrame && delay == 0) {
-        playedTillEnd = true;
         delay = 10;
+      }
+      if (!hasNextFrame) {
+        playedTillEnd = true;
       }
       nextFrame = now + delay;
     }
   }
 
-  bool isPlayedToEnd() { return playedTillEnd; }
+  bool isPlayedToEnd() const { return playedTillEnd; }
 
   ~ResourceImage() {
     LV_LOG_DEBUG(("Deleting resource image " + this->filename).c_str());
