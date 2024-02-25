@@ -1,6 +1,7 @@
 #pragma once
 #include "../config/Config.h"
 #include "WifiAccessPoint.h"
+#include "WifiScanner.h"
 #include "WifiStation.h"
 #include <esp_wifi.h>
 
@@ -10,6 +11,7 @@ private:
   NetworkConfig *networkConfig;
   WifiAccessPoint *ap = nullptr;
   WifiStation *sta = nullptr;
+  WifiScanner *scanner = nullptr;
 
   bool _isConnected = false;
 
@@ -17,13 +19,17 @@ public:
   explicit WifiManager(Config *config) {
     this->config = config;
     this->networkConfig = config->getNetworkConfig();
-    WiFi.mode(WIFI_AP_STA);
+    this->scanner = new WifiScanner();
+    WiFiClass::mode(WIFI_AP_STA);
   }
 
   ~WifiManager() {
+    delete scanner;
     delete ap;
     delete sta;
   }
+
+  std::vector<NetworkInfo> scan() { return this->scanner->scan(); }
 
   void resetWifi() {
     LV_LOG_INFO("Clearing wifi setup");
