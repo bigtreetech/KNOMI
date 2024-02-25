@@ -19,6 +19,7 @@ private:
   int width = 0;
   int height = 0;
   ulong nextFrame = 0;
+  bool playedTillEnd = false;
 
   // we don't own this
   DisplayHAL *currentHal;
@@ -50,12 +51,16 @@ public:
 
     if (nextFrame < now) {
       int delay = 0;
-      if (!gif->playFrame(false, &delay, this) && delay == 0) {
+      int hasNextFrame = gif->playFrame(false, &delay, this);
+      if (!hasNextFrame && delay == 0) {
+        playedTillEnd = true;
         delay = 10;
       }
       nextFrame = now + delay;
     }
   }
+
+  bool isPlayedToEnd() { return playedTillEnd; }
 
   ~ResourceImage() {
     LV_LOG_DEBUG(("Deleting resource image " + this->filename).c_str());

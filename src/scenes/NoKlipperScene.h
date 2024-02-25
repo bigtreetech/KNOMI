@@ -13,7 +13,7 @@ public:
   ~NoKlipperScene() override { delete ri_disconnect; }
   SwitchSceneRequest *NextScene() override {
     if (!deps.klipperApi->isKlipperNotAvailable()) {
-      return new SwitchSceneRequest(deps, SceneId::Standby, 0);
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
     return nullptr;
   }

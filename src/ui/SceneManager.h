@@ -10,7 +10,6 @@
 
 class SceneManager {
 private:
-  uint8_t timer_contne = 0;
   AbstractScene *currentScene = nullptr;
   SceneId currentSceneId;
   SwitchSceneRequest *switchSceneRequest = nullptr;
@@ -60,40 +59,20 @@ public:
 
   void refreshScene() {
     if (deps.progress->isInProgress && this->getCurrentSceneId() != SceneId::FirmwareUpdate) {
-      switchSceneRequest = new SwitchSceneRequest(deps, SceneId::FirmwareUpdate, 0);
+      switchSceneRequest = new SwitchSceneRequest(deps, SceneId::FirmwareUpdate);
+    } else if (deps.mgr->isInConfigMode() && this->getCurrentSceneId() != SceneId::APConfig) {
+      switchSceneRequest = new SwitchSceneRequest(deps, SceneId::APConfig);
     } else if (WiFi.isConnected() && !button->isPressed()) {
       if (deps.klipperApi->isKlipperNotAvailable() && this->getCurrentSceneId() != SceneId::NoKlipper) {
-        switchSceneRequest = new SwitchSceneRequest(deps, SceneId::NoKlipper, 0);
+        switchSceneRequest = new SwitchSceneRequest(deps, SceneId::NoKlipper);
       }
+    } else if (currentScene != nullptr) {
+      switchSceneRequest = currentScene->NextScene();
     }
-    Timer();
 
     if (currentScene != nullptr) {
       currentScene->Tick();
       switchSceneIfRequired();
-    }
-  }
-
-  uint32_t lastTime = 0;
-  void Timer() {
-    uint32_t nowTime = millis();
-    if (nowTime - lastTime < 500)
-      return;
-    lastTime = nowTime;
-
-    if (timer_contne > 0)
-      timer_contne--;
-
-    if (timer_contne == 0) {
-      if (currentScene != nullptr) {
-        // todo reimplement this timer_contne to scene actually being able to track it's lifetime in millis
-        // and nextscene();
-        timer_contne = 5;
-        switchSceneRequest = currentScene->NextScene();
-        if (switchSceneRequest != nullptr && switchSceneRequest->timerOverride >= 0) {
-          timer_contne = switchSceneRequest->timerOverride;
-        }
-      }
     }
   }
 };

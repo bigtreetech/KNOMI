@@ -6,6 +6,7 @@
 #include "log.h"
 #include "ui/Arc.h"
 #include "ui/DisplayHAL.h"
+#include "ui/SceneTimer.h"
 #include "ui/TextLabel.h"
 
 class AbstractScene {
