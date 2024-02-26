@@ -21,19 +21,8 @@ public:
   }
 
   SwitchSceneRequest *NextScene() override {
-    if ((deps.klipperApi->getExtruderActualTempValue() >= deps.klipperApi->getExtruderTargetTempValue()) &&
-        (deps.klipperApi->getExtruderTargetTempValue() != 0)) {
-      // heated fully...
-
-      if (!deps.klipperApi->isPrinting()) {
-        return new SwitchSceneRequest(deps, SceneId::Standby);
-      } else {
-        return new SwitchSceneRequest(deps, SceneId::BeforePrint);
-      }
-    } else {
-      if (deps.klipperApi->getExtruderTargetTempValue() == 0) {
-        return new SwitchSceneRequest(deps, SceneId::Printing);
-      }
+    if (!deps.klipperApi->isHeatingBed()) {
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
 
     return nullptr;

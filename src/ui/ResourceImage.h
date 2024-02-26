@@ -19,13 +19,14 @@ private:
   int width = 0;
   int height = 0;
   ulong nextFrame = 0;
-  bool playedTillEnd = false;
+  bool playedTillEnd;
 
   // we don't own this
   DisplayHAL *currentHal;
 
 public:
   ResourceImage(const String &filename, int x, int y) {
+    this->playedTillEnd = false;
     this->filename = "/" + filename;
     this->x = x;
     this->y = y;
@@ -36,6 +37,9 @@ public:
     if (gif->open(szFilename, gifOpen, gifClose, gifRead, gifSeek, gifDraw)) {
       this->width = gif->getCanvasWidth();
       this->height = gif->getCanvasHeight();
+    } else {
+      LV_LOG_WARN("Failed to open %s", szFilename);
+      this->playedTillEnd = true;
     }
     LV_LOG_RESOURCEIMAGE(("Created resource image " + this->filename).c_str());
   }

@@ -12,8 +12,8 @@ class KnomiStatusRequest : public KlipperApiRequest {
     isHeatingNozzle = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["heating_nozzle"].as<bool>();
     isHeatingBed = doc["result"]["status"]["gcode_macro _KNOMI_STATUS"]["heating_bed"].as<bool>();
 
-    LV_LOG_INFO("Knomi status: isHoming: %d, isProbing: %d, isQgling: %d, heatingNozzle: %d, heatingBed: %d", isHoming,
-                isProbing, isQgling, isHeatingNozzle, isHeatingBed);
+    LV_LOG_DEBUG("Knomi status: isHoming: %d, isProbing: %d, isQgling: %d, heatingNozzle: %d, heatingBed: %d", isHoming,
+                 isProbing, isQgling, isHeatingNozzle, isHeatingBed);
   }
 
 public:

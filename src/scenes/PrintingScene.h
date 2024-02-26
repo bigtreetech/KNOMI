@@ -14,15 +14,10 @@ public:
       return nullptr;
 
     if (deps.klipperApi->isPrinting()) {
-      if (deps.klipperApi->getProgressData() == 100) {
-        return new SwitchSceneRequest(deps, SceneId::Printing100Percent);
-      } else if (deps.klipperApi->getProgressData() >= 1) {
-        return new SwitchSceneRequest(deps, SceneId::Printing1Percent);
-      }
+      return new SwitchSceneRequest(deps, SceneId::Printing1Percent);
     } else {
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
-    return nullptr;
   }
 
   void Tick() override { ri_printing->tick(deps.displayHAL); }
