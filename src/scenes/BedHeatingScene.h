@@ -21,11 +21,10 @@ public:
   }
 
   SwitchSceneRequest *NextScene() override {
-    if (deps.klipperApi->getBedActualTempValue() >= deps.klipperApi->getBedTargetTempValue() &&
-            deps.klipperApi->getBedTargetTemp() != 0 ||
-        deps.klipperApi->getBedTargetTemp() == 0) {
-      return new SwitchSceneRequest(deps, SceneId::ExtruderHeating);
+    if (!deps.klipperApi->isHeatingBed()) {
+      return new SwitchSceneRequest(deps, SceneId::Standby);
     }
+
     return nullptr;
   }
 

@@ -17,4 +17,6 @@ public:
       return new SwitchSceneRequest(deps, SceneId::Printing);
     return nullptr;
   }
+
+  void Tick() override { ri_before->tick(deps.displayHAL); }
 };

@@ -17,8 +17,12 @@ public:
       return new SwitchSceneRequest(deps, SceneId::Leveling);
     else if (deps.klipperApi->isQGLeveling())
       return new SwitchSceneRequest(deps, SceneId::QGLeveling);
-    else if (deps.klipperApi->isPrinting() || deps.klipperApi->isHeating())
+    else if (deps.klipperApi->isHeatingBed())
       return new SwitchSceneRequest(deps, SceneId::BedHeating);
+    else if (deps.klipperApi->isHeatingNozzle())
+      return new SwitchSceneRequest(deps, SceneId::ExtruderHeating);
+    else if (deps.klipperApi->isPrinting())
+      return new SwitchSceneRequest(deps, SceneId::BeforePrint);
     else if (ri_voron->isPlayedToEnd())
       return new SwitchSceneRequest(deps, SceneId::Standby);
     else

@@ -16,7 +16,7 @@ class PrintingRequest : public KlipperApiRequest {
       result = String(datas);
       nameStrpriting = result;
     }
-    LV_LOG_INFO(nameStrpriting.c_str());
+    LV_LOG_DEBUG(nameStrpriting.c_str());
   }
 
 public:

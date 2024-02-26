@@ -36,9 +36,8 @@ public:
   bool isLeveling() const { return req3.isProbing; }
   bool isQGLeveling() const { return req3.isQgling; }
   bool isPrinting() const { return req1.print_status == 1; }
-  bool isHeating() const {
-    return req1.bedtemp_actual < req1.bedtemp_target || req1.tooltemp_actual < req1.tooltemp_target;
-  }
+  bool isHeatingBed() const { return req3.isHeatingBed; }
+  bool isHeatingNozzle() const { return req3.isHeatingNozzle; }
 
   ulong getLastSuccessfullCall() const {
     ulong lastCall1 = req1.getLastSuccessfullCall();
