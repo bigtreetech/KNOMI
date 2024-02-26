@@ -21,7 +21,7 @@ public:
   }
 
   SwitchSceneRequest *NextScene() override {
-    if (!deps.klipperApi->isHeatingBed()) {
+    if (!deps.klipperApi->isHeatingNozzle()) {
       return new SwitchSceneRequest(deps, SceneId::Standby);
     }
 
