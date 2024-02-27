@@ -11,7 +11,7 @@ public:
   ~VoronScene() override { delete ri_voron; }
 
   SwitchSceneRequest *NextScene() override {
-    if (deps.klipperApi->isPrinting())
+    if (deps.klipperApi->isHoming())
       return new SwitchSceneRequest(deps, SceneId::Homing);
     else if (deps.klipperApi->isLeveling())
       return new SwitchSceneRequest(deps, SceneId::Leveling);
