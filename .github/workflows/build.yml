@@ -156,7 +156,7 @@ jobs:
       uses: mikepenz/release-changelog-builder-action@v4.2.0
 
     - name: Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         body: | 
           Files published:
