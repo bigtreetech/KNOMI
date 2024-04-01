@@ -21,7 +21,7 @@
     "devDependencies": {
         "@gfx/zopfli": "^1.0.14",
         "@sveltejs/vite-plugin-svelte": "^2.5.3",
-        "@tsconfig/svelte": "^5.0.3",
+        "@tsconfig/svelte": "^5.0.4",
         "@types/semver": "^7.5.8",
         "@types/spark-md5": "^3.0.4",
         "@typescript-eslint/parser": "^7.3.1",
