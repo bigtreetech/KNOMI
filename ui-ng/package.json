@@ -38,7 +38,7 @@
         "tinro": "^0.6.12",
         "tslib": "^2.6.2",
         "typescript": "^5.4.3",
-        "vite": "^4.5.1",
+        "vite": "^4.5.3",
         "vite-plugin-compression2": "^1.0.0",
         "vite-plugin-singlefile": "^0.13.5",
         "vite-plugin-svgo": "^1.4.0"
