@@ -19,4 +19,4 @@ miette = { version = "5.10.0", features = ["fancy"] }
 log = "0.4.21"
 serde = "1.0.197"
 serde_json = "1.0.115"
-chrono = "0.4.35"
+chrono = "0.4.37"
