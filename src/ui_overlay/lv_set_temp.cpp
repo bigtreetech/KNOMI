@@ -144,7 +144,7 @@ void lv_loop_set_temp_screen(void) {
         if (event == KNOB_INC) {
             frontend_target += TARGET_INC;
             lv_img_set_angle(ui_img_set_temp_dial, angle += DIAL_ANGLE_INC);
-        } else if (event == KNOB_DEC) {
+        } else if (event == KNOB_DEC && (frontend_target - TARGET_INC >= 0)) {
             frontend_target -= TARGET_INC;
             lv_img_set_angle(ui_img_set_temp_dial, angle -= DIAL_ANGLE_INC);
         }
